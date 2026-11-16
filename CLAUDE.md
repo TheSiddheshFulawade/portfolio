@@ -19,7 +19,7 @@ Monorepo:
 - Accessibility: WCAG 2.2 AA. Respect `prefers-reduced-motion`.
 - Employer work (ReBIT / e-Kuber) is experience only: resume-level facts, no system
   diagrams, internal names, code, volumes or logos. Settlement Lab is original work.
-- Never read or write secrets (`.env*`, `*.pem`, `secrets/`). Never push to `main` directly.
+- Never read or write secrets (`.env*`, `*.pem`, `secrets/`). Never push to `main` or `develop` directly.
 - `docs/private/` holds personal documents. Never copy anything from it into a tracked file
   without the user's approval (no phone number, no personal email).
 
@@ -34,7 +34,14 @@ Load the matching skill before working in an area:
 
 ## Workflow
 `/spec-new` → you approve → `/spec-design` → you approve → `/spec-tasks` →
-`/implement <spec> <task>` (one task per session) → `/review` → PR → `/handoff`
+`/implement <spec> <task>` (one task per session) → `/review` → `/ship` → `/handoff`
+
+## Branches
+- `main`: production. Changes only through a release PR from `develop` (`/release`), merge commit, tag `vX.Y.Z`.
+- `develop`: integration. Changes only through PRs from short-lived branches, squash-merged.
+- Work branches from `develop`: `feature/<spec>-<task>` (e.g. `feature/010-T03`), `fix/<topic>`, `chore/<topic>`.
+- `/ship` pushes the branch, opens the PR to `develop`, posts the review on it, and merges only after the user says yes.
+- Merging and pushing always need the user's explicit go-ahead in the current session.
 
 ## Definition of done
 Task ticked in tasks.md · tests green · quality gate passes · `/review` has no high findings ·

@@ -7,7 +7,10 @@ The rules every spec, agent and session must follow. Changing this file requires
 1.2 Each spec has two human approval gates: after `requirements.md` and after `design.md`.
 1.3 `tasks.md` lists small tasks (≤ half a day). Each task names the test written first.
 1.4 One task per Claude session. Sessions end with `/handoff`.
-1.5 All work lands through pull requests. `main` is always deployable.
+1.5 All work lands through pull requests: work branches → `develop` (squash merge) →
+    `main` (release PR, merge commit, version tag). `main` is always deployable; `develop` always builds.
+1.6 Every PR to `develop` carries the `/review` findings as a PR comment, and no high or critical
+    finding is open when it merges. The user approves every merge.
 
 ## 2. Quality
 2.1 Tests first. A task is not started until its failing test exists.
