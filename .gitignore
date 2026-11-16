@@ -1,0 +1,36 @@
+# Personal documents and secrets: never commit
+docs/private/
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+
+# Claude Code local-only settings
+.claude/settings.local.json
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+
+# Java / Maven
+target/
+*.class
+hs_err_pid*
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini

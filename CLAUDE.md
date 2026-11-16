@@ -1,0 +1,44 @@
+# Portfolio: Siddhesh Fulawade
+
+Personal portfolio for a full stack Java engineer (payments, distributed systems) targeting
+engineering roles at global banks. Built with Claude Code using spec-driven development.
+
+Monorepo:
+- `apps/web`  Angular (standalone, signals, zoneless), prerendered (SSG)
+- `apps/api`  Spring Boot 4, Java 25, hosts Settlement Lab + contact API
+- `content/`  YAML/Markdown, the single source of truth for all site content
+- `specs/`    one folder per feature: requirements.md, design.md, tasks.md
+- `docs/`     brief, ADRs, session handoffs, blueprint
+
+## Non-negotiables (full text: specs/000-constitution.md)
+- No spec, no code. Implement only tasks from an approved `specs/NNN-*/tasks.md`.
+- Tests first for every task. Coverage gates: api ≥85% lines, web ≥80% lines.
+- Never hard-code content in components. Read it from `content/` through the content loader.
+- No new runtime dependency without an ADR in `docs/adr/`.
+- Budgets: initial JS ≤120 KB gzipped, LCP ≤1.8 s on mobile, CLS ≤0.05.
+- Accessibility: WCAG 2.2 AA. Respect `prefers-reduced-motion`.
+- Employer work (ReBIT / e-Kuber) is experience only: resume-level facts, no system
+  diagrams, internal names, code, volumes or logos. Settlement Lab is original work.
+- Never read or write secrets (`.env*`, `*.pem`, `secrets/`). Never push to `main` directly.
+- `docs/private/` holds personal documents. Never copy anything from it into a tracked file
+  without the user's approval (no phone number, no personal email).
+
+## Commands
+Web (from apps/web, once spec 001 creates it): `npm run dev | test | e2e | lint | typecheck | build`
+API (from apps/api): `./mvnw verify` · native: `./mvnw -Pnative package` (Windows: `mvnw.cmd`)
+
+## Where knowledge lives
+Load the matching skill before working in an area:
+- design-system · angular-standards · spring-standards · spec-driven
+- content-model · security-baseline · testing-playbook
+
+## Workflow
+`/spec-new` → you approve → `/spec-design` → you approve → `/spec-tasks` →
+`/implement <spec> <task>` (one task per session) → `/review` → PR → `/handoff`
+
+## Definition of done
+Task ticked in tasks.md · tests green · quality gate passes · `/review` has no high findings ·
+CHANGELOG entry · `/handoff` written at the end of the session.
+
+## Environment
+Windows 11. Hooks are Node scripts so they run the same in CI. Use forward slashes in paths.

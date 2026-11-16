@@ -1,0 +1,1104 @@
+<title>Portfolio Build Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: single reading column (~72ch) with wide breakout bands for diagrams, tables and UI mockups. Ledger paper + settlement teal. */
+:root{
+  --bg:#F4F5F2; --surface:#FFFFFF; --ink:#14191D; --muted:#56626C; --line:#DCE0DA;
+  --accent:#0A6964; --accent-soft:#E0EFEC; --warn:#8E5406; --warn-soft:#FAEFD9; --code-bg:#EEF1ED;
+  --font-display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1215; --surface:#151B1F; --ink:#E3E8EB; --muted:#95A2AB; --line:#27313A;
+  --accent:#4DC2B4; --accent-soft:#14302E; --warn:#E5AA4A; --warn-soft:#30250F; --code-bg:#11171B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1215; --surface:#151B1F; --ink:#E3E8EB; --muted:#95A2AB; --line:#27313A;
+  --accent:#4DC2B4; --accent-soft:#14302E; --warn:#E5AA4A; --warn-soft:#30250F; --code-bg:#11171B; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:1080px;margin:0 auto}
+.read{max-width:760px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2.1rem,5vw,3.2rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.55rem,3vw,2rem);font-weight:600}
+h3{font-size:1.18rem;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,pre,.mono{font-family:var(--font-mono)}
+code{font-size:.88em;background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:.82rem;line-height:1.55;margin:0}
+pre code{background:none;padding:0}
+.eyebrow{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.15rem;color:var(--muted);max-width:62ch}
+.stack{display:flex;flex-direction:column;gap:16px}
+section{padding-block:56px 8px;border-top:1px solid var(--line);margin-top:48px;display:flex;flex-direction:column;gap:20px}
+section > .sec-head{display:flex;flex-direction:column;gap:8px}
+.muted{color:var(--muted)}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:6px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.grid2>*,.grid3>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:14px 18px;border-radius:0 8px 8px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout strong{display:block;margin-bottom:4px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:720px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--code-bg)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;white-space:nowrap}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:.72rem;padding:1px 7px;border:1px solid var(--line);border-radius:999px;color:var(--muted);white-space:nowrap}
+.tag.a{color:var(--accent);border-color:var(--accent)}
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:4px 24px;padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:10px;list-style:none;margin:0}
+.toc li a{text-decoration:none;color:var(--ink);display:flex;gap:10px;padding:3px 0}
+.toc li a span{font-family:var(--font-mono);color:var(--accent);font-size:.82rem;padding-top:2px;min-width:2ch}
+.toc li a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--surface)}
+.kpi b{display:block;font-family:var(--font-mono);font-size:1.3rem;font-variant-numeric:tabular-nums;color:var(--accent)}
+.kpi span{font-size:.85rem;color:var(--muted)}
+.phase{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:16px 0;border-bottom:1px dashed var(--line)}
+.phase:last-child{border-bottom:0}
+.phase .when{font-family:var(--font-mono);font-size:.8rem;color:var(--muted)}
+.phase .when b{display:block;color:var(--accent);font-size:.95rem}
+.phase>div{min-width:0}
+@media (max-width:620px){.phase{grid-template-columns:1fr;gap:6px}}
+.mermaid-box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto}
+.caption{font-size:.88rem;color:var(--muted)}
+
+/* ---------- UI MOCKUPS: the proposed site's own look (dark-first product, fixed palette) ---------- */
+.shot{display:flex;flex-direction:column;gap:10px}
+.shot-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px}
+.frame{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0A0E13}
+.frame-scroll{overflow-x:auto}
+.mock{
+  --m-bg:#0A0E13;--m-panel:#10161D;--m-raise:#16202A;--m-line:#1F2B36;--m-text:#D9E1E8;--m-dim:#7E8C99;
+  --m-teal:#4FD1C5;--m-amber:#F2B84B;--m-red:#F07A6E;
+  background:var(--m-bg);color:var(--m-text);font-family:var(--font-body);font-size:13px;line-height:1.5;min-width:900px;color-scheme:dark}
+.mock.narrow{min-width:0;width:360px;margin:0 auto}
+.m-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#121820;border-bottom:1px solid #1F2B36}
+.m-bar i{width:9px;height:9px;border-radius:50%;background:#2A3540;display:block}
+.m-url{margin-left:10px;font-family:var(--font-mono);font-size:11px;color:#7E8C99;background:#0A0E13;padding:3px 10px;border-radius:5px}
+.m-nav{display:flex;align-items:center;gap:22px;padding:14px 28px;border-bottom:1px solid var(--m-line)}
+.m-logo{font-family:var(--font-mono);font-size:12px;color:var(--m-teal)}
+.m-logo em{color:var(--m-dim);font-style:normal}
+.m-nav nav{display:flex;gap:18px;margin-left:auto;color:var(--m-dim);font-size:12.5px}
+.m-nav nav b{color:var(--m-text);font-weight:500}
+.m-k{font-family:var(--font-mono);font-size:10.5px;border:1px solid var(--m-line);border-radius:4px;padding:1px 6px;color:var(--m-dim)}
+.m-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:7px 12px;border-radius:6px;border:1px solid var(--m-line);color:var(--m-text);background:var(--m-panel);white-space:nowrap}
+.m-btn.p{background:var(--m-teal);color:#06211F;border-color:var(--m-teal);font-weight:600}
+.m-body{padding:30px 28px}
+.m-eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--m-teal)}
+.m-h1{font-family:var(--font-display);font-weight:600;font-size:38px;line-height:1.08;letter-spacing:-.01em;margin:10px 0 12px;color:#EEF3F6}
+.m-h2{font-family:var(--font-display);font-weight:600;font-size:22px;color:#EEF3F6;margin:0 0 8px}
+.m-p{color:var(--m-dim);max-width:46ch}
+.m-panel{background:var(--m-panel);border:1px solid var(--m-line);border-radius:10px}
+.m-row{display:flex;gap:10px;flex-wrap:wrap}
+.m-mono{font-family:var(--font-mono)}
+.m-dim{color:var(--m-dim)}
+.m-teal{color:var(--m-teal)}
+.m-amber{color:var(--m-amber)}
+.m-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--m-line);color:var(--m-dim)}
+.m-pill.ok{color:var(--m-teal);border-color:#245A55}
+.m-pill.warn{color:var(--m-amber);border-color:#5C4720}
+.m-dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+.m-kpi{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;padding:11px 14px;border-bottom:1px solid var(--m-line)}
+.m-kpi:last-child{border-bottom:0}
+.m-kpi b{font-family:var(--font-mono);font-size:19px;font-weight:500;color:#EEF3F6;font-variant-numeric:tabular-nums}
+.m-kpi small{color:var(--m-dim);font-size:11px}
+.spark path{fill:none;stroke-width:1.6}
+.s-teal{stroke:#4FD1C5}.s-amber{stroke:#F2B84B}.s-red{stroke:#F07A6E}.s-grid{stroke:#1F2B36}
+.f-teal{fill:rgba(79,209,197,.12)}
+.flow{display:flex;align-items:center;gap:0;font-family:var(--font-mono);font-size:10.5px;color:var(--m-dim)}
+.flow .node{border:1px solid var(--m-line);background:var(--m-raise);padding:4px 8px;border-radius:5px;white-space:nowrap}
+.flow .node.hot{border-color:#245A55;color:var(--m-teal)}
+.flow .wire{flex:1;min-width:26px;height:1px;background:var(--m-line);position:relative;overflow:hidden}
+.flow .wire::after{content:"";position:absolute;top:-1px;left:-20%;width:14px;height:3px;border-radius:2px;background:var(--m-teal);animation:pkt 1.6s linear infinite}
+.flow .wire:nth-of-type(4)::after{animation-delay:.4s}
+.flow .wire:nth-of-type(6)::after{animation-delay:.8s}
+@keyframes pkt{to{left:110%}}
+@media (prefers-reduced-motion:reduce){.flow .wire::after{animation:none;left:45%}}
+.m-chip{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--m-line);color:var(--m-dim)}
+.m-chip.on{background:#123432;border-color:#245A55;color:var(--m-teal)}
+.m-card{background:var(--m-panel);border:1px solid var(--m-line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.m-tags{display:flex;gap:6px;flex-wrap:wrap}
+.m-tags span{font-family:var(--font-mono);font-size:10px;color:var(--m-dim);border:1px solid var(--m-line);padding:1px 6px;border-radius:4px}
+.m-log{font-family:var(--font-mono);font-size:10.5px;line-height:1.7;color:var(--m-dim);padding:10px 12px;background:#080B0F;border-top:1px solid var(--m-line)}
+.m-seg{display:inline-flex;border:1px solid var(--m-line);border-radius:6px;overflow:hidden;font-size:11px}
+.m-seg span{padding:5px 10px;color:var(--m-dim)}
+.m-seg span.on{background:#123432;color:var(--m-teal)}
+.m-slider{height:4px;background:var(--m-line);border-radius:2px;position:relative;margin-top:8px}
+.m-slider::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--v);background:var(--m-teal);border-radius:2px}
+.m-slider::after{content:"";position:absolute;left:calc(var(--v) - 6px);top:-4px;width:12px;height:12px;border-radius:50%;background:#EEF3F6}
+.m-check{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
+.m-check i{width:13px;height:13px;border:1px solid var(--m-line);border-radius:3px;display:inline-block}
+.m-check i.on{background:var(--m-amber);border-color:var(--m-amber)}
+.m-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--m-dim)}
+.m-tl{position:relative;padding-left:26px;display:flex;flex-direction:column;gap:18px}
+.m-tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--m-line)}
+.m-tl .it{position:relative}
+.m-tl .it::before{content:"";position:absolute;left:-23px;top:5px;width:9px;height:9px;border-radius:50%;border:2px solid var(--m-teal);background:var(--m-bg)}
+.m-tl .it.old::before{border-color:var(--m-dim)}
+.m-box{border:1px solid var(--m-line);background:var(--m-raise);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:10.5px;text-align:center}
+.m-arrow{color:var(--m-dim);font-family:var(--font-mono);font-size:12px;text-align:center}
+</style>
+
+<div class="wrap">
+
+<header class="stack read">
+  <div class="eyebrow">Blueprint · v2 · 16 Nov 2026 · employer work shown as experience, Settlement Lab as flagship, 4-week plan</div>
+  <h1>Portfolio Build Blueprint</h1>
+  <p class="lede">A production-grade portfolio for Siddhesh Fulawade, built end to end with Claude Code, aimed at engineering interviewers at global banks. It covers positioning, tech stack, system architecture, the content model, UI screens, the agentic setup (agents, skills, commands, hooks, MCP), spec-driven workflow, testing, security, and a day-by-day execution plan.</p>
+</header>
+
+<div class="kpis" style="margin-top:28px">
+  <div class="kpi"><b>≈ ₹1,000</b><span>per year to run: the domain, everything else on free tiers</span></div>
+  <div class="kpi"><b>8</b><span>sub-agents, each with one job and limited tools</span></div>
+  <div class="kpi"><b>3</b><span>MCP servers, kept small to save context</span></div>
+  <div class="kpi"><b>~4 wks</b><span>at 15+ hrs/week, then ongoing upkeep</span></div>
+</div>
+
+<ol class="toc" style="margin-top:28px">
+  <li><a href="#positioning"><span>1</span>Positioning: what bank interviewers look for</a></li>
+  <li><a href="#stack"><span>2</span>Tech stack and why</a></li>
+  <li><a href="#architecture"><span>3</span>System architecture and the Live Lab</a></li>
+  <li><a href="#content"><span>4</span>Content model (add/remove without code)</a></li>
+  <li><a href="#screens"><span>5</span>UI screens</a></li>
+  <li><a href="#agentic"><span>6</span>Agentic setup: LLD</a></li>
+  <li><a href="#sdd"><span>7</span>Spec-driven workflow</a></li>
+  <li><a href="#testing"><span>8</span>Testing and quality gates</a></li>
+  <li><a href="#security"><span>9</span>Security checklist</a></li>
+  <li><a href="#cicd"><span>10</span>Deployment, costs, visitor tracking</a></li>
+  <li><a href="#roadmap"><span>11</span>Execution plan, phase by phase</a></li>
+  <li><a href="#sessions"><span>12</span>Session management</a></li>
+  <li><a href="#advice"><span>13</span>Notes from the field</a></li>
+</ol>
+
+<!-- 1 -->
+<section id="positioning">
+  <div class="sec-head read">
+    <div class="eyebrow">01 · Positioning</div>
+    <h2>In banking, fast is expected. Correct under concurrency is the job.</h2>
+  </div>
+  <div class="read stack">
+    <p>Interviewers at JPMorgan, Goldman Sachs, Morgan Stanley, Barclays, Deutsche Bank, Citi or UBS technology centres rarely ask how fast something was. They ask what happens when a message is delivered twice, when the ledger call times out halfway, or when two threads debit the same account. Your resume already holds those stories: RTGS settlement, ISO 20022, Kafka and IBM MQ, a Resilience Service, thread-safe processing. The site's job is to prove them in 30 seconds for a recruiter and in 30 minutes for an interviewer.</p>
+    <p>So the design thesis is <strong>an observability console for a payment engine, applied to a career</strong>. Numbers set in monospace, system states shown as status pills, message flows instead of decorative gradients, and one working demo that runs real concurrent settlement in Java and shows its invariants holding.</p>
+    <div class="callout"><strong>Employer work is experience. Your own work is the showcase.</strong>e-Kuber 3.0 (RTGS, NEFT, settlement) appears as experience at the level of your resume: in the hero line, the metrics and the experience timeline. It is never presented as "my project", and the site has no system diagrams, code, screenshots or internal names from it. The flagship project is <strong>Settlement Lab</strong>, an open-source settlement engine you write from scratch, inspired by the domain. Interviewers can read every line of it. The judgment you built at work shows up in pattern articles that use general industry knowledge, not system specifics.</div>
+  </div>
+  <div class="grid3">
+    <div class="card"><span class="tag a">Recruiter · 30 s</span><p>Role, domain, years, location, notice period, resume PDF and LinkedIn are all visible without scrolling. Hero metrics are taken straight from the resume.</p></div>
+    <div class="card"><span class="tag a">Hiring manager · 5 min</span><p>Settlement Lab's write-up (Context, Constraints, Decisions, Trade-offs, Results) and pattern articles drawn from payments work. ADR-style decision cards show judgment, which is what "senior" actually means.</p></div>
+    <div class="card"><span class="tag a">Interviewer · 30 min</span><p>Settlement Lab running live, a public repo with specs, ADRs, tests and CI, and a "How this site is built" page that shows disciplined, AI-assisted engineering that you own.</p></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="stack">
+  <div class="sec-head read">
+    <div class="eyebrow">02 · Tech stack</div>
+    <h2>The bank's own stack, on current LTS versions, with nothing extra</h2>
+    <p class="muted">Pin exact versions in spec 001 after checking the current releases with the Context7 MCP. The majors below are the targets as of November 2026.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Choice</th><th>Why it lands with a bank interviewer</th><th>Considered and rejected</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend</td><td>Angular 21+ (standalone, signals, zoneless, OnPush), static prerender (SSG), incremental hydration, <code>@defer</code> for heavy widgets</td><td>Angular is the default for bank ops and front-office UIs. Prerendered HTML gives instant LCP and full SEO.</td><td>Next.js (good, but off-stack for banks); Astro (best for static sites, but hides your Angular skill)</td></tr>
+      <tr><td>Styling</td><td>Own design tokens as CSS custom properties, SCSS per component, no UI kit</td><td>Small bundle and total control. Shows design-system thinking.</td><td>Angular Material, Tailwind (generic look)</td></tr>
+      <tr><td>Charts</td><td>uPlot for streaming time series; hand-built SVG for architecture diagrams</td><td>Built for high-frequency data and stays smooth with 100k points</td><td>Chart.js, ECharts (heavier)</td></tr>
+      <tr><td>Content</td><td>YAML + Markdown in <code>/content</code>, JSON Schema, build-time validation; Sveltia CMS at <code>/admin</code></td><td>Git gives you an audit trail and rollback. No database to attack.</td><td>Headless CMS such as Contentful or Strapi (cost, vendor lock-in, attack surface)</td></tr>
+      <tr><td>Backend</td><td>Java 25 LTS, Spring Boot 4.x, Maven, virtual threads, Resilience4j, Bucket4j, Caffeine</td><td>Your core stack on current LTS. Concurrency is demonstrated with running code, not described.</td><td>Node or serverless functions (throws away your Java signal)</td></tr>
+      <tr><td>API contract</td><td>OpenAPI 3.1, spec-first; TypeScript client generated from it</td><td>Spec-driven at the wire level, so frontend and backend cannot drift</td><td>Hand-written fetch calls</td></tr>
+      <tr><td>Runtime</td><td>GraalVM native image in a distroless, non-root container</td><td>About 100 ms cold start makes scale-to-zero viable, with a minimal attack surface</td><td>Fat JVM image (multi-second cold start)</td></tr>
+      <tr><td>Web hosting</td><td>Cloudflare Pages, DNS, WAF and CDN</td><td>Global edge, free tier, full header control, DDoS protection</td><td>Vercel or Netlify (fine, but Cloudflare also fronts the API)</td></tr>
+      <tr><td>API hosting</td><td>Azure Container Apps (scale to zero) behind Cloudflare</td><td>Matches your Azure experience at near-zero cost</td><td>AKS or OpenShift (overkill); a VPS (you patch it yourself)</td></tr>
+      <tr><td>Observability</td><td>Micrometer + OpenTelemetry to Grafana Cloud free tier; Cloudflare Web Analytics (cookieless)</td><td>Real p99 dashboards you can screenshot in interviews, with no cookie banner</td><td>GA4 (cookies and consent banner)</td></tr>
+      <tr><td>Email</td><td>Resend or Azure Communication Services</td><td>Contact form that never stores personal data</td><td>Saving messages in a database</td></tr>
+      <tr><td>CI/CD</td><td>GitHub Actions, Renovate, Claude Code GitHub Action for PR review</td><td>Everything is visible in the public repo</td><td>Jenkins (you know it, but hosting it is overhead)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 3 -->
+<section id="architecture">
+  <div class="sec-head read">
+    <div class="eyebrow">03 · System architecture</div>
+    <h2>Static by default, one small Java service where it proves something</h2>
+    <p class="muted">Every page is prerendered and served from the edge. The only dynamic parts are the Live Lab and the contact form, both on one Spring Boot service. Fewer moving parts means less to secure and less to pay for.</p>
+  </div>
+  <div class="mermaid-box"><pre class="mermaid">
+flowchart LR
+  U["Visitor browser"] -->|HTTPS| CF["Cloudflare edge<br/>DNS · WAF · CDN · rate rules"]
+  CF --> PG["Cloudflare Pages<br/>prerendered Angular + /admin CMS"]
+  CF -->|api.domain| API["Azure Container Apps<br/>Spring Boot native image"]
+  API --> LAB["Live Lab engine"]
+  API --> CT["Contact service"]
+  CT --> TS["Turnstile verify"]
+  CT --> MAIL["Email provider"]
+  API --> OT["OpenTelemetry to Grafana Cloud"]
+  CMS["Sveltia CMS"] -->|commits content| GH["GitHub repo"]
+  GH -->|Actions: build, test, scan| PG
+  GH -->|Actions: native build, Trivy, cosign| REG["Container registry"] --> API
+  </pre></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Backend LLD (hexagonal)</h3>
+<pre><code>apps/api/src/main/java/dev/sf/portfolio/
+  lab/
+    domain/       Ledger, Account, Transfer,
+                  IdempotencyStore, InvariantChecker
+    application/  RunService, RunRegistry, RunLimits
+    adapters/
+      web/        LabController (REST + SSE)
+      messaging/  BoundedQueueBus (simulated MQ)
+      gl/         FakeGeneralLedger (fault injection)
+  contact/
+    ContactController, ContactService, MailPort
+  platform/
+    SecurityConfig, RateLimitFilter,
+    ProblemDetailsAdvice, ObservabilityConfig</code></pre>
+      <p class="caption">ArchUnit tests enforce that <code>domain</code> imports nothing from Spring or <code>adapters</code>.</p>
+    </div>
+    <div class="card">
+      <h3>API surface</h3>
+<pre><code>POST /api/lab/runs            start a bounded run
+     { txns ≤ 20000, workers ≤ 256,
+       model: PLATFORM | VIRTUAL,
+       faults: [MQ_LATENCY, CACHE_DOWN,
+                GL_TIMEOUT, DUPLICATE_DELIVERY],
+       turnstileToken }
+GET  /api/lab/runs/{id}/stream   SSE, 4 frames/s
+GET  /api/lab/runs/{id}          final report
+POST /api/contact               validated, rate limited
+GET  /actuator/health           only public actuator</code></pre>
+      <p class="caption">Errors use RFC 9457 problem details. No stack traces leave the service.</p>
+    </div>
+  </div>
+
+  <div class="read stack">
+    <h3>Settlement Lab: your flagship open-source project</h3>
+    <p>This is the centrepiece and the strongest interview conversation starter. It is your own project, in its own public repo (and embedded in the site at <code>/lab</code>), written from scratch on textbook patterns. It must not copy e-Kuber design, naming or code. Because you own it completely, you can walk an interviewer through any file.</p>
+    <ul>
+      <li><strong>Ledger</strong> of 1,000 in-memory accounts. Transfers lock both accounts in ascending id order, which prevents deadlock. An alternative mode uses optimistic CAS so visitors can compare the two.</li>
+      <li><strong>Thread model switch</strong>: a fixed platform-thread pool or virtual threads. A blocking "GL call" of 5–40 ms shows why virtual threads win on I/O-bound work.</li>
+      <li><strong>Simulated MQ</strong> as a bounded queue. Backpressure is visible as queue depth, and producers block when the queue is full.</li>
+      <li><strong>Idempotency</strong>: every pacs.008-style message carries a UETR-like key. Duplicate delivery is injected on purpose and the duplicate count must stay at zero.</li>
+      <li><strong>Resilience4j</strong> circuit breaker, retry with jitter, and bulkhead around the fake GL. Breaker state is streamed live.</li>
+      <li><strong>Invariant checker</strong>: the sum of all balances is constant, no transfer is posted twice, and no balance goes negative. Shown as green checks, the punchline of the demo.</li>
+      <li><strong>Abuse controls</strong>: Turnstile, at most 5 runs per IP per hour (Bucket4j), a global semaphore of 2 concurrent runs, hard caps on txns and workers, and a 20 s run timeout.</li>
+    </ul>
+  </div>
+  <div class="mermaid-box"><pre class="mermaid">
+sequenceDiagram
+  participant UI as Lab UI (Angular)
+  participant API as LabController
+  participant RS as RunService
+  participant Q as BoundedQueueBus
+  participant W as Settlement workers
+  participant L as Ledger + IdempotencyStore
+  UI->>API: POST /runs (config, turnstile)
+  API->>API: verify token, rate limit, caps
+  API->>RS: start(config) returns runId
+  UI->>API: GET /runs/{id}/stream (SSE)
+  RS->>Q: publish N transfer messages (+ injected duplicates)
+  loop each message
+    W->>Q: take()
+    W->>L: idempotent apply(transfer), ordered locks
+    L-->>W: POSTED or DUPLICATE_IGNORED
+  end
+  RS-->>UI: metrics every 250 ms (tps, p50, p99, queue, breaker)
+  RS->>L: InvariantChecker.verify()
+  RS-->>UI: final report (invariants, totals)
+  </pre></div>
+</section>
+
+<!-- 4 -->
+<section id="content">
+  <div class="sec-head read">
+    <div class="eyebrow">04 · Content model</div>
+    <h2>Content lives in files, never in components</h2>
+    <p class="muted">Every job, project, metric, skill and article is a file in <code>/content</code>, validated by JSON Schema in CI. Components only render. You can edit through three doors, and all of them end as a reviewed git commit.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+<pre><code>content/
+  _schema/              *.schema.json (source of truth)
+  profile.yaml          name, headline, location,
+                        notice period, links, availability
+  metrics.yaml          hero KPIs + where each comes from
+  experience/
+    2024-11-rebit.yaml
+    2024-07-lumu.yaml
+    2023-12-iitb.yaml
+  projects/
+    settlement-lab.md   flagship, own open source
+    pennywise.md
+    anomaly-detection.md
+    helmet-anpr.md
+  notes/                engineering articles, incl.
+                        payments-patterns.md (no
+                        employer system specifics)
+  skills.yaml           grouped, each linked to evidence
+  achievements.yaml
+  education.yaml
+  certifications.yaml
+  assets/               images (optimised at build)</code></pre>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <h3>Every item shares these fields</h3>
+<pre><code>id: rebit
+published: true      # false hides it everywhere
+featured: true       # appears on the home page
+order: 10            # sort weight
+updated: 2026-11-16</code></pre>
+      </div>
+      <div class="card">
+        <h3>Three ways to edit</h3>
+        <ul>
+          <li><strong>Browser:</strong> Sveltia CMS at <code>/admin</code>. GitHub login, and only accounts with write access to the repo can save.</li>
+          <li><strong>Claude Code:</strong> <code>/add-content project "Kafka outbox demo"</code> interviews you, writes the file, validates it and opens a PR.</li>
+          <li><strong>Direct:</strong> edit the YAML in your editor. Schema errors fail the build with a readable message.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>When this happens</th><th>You change</th><th>The system does</th></tr></thead>
+    <tbody>
+      <tr><td>New job</td><td>Add <code>experience/2027-03-bank.yaml</code></td><td>Timeline, home hero, JSON-LD and resume PDF update on the next deploy</td></tr>
+      <tr><td>New project</td><td>Add <code>projects/slug.md</code></td><td>Card, detail page, OG image and sitemap entry are generated</td></tr>
+      <tr><td>Hide something</td><td><code>published: false</code></td><td>Removed from every page, feed and sitemap with no code change</td></tr>
+      <tr><td>New headline metric</td><td>Edit <code>metrics.yaml</code></td><td>Hero panel updates; CI rejects a metric with no <code>source</code></td></tr>
+      <tr><td>Updated resume</td><td>Nothing extra</td><td>A build step renders <code>resume.pdf</code> from the same content, so the site and the PDF never disagree</td></tr>
+      <tr><td>New section type later</td><td>Add a schema and a template component</td><td>Spec it first with <code>/spec-new</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 5 -->
+<section id="screens">
+  <div class="sec-head read">
+    <div class="eyebrow">05 · UI screens</div>
+    <h2>A payments console, applied to a career</h2>
+    <p class="muted">Dark-first graphite with a light theme, settlement teal for healthy states, amber for in-flight and warnings. IBM Plex Sans Condensed for headings, Plex Sans for text, Plex Mono for every number. Motion is limited to message flow and live data, and it switches off under reduced-motion. These are direction mockups; spec 002 turns them into tokens and components.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>Motion and visuals (part of spec 002)</h3><ul>
+      <li><strong>Hero:</strong> a live message-flow line where payment packets travel from pacs.008 to settlement, and metrics count up once on load</li>
+      <li><strong>Page changes:</strong> View Transitions API, so cards morph into their detail pages instead of hard cuts</li>
+      <li><strong>Scroll:</strong> sections settle into place with a short 8 px rise; content is never hidden while waiting</li>
+      <li><strong>Background:</strong> a faint dot grid that drifts slowly, drawn on canvas, paused when off screen</li>
+      <li><strong>Micro-interactions:</strong> magnetic buttons, card hover glow following the cursor, a command palette that springs open</li>
+      <li><strong>Settlement Lab:</strong> real-time charts and a flowing ledger, the one place motion is dense</li>
+    </ul></div>
+    <div class="card"><h3>Rules that keep it clean</h3><ul>
+      <li>One accent colour, one display face, generous spacing; motion explains something or it doesn't ship</li>
+      <li>Only <code>transform</code> and <code>opacity</code> are animated, so animations stay at 60 fps on mid-range phones</li>
+      <li>Native CSS and Web Animations API; no heavy animation library (budget: JS ≤120 KB)</li>
+      <li>Everything calms down under "reduce motion" settings</li>
+      <li>Before coding, the screens are refined as high-fidelity designs you approve, so you iterate on visuals cheaply</li>
+    </ul></div>
+  </div>
+
+  <!-- Screen A: Home -->
+  <div class="shot">
+    <div class="shot-head"><h3>A · Home</h3><span class="caption">Thesis, proof and three ways in, all above the fold</span></div>
+    <div class="frame frame-scroll"><div class="mock">
+      <div class="m-bar"><i></i><i></i><i></i><span class="m-url">siddheshfulawade.dev</span></div>
+      <div class="m-nav">
+        <span class="m-logo">sf<em>@payments</em>:~$</span>
+        <nav><b>Experience</b><span>Projects</span><span>Settlement Lab</span><span>Notes</span><span>About</span></nav>
+        <span class="m-k">Ctrl K</span>
+        <span class="m-btn">Resume PDF</span>
+      </div>
+      <div class="m-body" style="display:grid;grid-template-columns:1.15fr 1fr;gap:34px;align-items:start">
+        <div>
+          <div class="m-eyebrow">Full stack Java engineer · Payments &amp; distributed systems</div>
+          <div class="m-h1">I build payment systems that stay correct under load.</div>
+          <p class="m-p">2+ years contributing to RBI's e-Kuber 3.0 central banking platform at ReBIT: RTGS, RTGS settlement, NEFT and bond depository. Spring Boot, Kafka, IBM MQ, ISO 20022 and Java concurrency.</p>
+          <div class="m-row" style="margin-top:18px"><span class="m-btn p">See my work →</span><span class="m-btn">Run Settlement Lab</span></div>
+          <div class="m-row" style="margin-top:22px;align-items:center;gap:14px">
+            <span class="m-pill ok"><span class="m-dot"></span>open to roles · Mumbai / Pune / remote</span>
+            <span class="m-dim m-mono" style="font-size:10.5px">ReBIT · Lumu Oy · IIT Bombay</span>
+          </div>
+        </div>
+        <div class="m-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--m-line)">
+            <span class="m-label">career.metrics · from resume</span><span class="m-pill ok"><span class="m-dot"></span>healthy</span>
+          </div>
+          <div class="m-kpi"><div><b id="tph">100,000+</b><br><small>transactions / hour, thread-safe</small></div>
+            <svg class="spark" width="96" height="30" viewBox="0 0 96 30" aria-hidden="true"><path class="s-teal" d="M0 24 L12 20 L24 22 L36 15 L48 17 L60 10 L72 12 L84 6 L96 5"/></svg></div>
+          <div class="m-kpi"><div><b>−30%</b><br><small>database calls, batching + Data Grid cache</small></div>
+            <svg class="spark" width="96" height="30" viewBox="0 0 96 30" aria-hidden="true"><path class="s-amber" d="M0 6 L12 7 L24 9 L36 12 L48 14 L60 18 L72 20 L84 22 L96 23"/></svg></div>
+          <div class="m-kpi"><div><b>85%</b><br><small>unit test coverage on payment flows</small></div><span class="m-pill ok">JUnit 5</span></div>
+          <div class="m-kpi"><div><b>−40%</b><br><small>deployment time on OpenShift</small></div><span class="m-pill">Jenkins</span></div>
+          <div style="padding:12px 14px;border-top:1px solid var(--m-line)">
+            <div class="flow"><span class="node">pacs.008</span><span class="wire"></span><span class="node">validate</span><span class="wire"></span><span class="node hot">settle</span><span class="wire"></span><span class="node">pacs.002</span></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Screen B: Case study -->
+  <div class="shot">
+    <div class="shot-head"><h3>B · Settlement Lab write-up</h3><span class="caption">Your own project, with decisions and trade-offs. Every diagram here is your code.</span></div>
+    <div class="frame frame-scroll"><div class="mock">
+      <div class="m-bar"><i></i><i></i><i></i><span class="m-url">siddheshfulawade.dev/projects/settlement-lab</span></div>
+      <div class="m-body" style="display:grid;grid-template-columns:170px 1fr;gap:30px">
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px" class="m-dim">
+          <span class="m-label">On this page</span>
+          <span class="m-teal">Context</span><span>Constraints</span><span>Architecture</span><span>Decisions</span><span>Results</span><span>What I'd change</span>
+          <span class="m-pill ok" style="margin-top:10px;align-self:flex-start">open source · MIT</span>
+          <span class="m-dim" style="font-size:10.5px">Related note: Patterns from central-bank payments work</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div><div class="m-eyebrow">Flagship project · Open source · 2026</div>
+            <div class="m-h1" style="font-size:30px">Settling payments concurrently without a single double post</div>
+            <div class="m-row"><span class="m-pill">Java 25</span><span class="m-pill">Spring Boot 4</span><span class="m-pill">Virtual threads</span><span class="m-pill">Resilience4j</span><span class="m-pill">pacs.008-style messages</span><span class="m-pill">jqwik</span></div></div>
+          <div class="m-panel" style="padding:16px;display:grid;grid-template-columns:1fr 18px 1fr 18px 1.2fr 18px 1fr;align-items:center;gap:6px">
+            <div class="m-box">Message<br>generator</div><div class="m-arrow">→</div>
+            <div class="m-box">Bounded<br>queue</div><div class="m-arrow">→</div>
+            <div class="m-box" style="border-color:#245A55;color:var(--m-teal)">Settlement workers<br>× N, ordered locks</div><div class="m-arrow">→</div>
+            <div class="m-box">In-memory<br>ledger</div>
+            <div style="grid-column:1 / -1;display:flex;justify-content:center;gap:10px;margin-top:6px">
+              <div class="m-box" style="border-color:#5C4720;color:var(--m-amber)">Idempotency store · circuit breaker · retry with jitter · invariant checker</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="m-card"><span class="m-label">ADR-003</span><b>Per-account ordered locking instead of a global lock</b><span class="m-dim">Keeps unrelated accounts parallel and removes deadlock by construction. Cost: lock ordering must be enforced everywhere. CAS mode included for comparison.</span></div>
+            <div class="m-card"><span class="m-label">Measured · JMH</span><b class="m-mono m-teal" style="font-size:20px">0 double posts</b><span class="m-dim">Across 100 randomised runs with 2% duplicate delivery and GL timeout bursts.</span></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Screen C: Live Lab -->
+  <div class="shot">
+    <div class="shot-head"><h3>C · Settlement Lab, live</h3><span class="caption">Configure a run, watch throughput and latency, then check that the invariants held</span></div>
+    <div class="frame frame-scroll"><div class="mock">
+      <div class="m-bar"><i></i><i></i><i></i><span class="m-url">siddheshfulawade.dev/lab</span></div>
+      <div class="m-body" style="display:grid;grid-template-columns:250px 1fr;gap:20px;padding-top:22px">
+        <div class="m-panel" style="padding:16px;display:flex;flex-direction:column;gap:16px">
+          <div class="m-label">Run configuration</div>
+          <div><div style="display:flex;justify-content:space-between"><span>Transactions</span><span class="m-mono">10,000</span></div><div class="m-slider" style="--v:50%"></div></div>
+          <div><div style="display:flex;justify-content:space-between"><span>Workers</span><span class="m-mono">64</span></div><div class="m-slider" style="--v:25%"></div></div>
+          <div><div style="margin-bottom:6px">Thread model</div><div class="m-seg"><span>Platform pool</span><span class="on">Virtual threads</span></div></div>
+          <div><div style="margin-bottom:4px">Inject faults</div>
+            <div class="m-check"><i class="on"></i>Duplicate delivery (2%)</div>
+            <div class="m-check"><i class="on"></i>GL timeout burst</div>
+            <div class="m-check"><i></i>Cache outage</div>
+            <div class="m-check"><i></i>MQ latency spike</div></div>
+          <span class="m-btn p" style="justify-content:center">Run settlement</span>
+          <span class="m-dim" style="font-size:10.5px">5 runs/hour per visitor · capped at 20,000 txns</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+            <div class="m-panel" style="padding:10px 12px"><div class="m-label">Throughput</div><b class="m-mono" style="font-size:20px" id="lab-tps">2,184</b> <span class="m-dim">tps</span></div>
+            <div class="m-panel" style="padding:10px 12px"><div class="m-label">p99 latency</div><b class="m-mono" style="font-size:20px">41.7</b> <span class="m-dim">ms</span></div>
+            <div class="m-panel" style="padding:10px 12px"><div class="m-label">Queue depth</div><b class="m-mono" style="font-size:20px">312</b> <span class="m-dim">/ 1024</span></div>
+            <div class="m-panel" style="padding:10px 12px"><div class="m-label">GL breaker</div><span class="m-pill warn" style="margin-top:4px"><span class="m-dot"></span>HALF_OPEN</span></div>
+          </div>
+          <div class="m-panel" style="padding:12px 14px">
+            <div style="display:flex;justify-content:space-between"><span class="m-label">Throughput vs latency · last 12 s</span><span class="m-dim m-mono" style="font-size:10px"><span class="m-teal">━ tps</span> &nbsp; <span class="m-amber">━ p99</span></span></div>
+            <svg class="spark" viewBox="0 0 600 120" width="100%" height="120" preserveAspectRatio="none" aria-label="Throughput rising then dipping during a GL timeout burst, p99 latency spiking at the same moment">
+              <path class="s-grid" d="M0 30 H600 M0 60 H600 M0 90 H600"/>
+              <path class="f-teal" style="stroke:none" d="M0 110 L40 80 L80 52 L120 40 L160 36 L200 34 L240 35 L280 60 L320 78 L360 70 L400 46 L440 36 L480 33 L520 32 L560 34 L600 33 L600 120 L0 120 Z"/>
+              <path class="s-teal" d="M0 110 L40 80 L80 52 L120 40 L160 36 L200 34 L240 35 L280 60 L320 78 L360 70 L400 46 L440 36 L480 33 L520 32 L560 34 L600 33"/>
+              <path class="s-amber" d="M0 100 L40 98 L80 97 L120 96 L160 97 L200 96 L240 92 L280 40 L320 28 L360 55 L400 88 L440 95 L480 96 L520 97 L560 96 L600 96"/>
+            </svg>
+          </div>
+          <div class="m-panel" style="overflow:hidden">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+              <div style="padding:10px 12px;border-right:1px solid var(--m-line)"><span class="m-teal">✓</span> Σ balances conserved<br><span class="m-dim m-mono" style="font-size:10.5px">₹10,00,00,000.00</span></div>
+              <div style="padding:10px 12px;border-right:1px solid var(--m-line)"><span class="m-teal">✓</span> Double posts: 0<br><span class="m-dim m-mono" style="font-size:10.5px">198 duplicates ignored</span></div>
+              <div style="padding:10px 12px;border-right:1px solid var(--m-line)"><span class="m-teal">✓</span> Negative balances: 0<br><span class="m-dim m-mono" style="font-size:10.5px">41 rejected, insufficient funds</span></div>
+              <div style="padding:10px 12px"><span class="m-amber">↻</span> Retries: 312<br><span class="m-dim m-mono" style="font-size:10.5px">jittered backoff, max 3</span></div>
+            </div>
+            <div class="m-log">
+              12:04:07.412 <span class="m-amber">WARN</span> gl-client breaker CLOSED → OPEN (failure rate 54% / 20 calls)<br>
+              12:04:08.001 INFO&nbsp; settle  UETR 7f3c…a9 DUPLICATE_IGNORED (idempotency hit)<br>
+              12:04:09.415 INFO&nbsp; gl-client breaker OPEN → HALF_OPEN, 5 trial calls
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- Screen D: Experience -->
+    <div class="shot" style="min-width:0">
+      <div class="shot-head"><h3>D · Experience as a release log</h3></div>
+      <div class="frame frame-scroll"><div class="mock" style="min-width:480px">
+        <div class="m-bar"><i></i><i></i><i></i><span class="m-url">/experience</span></div>
+        <div class="m-body">
+          <div class="m-tl">
+            <div class="it"><div class="m-mono m-teal" style="font-size:11px">v3 · Nov 2024 → present · current</div>
+              <b style="font-size:14px">ReBIT · Full Stack Java Developer</b>
+              <div class="m-dim">e-Kuber 3.0: RTGS, settlement, NEFT, bond depository</div>
+              <div class="m-tags" style="margin-top:6px"><span>Spring Boot</span><span>Kafka</span><span>IBM MQ</span><span>OpenShift</span></div>
+              <div class="m-dim" style="margin-top:6px;font-size:11.5px">▸ 7 changes · Rising Star Award</div></div>
+            <div class="it old"><div class="m-mono m-dim" style="font-size:11px">v2 · Jul → Oct 2024 · remote, Finland</div>
+              <b style="font-size:14px">Lumu Oy · Freelance backend</b>
+              <div class="m-dim">Multilingual news backend, vector search, GPT summaries</div></div>
+            <div class="it old"><div class="m-mono m-dim" style="font-size:11px">v1 · Dec 2023 → Jun 2024</div>
+              <b style="font-size:14px">IIT Bombay · Software Engineer Intern</b>
+              <div class="m-dim">4 Django REST backends, led 4 teams</div></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <!-- Screen E: Projects -->
+    <div class="shot" style="min-width:0">
+      <div class="shot-head"><h3>E · Projects</h3></div>
+      <div class="frame frame-scroll"><div class="mock" style="min-width:480px">
+        <div class="m-bar"><i></i><i></i><i></i><span class="m-url">/projects</span></div>
+        <div class="m-body" style="display:flex;flex-direction:column;gap:12px">
+          <div class="m-row"><span class="m-chip on">All</span><span class="m-chip">Java</span><span class="m-chip">Distributed</span><span class="m-chip">Backend</span><span class="m-chip">AI/ML</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="m-card"><span class="m-label">Flagship · Open source · Live</span><b>Settlement Lab</b><span class="m-dim">Concurrent ledger with idempotency and circuit breakers</span><div class="m-tags"><span>Java 25</span><span>Virtual threads</span></div></div>
+            <div class="m-card"><span class="m-label">Backend</span><b>PennyWise</b><span class="m-dim">Group expenses, split rules, Celery reminders</span><div class="m-tags"><span>DRF</span><span>Redis</span></div></div>
+            <div class="m-card"><span class="m-label">AI/ML · ©</span><b>Anomaly Detection</b><span class="m-dim">LRCN on UCF-Crime, ranked 12th globally</span><div class="m-tags"><span>TensorFlow</span></div></div>
+            <div class="m-card"><span class="m-label">AI/ML</span><b>Helmet + ANPR</b><span class="m-dim">YOLOv5 and EasyOCR, real-time camera</span><div class="m-tags"><span>OpenCV</span></div></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- Screen F: How this site is built -->
+    <div class="shot" style="min-width:0">
+      <div class="shot-head"><h3>F · How this site is built</h3></div>
+      <div class="frame frame-scroll"><div class="mock" style="min-width:480px">
+        <div class="m-bar"><i></i><i></i><i></i><span class="m-url">/engineering</span></div>
+        <div class="m-body" style="display:flex;flex-direction:column;gap:12px">
+          <div class="m-h2">Built with AI agents. Owned by me.</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+            <div class="m-panel" style="padding:8px"><b class="m-mono m-teal" style="font-size:18px">100</b><div class="m-dim" style="font-size:10px">Lighthouse perf</div></div>
+            <div class="m-panel" style="padding:8px"><b class="m-mono m-teal" style="font-size:18px">A+</b><div class="m-dim" style="font-size:10px">Observatory</div></div>
+            <div class="m-panel" style="padding:8px"><b class="m-mono m-teal" style="font-size:18px">87%</b><div class="m-dim" style="font-size:10px">API coverage</div></div>
+            <div class="m-panel" style="padding:8px"><b class="m-mono m-teal" style="font-size:18px">0</b><div class="m-dim" style="font-size:10px">high CVEs</div></div>
+          </div>
+          <div class="m-panel" style="padding:10px 12px;font-family:var(--font-mono);font-size:10.5px;line-height:1.9">
+            <span class="m-teal">✓</span> spec 010-live-lab-engine · 14/14 tasks<br>
+            <span class="m-teal">✓</span> ci · unit · e2e · axe · lighthouse · zap<br>
+            <span class="m-teal">✓</span> supply chain · sbom · cosign signed<br>
+            <span class="m-amber">●</span> renovate · 2 PRs waiting for review
+          </div>
+          <span class="m-dim" style="font-size:11px">Specs, ADRs and agent definitions are linked to the public repo.</span>
+        </div>
+      </div></div>
+    </div>
+    <!-- Screen G: Mobile -->
+    <div class="shot" style="min-width:0">
+      <div class="shot-head"><h3>G · Mobile home + command palette</h3></div>
+      <div class="frame" style="padding:14px 0;background:#121820"><div class="mock narrow" style="border:1px solid #1F2B36;border-radius:14px;overflow:hidden">
+        <div class="m-nav" style="padding:12px 16px"><span class="m-logo">sf<em>@payments</em></span><span class="m-k" style="margin-left:auto">☰</span></div>
+        <div style="padding:18px 16px;display:flex;flex-direction:column;gap:12px">
+          <div class="m-eyebrow" style="font-size:9.5px">Java · Payments · Distributed</div>
+          <div class="m-h1" style="font-size:25px;margin:0">I build payment systems that stay correct under load.</div>
+          <div class="m-panel">
+            <div class="m-kpi"><div><b style="font-size:16px">100,000+</b><br><small>txn / hour</small></div><span class="m-pill ok">thread-safe</span></div>
+            <div class="m-kpi"><div><b style="font-size:16px">85%</b><br><small>test coverage</small></div></div>
+          </div>
+          <div class="m-panel" style="padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+            <span class="m-mono m-dim" style="font-size:11px">› rtgs<span class="m-teal">▍</span></span>
+            <span style="font-size:12px">Experience · ReBIT, RTGS &amp; NEFT</span>
+            <span style="font-size:12px" class="m-dim">Note · Patterns from central-bank payments</span>
+            <span style="font-size:12px" class="m-dim">Action · Download resume</span>
+          </div>
+          <span class="m-btn p" style="justify-content:center">Run Settlement Lab</span>
+        </div>
+      </div></div>
+    </div>
+  </div>
+  <p class="caption read">Also in scope, not drawn: Notes (engineering articles, including "Patterns from central-bank payments work", written at the level of general industry knowledge), About, Contact (form plus copyable email), a 404 that reads like a failed route lookup, and a print-friendly resume page.</p>
+</section>
+
+<!-- 6 -->
+<section id="agentic">
+  <div class="sec-head read">
+    <div class="eyebrow">06 · Agentic setup · LLD</div>
+    <h2>One orchestrator, narrow specialists, and gates the agents cannot skip</h2>
+    <p class="muted">The main session plans and delegates. Sub-agents each own one area with limited tools. Skills hold knowledge that loads only when relevant. Hooks enforce rules deterministically, because a model can forget an instruction but a hook always runs.</p>
+  </div>
+  <div class="mermaid-box"><pre class="mermaid">
+flowchart TB
+  YOU(("You: approve specs, review PRs")) --> MAIN["Main session (orchestrator)<br/>reads CLAUDE.md + constitution"]
+  MAIN --> CMD["Workflow commands<br/>spec-new · spec-design · spec-tasks · implement · review · release · handoff"]
+  MAIN --> ARCH["spec-architect"]
+  MAIN --> TE["test-engineer"]
+  MAIN --> FE["angular-engineer"]
+  MAIN --> BE["spring-engineer"]
+  MAIN --> CE["content-editor"]
+  MAIN --> RV{{"review fan-out (parallel)"}}
+  RV --> SEC["security-auditor"]
+  RV --> UIR["ui-reviewer"]
+  RV --> PERF["perf-auditor"]
+  SK[("Skills, loaded on demand<br/>design-system · angular-standards · spring-standards<br/>spec-driven · content-model · security-baseline · testing-playbook")] -.-> ARCH & FE & BE & TE & SEC & UIR
+  MCP[("MCP: Playwright · Context7 · Chrome DevTools")] -.-> FE & UIR & PERF
+  HK[["Hooks: guard-bash · protect-secrets · format-on-edit · quality-gate · spec-status"]] -.-> MAIN
+  </pre></div>
+
+  <div class="grid2">
+    <div class="card"><h3>Repository layout</h3>
+<pre><code>portfolio/
+├─ CLAUDE.md                 project constitution (short)
+├─ .mcp.json                 project MCP servers
+├─ .claude/
+│  ├─ settings.json          permissions + hooks
+│  ├─ agents/                8 sub-agents (*.md)
+│  ├─ skills/                knowledge + workflow skills
+│  │  ├─ design-system/      SKILL.md, tokens.md, motion.md
+│  │  ├─ spec-driven/        SKILL.md, templates/
+│  │  ├─ spec-new/           SKILL.md (user command)
+│  │  └─ ...
+│  └─ hooks/                 Node scripts (Windows-safe)
+├─ specs/
+│  ├─ 000-constitution.md
+│  └─ 010-live-lab-engine/
+│     ├─ requirements.md     EARS criteria
+│     ├─ design.md           components, API, sequence
+│     └─ tasks.md            T-01…T-14, test-first
+├─ docs/  adr/  sessions/  brief.md
+├─ content/                  see section 04
+├─ apps/web/                 Angular
+├─ apps/api/                 Spring Boot
+├─ infra/                    Dockerfile, Bicep, _headers
+└─ .github/workflows/</code></pre></div>
+    <div class="card"><h3>CLAUDE.md (keep it under ~120 lines)</h3>
+<pre><code># Portfolio: Siddhesh Fulawade
+Monorepo: apps/web (Angular, SSG), apps/api
+(Spring Boot 4, Java 25), content/ (source of truth).
+
+## Non-negotiables (specs/000-constitution.md)
+- No spec, no code. Work only from an approved
+  specs/NNN-*/tasks.md.
+- Tests first for every task. api ≥85%, web ≥80%.
+- No content hard-coded in components.
+- No new dependency without an ADR.
+- Budgets: initial JS ≤120 KB gz, LCP ≤1.8 s mobile.
+- Never touch .env, secrets/, or push to main.
+
+## Commands
+web: npm run dev|test|e2e|lint|build
+api: ./mvnw verify | ./mvnw -Pnative package
+
+## Knowledge
+Standards live in .claude/skills. Load the
+matching skill before editing that area.
+
+## Definition of done
+tasks ticked · tests green · /review clean ·
+CHANGELOG entry · /handoff written</code></pre></div>
+  </div>
+
+  <h3>Sub-agents (<code>.claude/agents/</code>)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Agent</th><th>Model</th><th>Tools</th><th>Owns</th><th>Used by</th></tr></thead>
+    <tbody>
+      <tr><td>spec-architect</td><td><span class="tag a">opus</span></td><td>Read, Grep, Glob, Write (specs/, docs/adr only), Context7</td><td>Turns requirements into design.md, OpenAPI changes and ADRs</td><td>/spec-design, /spec-tasks</td></tr>
+      <tr><td>test-engineer</td><td><span class="tag">sonnet</span></td><td>Read, Write (test dirs), Bash (npm test, mvnw test)</td><td>Writes failing tests from acceptance criteria before any implementation</td><td>/implement step 1</td></tr>
+      <tr><td>angular-engineer</td><td><span class="tag">sonnet</span></td><td>Read, Edit, Write, Bash (npm), Context7, Playwright</td><td><code>apps/web</code> only</td><td>/implement on web tasks</td></tr>
+      <tr><td>spring-engineer</td><td><span class="tag">sonnet</span></td><td>Read, Edit, Write, Bash (mvnw), Context7</td><td><code>apps/api</code> only</td><td>/implement on api tasks</td></tr>
+      <tr><td>content-editor</td><td><span class="tag">sonnet</span></td><td>Read, Edit (content/ only)</td><td>Impact-first copy, metric sourcing, NDA scrub, schema validity</td><td>/add-content</td></tr>
+      <tr><td>security-auditor</td><td><span class="tag a">opus</span></td><td>Read, Grep, Glob, Bash (semgrep, gitleaks, audits). No Edit.</td><td>Findings with severity, file:line, exploit scenario, fix</td><td>/review, /release</td></tr>
+      <tr><td>ui-reviewer</td><td><span class="tag">sonnet</span></td><td>Read, Playwright MCP</td><td>Screenshots at 375/768/1440 in both themes, axe, token compliance</td><td>/review</td></tr>
+      <tr><td>perf-auditor</td><td><span class="tag">sonnet</span></td><td>Bash (lhci, bundle analyzer), Chrome DevTools MCP</td><td>Lighthouse budgets, bundle size, LCP and INP traces</td><td>/review, /release</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="grid2">
+    <div class="card"><h3>Example agent: security-auditor.md</h3>
+<pre><code>---
+name: security-auditor
+description: Read-only security review. Use after any
+  task touching apps/api, headers, forms, auth,
+  dependencies or CI workflows.
+tools: Read, Grep, Glob, Bash
+model: opus
+---
+You are an application security engineer at a bank.
+Review the diff (git diff main...HEAD) against
+.claude/skills/security-baseline/checklist.md.
+Run: semgrep --config auto, gitleaks detect,
+npm audit --omit=dev, ./mvnw dependency-check:check.
+Report a table: severity | file:line | scenario | fix.
+Never modify files. If nothing is found, say which
+checks ran so the result can be trusted.</code></pre></div>
+    <div class="card"><h3>Example workflow skill: spec-new</h3>
+<pre><code>---
+name: spec-new
+description: Start a feature spec from a one-line idea.
+disable-model-invocation: true
+argument-hint: NNN-feature-name "idea"
+---
+1. Create specs/&lt;NNN-feature-name&gt;/ from
+   ../spec-driven/templates/requirements.md.
+   Arguments: $ARGUMENTS
+2. Read specs/000-constitution.md and docs/brief.md.
+3. Ask me at most 5 clarifying questions.
+4. Write user stories plus EARS acceptance criteria
+   with ids REQ-&lt;AREA&gt;-NNN, and an out-of-scope list.
+5. Stop. Do not design or write code.</code></pre></div>
+  </div>
+
+  <div class="grid2">
+    <div class="stack">
+      <h3>Knowledge skills (model loads them when relevant)</h3>
+      <div class="tbl"><table style="min-width:0">
+        <thead><tr><th>Skill</th><th>Contents</th></tr></thead>
+        <tbody>
+          <tr><td>design-system</td><td>Tokens, type scale, spacing, motion rules, component inventory, do and don't</td></tr>
+          <tr><td>angular-standards</td><td>Standalone, signals, zoneless, OnPush, <code>@defer</code>, folder rules, testing patterns</td></tr>
+          <tr><td>spring-standards</td><td>Hexagonal packages, records, problem details, virtual threads, Resilience4j config</td></tr>
+          <tr><td>spec-driven</td><td>Templates for requirements, design, tasks; EARS cheat sheet</td></tr>
+          <tr><td>content-model</td><td>Schemas, how to add or hide items, writing and NDA rules</td></tr>
+          <tr><td>security-baseline</td><td>Headers, CSP, ASVS subset checklist, threat model</td></tr>
+          <tr><td>testing-playbook</td><td>Pyramid, naming, concurrency tests, fixtures</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="stack">
+      <h3>Workflow commands (you invoke them)</h3>
+      <div class="tbl"><table style="min-width:0">
+        <thead><tr><th>Command</th><th>Does</th></tr></thead>
+        <tbody>
+          <tr><td>/spec-new</td><td>Idea to requirements.md, then stops</td></tr>
+          <tr><td>/spec-design</td><td>spec-architect writes design.md and ADRs</td></tr>
+          <tr><td>/spec-tasks</td><td>Design to numbered, test-first tasks</td></tr>
+          <tr><td>/implement</td><td>One task: test-engineer, then engineer, then gate</td></tr>
+          <tr><td>/review</td><td>Security, UI and perf auditors in parallel</td></tr>
+          <tr><td>/add-content</td><td>Guided add of a job, project or note</td></tr>
+          <tr><td>/adr</td><td>Records a decision in docs/adr</td></tr>
+          <tr><td>/release</td><td>Changelog, version tag, full audit, deploy checklist</td></tr>
+          <tr><td>/handoff</td><td>Writes docs/sessions/YYYY-MM-DD.md for the next session</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="stack">
+      <h3>Hooks (deterministic gates)</h3>
+      <div class="tbl"><table style="min-width:0">
+        <thead><tr><th>Event</th><th>Script and effect</th></tr></thead>
+        <tbody>
+          <tr><td>PreToolUse · Bash</td><td><code>guard-bash.mjs</code> blocks force push, push to main, <code>--no-verify</code>, <code>rm -rf</code>, piping curl to a shell</td></tr>
+          <tr><td>PreToolUse · Read/Edit/Write</td><td><code>protect-secrets.mjs</code> blocks <code>.env*</code>, <code>*.pem</code>, <code>secrets/</code></td></tr>
+          <tr><td>PostToolUse · Edit/Write</td><td><code>format.mjs</code> runs Prettier or google-java-format on the changed file</td></tr>
+          <tr><td>Stop</td><td><code>quality-gate.mjs</code> runs typecheck, lint and affected tests; exit 2 sends failures back to Claude</td></tr>
+          <tr><td>SessionStart</td><td><code>spec-status.mjs</code> injects open tasks from <code>specs/*/tasks.md</code> and the latest handoff</td></tr>
+        </tbody>
+      </table></div>
+      <p class="caption">Write hooks in Node, not bash, so they behave the same on Windows and in CI.</p>
+    </div>
+    <div class="card"><h3>.claude/settings.json (excerpt)</h3>
+<pre><code>{
+  "permissions": {
+    "allow": ["Bash(npm run *)", "Bash(./mvnw *)",
+              "Bash(git status)", "Bash(git diff *)"],
+    "ask":   ["Bash(git commit *)", "Bash(git push *)"],
+    "deny":  ["Read(./.env*)", "Read(./secrets/**)",
+              "Bash(git push --force*)", "Bash(rm -rf *)"]
+  },
+  "hooks": {
+    "PreToolUse": [{ "matcher": "Bash", "hooks": [{
+      "type": "command",
+      "command": "node .claude/hooks/guard-bash.mjs" }]}],
+    "PostToolUse": [{ "matcher": "Edit|Write", "hooks": [{
+      "type": "command",
+      "command": "node .claude/hooks/format.mjs" }]}],
+    "Stop": [{ "hooks": [{ "type": "command",
+      "command": "node .claude/hooks/quality-gate.mjs" }]}]
+  }
+}</code></pre></div>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>MCP server</th><th>Why</th><th>Used by</th></tr></thead>
+    <tbody>
+      <tr><td>Playwright</td><td>Drives a real browser for screenshots, flows and axe checks</td><td>ui-reviewer, angular-engineer, e2e authoring</td></tr>
+      <tr><td>Context7</td><td>Current Angular and Spring Boot docs, which prevents APIs from older versions</td><td>spec-architect, both engineers</td></tr>
+      <tr><td>Chrome DevTools</td><td>Performance traces, network waterfall, console errors</td><td>perf-auditor</td></tr>
+      <tr><td>GitHub</td><td>Skip the MCP; the <code>gh</code> CLI does issues and PRs at lower context cost</td><td>main session</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 7 -->
+<section id="sdd">
+  <div class="sec-head read">
+    <div class="eyebrow">07 · Spec-driven development</div>
+    <h2>Every feature passes two human gates before code exists</h2>
+  </div>
+  <div class="mermaid-box"><pre class="mermaid">
+flowchart LR
+  A["/spec-new<br/>requirements.md"] --> G1{"You approve"}
+  G1 --> B["/spec-design<br/>design.md + ADRs + OpenAPI"]
+  B --> G2{"You approve"}
+  G2 --> C["/spec-tasks<br/>tasks.md"]
+  C --> D["/implement T-n<br/>failing test, code, gate"]
+  D -->|next task| D
+  D --> E["/review<br/>3 auditors in parallel"]
+  E --> F["PR + CI"]
+  F --> H["merge + /handoff"]
+  </pre></div>
+  <div class="grid2">
+    <div class="card"><h3>requirements.md (EARS excerpt, spec 010)</h3>
+<pre><code>REQ-LAB-003  WHEN a transfer message is delivered
+  more than once, THE settlement engine SHALL post
+  it to the ledger exactly once.
+REQ-LAB-004  WHILE the GL failure rate exceeds 50%
+  over 20 calls, THE engine SHALL open the circuit
+  breaker and route transfers to the retry queue.
+REQ-LAB-007  IF a client starts more than 5 runs in
+  one hour, THEN THE API SHALL respond 429 with a
+  Retry-After header and an RFC 9457 body.
+REQ-LAB-009  THE engine SHALL keep the sum of all
+  account balances constant for the whole run.</code></pre></div>
+    <div class="card"><h3>tasks.md (excerpt)</h3>
+<pre><code>- [x] T-01 Ledger with ordered locking
+      test first: LedgerConcurrencyTest
+      (jqwik, 64 threads, 10k random transfers)
+      done: REQ-LAB-009 holds in 100 runs
+- [x] T-02 IdempotencyStore (Caffeine, TTL 10 min)
+      covers REQ-LAB-003
+- [ ] T-03 BoundedQueueBus with backpressure
+- [ ] T-04 FakeGeneralLedger + fault injection
+- [ ] T-05 Resilience4j breaker/retry/bulkhead
+      covers REQ-LAB-004
+...</code></pre></div>
+  </div>
+  <div class="read stack">
+    <h3>The 17 specs, in build order</h3>
+    <p class="mono" style="font-size:.86rem;line-height:1.9">000 constitution · 001 monorepo &amp; tooling · 002 design system · 003 content model &amp; CMS · 004 app shell (nav, Ctrl K palette, themes, SEO) · 005 home · 006 experience · 007 project write-up template · 008 projects · 009 notes (incl. payments patterns) · 010 settlement-lab engine (own repo) · 011 settlement-lab UI · 012 contact · 013 engineering page · 014 security hardening · 015 observability · 016 deploy &amp; release · 017 resume PDF from content · 018 visitor analytics &amp; public counter</p>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="testing">
+  <div class="sec-head read">
+    <div class="eyebrow">08 · Testing</div>
+    <h2>Gates in CI, not intentions in a README</h2>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Tooling</th><th>Gate (CI fails below this)</th></tr></thead>
+    <tbody>
+      <tr><td>Web unit and component</td><td>Vitest + Angular Testing Library</td><td>≥80% lines on <code>core</code> and <code>features</code></td></tr>
+      <tr><td>End to end</td><td>Playwright on Chromium, WebKit and Firefox plus a mobile viewport</td><td>All critical journeys green</td></tr>
+      <tr><td>Visual regression</td><td>Playwright screenshots, both themes</td><td>No unreviewed diffs</td></tr>
+      <tr><td>Accessibility</td><td>axe-core inside Playwright, keyboard-only journey</td><td>WCAG 2.2 AA, zero serious violations</td></tr>
+      <tr><td>Performance</td><td>Lighthouse CI with budgets</td><td>Perf ≥95 mobile, LCP ≤1.8 s, CLS ≤0.05, INP ≤200 ms, JS ≤120 KB gz</td></tr>
+      <tr><td>API unit</td><td>JUnit 5, Mockito, AssertJ, JaCoCo</td><td>≥85% lines (matches the resume claim)</td></tr>
+      <tr><td>Concurrency</td><td>jqwik property tests, stress tests with Awaitility, jcstress on the ledger primitive</td><td>Invariants hold over 100 randomised runs</td></tr>
+      <tr><td>Integration</td><td>Spring Boot Test, WireMock for email and Turnstile</td><td>All contracts green</td></tr>
+      <tr><td>Architecture</td><td>ArchUnit</td><td>Domain has no framework imports</td></tr>
+      <tr><td>Mutation</td><td>PIT on <code>lab.domain</code></td><td>≥70% mutation score</td></tr>
+      <tr><td>Benchmarks</td><td>JMH: platform threads vs virtual threads</td><td>Published as a Note on the site</td></tr>
+      <tr><td>Load</td><td>k6 against staging</td><td>p99 ≤200 ms at 50 rps on the contact and run APIs</td></tr>
+      <tr><td>Contract</td><td>OpenAPI diff check in CI</td><td>No breaking change without a version bump</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 9 -->
+<section id="security">
+  <div class="sec-head read">
+    <div class="eyebrow">09 · Security</div>
+    <h2>Treat the portfolio like a bank would treat a public endpoint</h2>
+    <p class="muted">Targets: Mozilla Observatory A+, securityheaders.com A+, SSL Labs A+, zero high or critical CVEs at release.</p>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Edge and browser</h3><ul>
+      <li>Strict hash-based CSP (Angular autoCsp), <code>frame-ancestors 'none'</code>, no <code>unsafe-inline</code></li>
+      <li>HSTS with preload, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COOP and CORP</li>
+      <li>Cloudflare WAF managed rules plus rate rules on <code>/api/*</code></li>
+      <li>No cookies or third-party trackers, so no consent banner</li>
+      <li>Subresource Integrity on any external asset (aim for none)</li></ul></div>
+    <div class="card"><h3>API</h3><ul>
+      <li>Spring Security stateless, CORS allow-list of your own origin only</li>
+      <li>Jakarta Validation on every input, request size limits, strict JSON</li>
+      <li>Server-side Turnstile check, Bucket4j limits, global run semaphore</li>
+      <li>RFC 9457 errors with no stack traces; only <code>/actuator/health</code> public</li>
+      <li>Secrets in Azure Key Vault through managed identity; no personal data stored</li></ul></div>
+    <div class="card"><h3>Supply chain</h3><ul>
+      <li>Renovate with grouped updates; OSV-Scanner, npm audit and OWASP Dependency-Check</li>
+      <li>CodeQL and Semgrep (SAST); gitleaks as pre-commit hook and in CI</li>
+      <li>Trivy image scan, CycloneDX SBOM, cosign-signed images</li>
+      <li>GitHub Actions pinned by commit SHA, least-privilege <code>GITHUB_TOKEN</code></li>
+      <li>Branch protection: PR required, signed commits, required checks</li></ul></div>
+    <div class="card"><h3>Runtime and agents</h3><ul>
+      <li>Distroless, non-root, read-only filesystem, dropped capabilities</li>
+      <li>OWASP ZAP baseline scan against staging on every release</li>
+      <li><code>/security-review</code> (built in) plus security-auditor before each PR</li>
+      <li>Claude permissions deny secrets and pushes; hooks enforce it</li>
+      <li>Threat model (STRIDE) kept in <code>docs/threat-model.md</code></li></ul></div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="cicd">
+  <div class="sec-head read">
+    <div class="eyebrow">10 · CI/CD</div>
+    <h2>Every PR gets a preview, every merge is releasable</h2>
+  </div>
+  <div class="mermaid-box"><pre class="mermaid">
+flowchart LR
+  PR["Pull request"] --> V["validate content schemas"]
+  V --> W["web: lint, unit, build SSG"]
+  V --> A["api: verify, ArchUnit, PIT, JaCoCo"]
+  W --> E2E["Playwright + axe + Lighthouse CI"]
+  A --> SC["CodeQL · Semgrep · gitleaks · deps"]
+  E2E --> PV["Cloudflare preview URL"]
+  SC --> RVW["Claude PR review (Action)"]
+  PV --> M{"merge to main"}
+  RVW --> M
+  M --> NB["native image, Trivy, SBOM, cosign"]
+  NB --> STG["staging + ZAP + k6"]
+  STG --> PROD["production (manual approval)"]
+  </pre></div>
+
+  <div class="read stack">
+    <h3>Where it runs and what it costs</h3>
+    <p>The only thing you must pay for is the domain. Everything else fits in free tiers at portfolio traffic. Prices are approximate as of November 2026; check them when you buy.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Item</th><th>Provider</th><th>Cost per year</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Domain</td><td>Cloudflare Registrar, <code>.com</code> or <code>.dev</code></td><td>≈ ₹900–1,300</td><td>Sold at cost with no markup, free WHOIS privacy, same price on renewal. Avoid first-year promos that renew at 3–4×.</td></tr>
+      <tr><td>Website hosting</td><td>Cloudflare Pages</td><td>₹0</td><td>Unlimited static requests and bandwidth, preview URL per PR</td></tr>
+      <tr><td>DNS, CDN, WAF, SSL</td><td>Cloudflare free plan</td><td>₹0</td><td>Includes DDoS protection and rate rules</td></tr>
+      <tr><td>Java API (Settlement Lab, contact)</td><td>Azure Container Apps, scale to zero</td><td>₹0 expected</td><td>Monthly free grant covers this traffic. Azure sign-up needs a card for identity checks.</td></tr>
+      <tr><td>Container images</td><td>GitHub Container Registry</td><td>₹0</td><td>Use this instead of Azure Container Registry, which costs about $5/month</td></tr>
+      <tr><td>Professional email</td><td>Cloudflare Email Routing</td><td>₹0</td><td><code>hello@yourdomain</code> forwards to your Gmail. Looks far better to recruiters.</td></tr>
+      <tr><td>Contact form email</td><td>Resend free tier</td><td>₹0</td><td>Up to 3,000 emails a month</td></tr>
+      <tr><td>Bot protection</td><td>Cloudflare Turnstile</td><td>₹0</td><td>No puzzles for real visitors</td></tr>
+      <tr><td>Analytics and visitor count</td><td>Cloudflare Web Analytics + D1</td><td>₹0</td><td>See below</td></tr>
+      <tr><td>Uptime monitoring</td><td>UptimeRobot or Better Stack free</td><td>₹0</td><td>Emails you if the site or API goes down</td></tr>
+      <tr><td>Dashboards</td><td>Grafana Cloud free</td><td>₹0</td><td>Metrics and traces from the API</td></tr>
+      <tr><td>Code, CI, security scans</td><td>GitHub free (public repos)</td><td>₹0</td><td>Actions minutes are free for public repos</td></tr>
+      <tr><td><strong>Total</strong></td><td></td><td><strong>≈ ₹1,000–1,300 per year</strong></td><td>Plus your existing Claude subscription for building it</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><strong>Commonly missed items</strong>Set an Azure budget alert at ₹100 so a surprise bill is impossible to miss. Turn on two-factor login for the registrar, Cloudflare, GitHub and Azure, since losing any of them means losing the site. Enable domain auto-renew. Expect the first Settlement Lab run after a quiet period to take about a second longer while the API wakes up; the UI shows a "warming up" state.</div>
+
+  <div class="read stack">
+    <h3>Visitor tracking (spec 018)</h3>
+    <ul>
+      <li><strong>Private dashboard for you:</strong> Cloudflare Web Analytics. It shows visitors, pages, countries, referrers (for example, whether a visit came from LinkedIn) and Core Web Vitals. It uses no cookies, so the site needs no consent banner.</li>
+      <li><strong>Public counter on the site:</strong> a small Cloudflare Pages Function with a D1 database stores one row per visitor per day, keyed by a salted hash of IP and date that cannot be reversed. The footer shows it in the site's own style, for example <code>visitors.total 4,218 · today 37</code>. The salt rotates daily and no raw IPs are stored.</li>
+      <li><strong>Bots excluded:</strong> known crawlers and repeat hits within 30 minutes are not counted.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="roadmap">
+  <div class="sec-head read">
+    <div class="eyebrow">11 · Execution plan</div>
+    <h2>Four weeks at 15+ hours a week, from an empty folder to launch</h2>
+    <p class="muted">Each week is about 4 focused sessions of 3–4 hours. Web and API work run in parallel sessions on separate worktrees, which is what makes 4 weeks realistic.</p>
+  </div>
+
+  <div class="card">
+    <h3>Phase 0, day 1: groundwork (in this order)</h3>
+<pre><code># 1. Toolchain (Windows)
+winget install EclipseAdoptium.Temurin.25.JDK
+winget install OpenJS.NodeJS.LTS
+winget install GitHub.cli
+# plus Docker Desktop and Git if missing
+
+# 2. Repo
+mkdir D:\Siddhesh\portfolio; cd D:\Siddhesh\portfolio
+git init; gh repo create portfolio --private --source .
+mkdir .claude\agents, .claude\skills, .claude\hooks, specs, docs\adr, docs\sessions, content
+
+# 3. Write docs/brief.md yourself (1 page): audience, goals, tone, must-haves.
+#    Copy the resume PDF into docs/ as the source of truth for content.
+
+# 4. MCP servers (project scope; on native Windows wrap npx in "cmd /c")
+claude mcp add --scope project playwright -- cmd /c npx -y @playwright/mcp@&lt;pinned&gt;
+claude mcp add --scope project context7   -- cmd /c npx -y @upstash/context7-mcp@&lt;pinned&gt;
+claude mcp add --scope project devtools   -- cmd /c npx -y chrome-devtools-mcp@&lt;pinned&gt;
+
+# 5. First Claude session, in plan mode:
+#    "Read docs/brief.md and the resume. Draft specs/000-constitution.md and CLAUDE.md.
+#     Then use skill-creator to scaffold the 7 knowledge skills and 9 workflow skills,
+#     and write the 8 agents in .claude/agents per this blueprint."
+# 6. Review every generated file yourself. Commit: "chore: agentic scaffold".</code></pre>
+  </div>
+
+  <div class="card" style="gap:0">
+    <div class="phase"><div class="when"><b>Week 1</b>Foundations</div><div><strong>Specs 001–004, plus 010 started.</strong> Monorepo, Angular and Spring skeletons, CI skeleton, hooks working. Design tokens and 12 core components with a gallery page. Content schemas, loaders and Sveltia CMS. App shell with nav, themes, command palette and SEO plumbing. In a parallel worktree session, write spec 010 and the first Settlement Lab ledger tasks test-first. <span class="muted">Exit: a deployable shell with green CI and a ledger whose invariants hold.</span></div></div>
+    <div class="phase"><div class="when"><b>Week 2</b>Pages + engine</div><div><strong>Specs 005–009 on web, 010 on api, in parallel.</strong> Home, experience log, projects, write-up template, notes. content-editor rewrites resume lines into impact-first copy that names ReBIT work as experience only, for your approval. The engine gains idempotency, bounded queue, fault injection and Resilience4j. <span class="muted">Exit: a recruiter-ready static site on a preview URL, and an engine that passes every fault scenario locally.</span></div></div>
+    <div class="phase"><div class="when"><b>Week 3</b>Lab UI + features</div><div><strong>Specs 011, 012, 013, 015.</strong> SSE stream and the uPlot Lab UI; Settlement Lab write-up and its public repo README; contact form with Turnstile and email; the "how this site is built" page; OpenTelemetry dashboards. JMH results become your first Note, and the payments-patterns Note is drafted. <span class="muted">Exit: feature complete.</span></div></div>
+    <div class="phase"><div class="when"><b>Week 4</b>Harden + launch</div><div><strong>Specs 014, 016, 017.</strong> Days 1–3: headers and CSP, threat model, ZAP, k6, mutation tests, accessibility pass with a real screen reader, cross-browser checks. Days 4–6: domain, Cloudflare, Azure Container Apps through Bicep, staging then production, resume PDF generation, OG images, JSON-LD Person schema, sitemap. <span class="muted">Exit: live, A+ on scanners, public repos.</span></div></div>
+    <div class="phase"><div class="when"><b>After launch</b>Ongoing</div><div><strong>Operate.</strong> One Note a month (outbox pattern, virtual threads, ISO 20022 basics). Renovate PRs weekly. Add Settlement Lab features as conversation starters, such as a Kafka mode or a reconciliation report. Update content with <code>/add-content</code> after each achievement.</div></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section id="sessions">
+  <div class="sec-head read">
+    <div class="eyebrow">12 · Session management</div>
+    <h2>Context is your scarcest resource</h2>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Per-session rhythm</h3><ul>
+      <li>One spec task per session. Start fresh (<code>/clear</code>) between tasks; the SessionStart hook reloads what matters.</li>
+      <li>Use plan mode for anything touching more than two files. Read the plan before approving.</li>
+      <li>Commit after every green task so a bad turn costs one rewind (Esc Esc), not an afternoon.</li>
+      <li>End with <code>/handoff</code>: what changed, what is next, open questions.</li>
+      <li>Watch <code>/context</code>. Above about 60%, finish the task, hand off and start a new session instead of letting it compact mid-task.</li>
+    </ul></div>
+    <div class="card"><h3>Scaling up</h3><ul>
+      <li>Run web and api tasks in parallel sessions on separate git worktrees so they never edit the same files.</li>
+      <li>Send exploration and reviews to sub-agents so their file dumps stay out of the main context.</li>
+      <li>Keep CLAUDE.md short. Move detail into skills, which load only when needed.</li>
+      <li>When Claude repeats a mistake twice, fix the root: a rule in a skill, or a hook if it must never happen.</li>
+      <li>Use the Claude Code GitHub Action (headless) for PR review, so CI catches what a tired you would miss.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section id="advice">
+  <div class="sec-head read">
+    <div class="eyebrow">13 · Notes from the field</div>
+    <h2>What will decide the interview</h2>
+  </div>
+  <div class="stack read">
+    <div class="callout warn"><strong>Employer work: experience, not project.</strong>e-Kuber is RBI critical infrastructure. On the site, say you <em>contributed to</em> it and show only what is already on your resume. Publish no system diagrams, code, screenshots, internal names or volumes, and no RBI or ReBIT logos (text mentions are fine). Read your employment agreement and any disclosure or social-media policy, and consider telling your manager. A bank's background check may look at exactly this. Interviewers notice discretion, and they notice its absence even more.</div>
+    <div class="callout"><strong>Let Settlement Lab carry the technical proof.</strong>When an interviewer asks "show me something you built", open the Settlement Lab repo, not a description of your employer's system. Talk about work experience as decisions and lessons ("we had to guarantee exactly-once posting, so…") without describing the system itself.</div>
+    <div class="callout"><strong>Be ready for the arithmetic.</strong>100,000 transactions per hour is about 28 per second. A sharp interviewer will work that out. Frame it with what each transaction involved (ISO 20022 parsing, validation, GL posting, an MQ hop, exactly-once guarantees) and use the Lab to show you understand where throughput actually goes. Use international number format on the site; global recruiters misread "1,00,000".</div>
+    <div class="callout"><strong>Own every line.</strong>"Built 100% with Claude Code" is a strength in 2026 only if you can explain any file on request. Treat agents like strong junior engineers: you approve specs, you review every PR, and you can defend each ADR.</div>
+    <div class="callout"><strong>Seniority comes from trade-offs, not adjectives.</strong>With 2+ years, don't call yourself senior. Show it through decision records, failure handling and what you would change. Keep the ML projects, but move them below the payments work so your positioning stays clear.</div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var el = document.getElementById('lab-tps'); if(!el) return;
+  var base = 2184;
+  setInterval(function(){
+    var v = base + Math.round((Math.random()-0.5)*180);
+    el.textContent = v.toLocaleString('en-US');
+  }, 900);
+})();
+</script>
