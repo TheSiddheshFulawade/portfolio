@@ -10,7 +10,7 @@ const SAFE_DELETE = /^(\.\/)?(apps\/(web|api)\/)?(node_modules|dist|target|cover
 
 const rules = [
   [/\bgit\s+push\b.*(\s--force(-with-lease)?\b|\s-f\b)/, 'force push is not allowed'],
-  [/\bgit\s+push\b(?!.*--dry-run)[^;&|\n]*[\s:](main|master|develop)(?=\s|$|;|&|\|)/, 'direct push to main or develop is not allowed; push a work branch and open a pull request (/ship)'],
+  [/\bgit\s+push\b(?!.*--dry-run)[^;&|\n]*[\s:](refs\/heads\/)?(main|master|develop)(?=\s|$|;|&|\|)/, 'direct push to main or develop is not allowed; push a work branch and open a pull request (/ship)'],
   [/\bgh\s+pr\s+merge\b[^;&|\n]*--admin\b/, 'bypassing branch protection with --admin is not allowed'],
   [/--no-verify\b/, 'skipping git hooks (--no-verify) is not allowed'],
   [/\bgit\s+(commit|merge|rebase)\b.*\s-c\s+commit\.gpgsign=false/, 'disabling commit signing is not allowed'],
