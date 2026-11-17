@@ -4,9 +4,13 @@ description: Review the current branch with security, UI and performance auditor
 disable-model-invocation: true
 argument-hint: "[optional paths or routes]"
 ---
-Review the current branch against main. Scope: $ARGUMENTS
+Review the current branch against develop. Scope: $ARGUMENTS
 
-1. Get the diff: `git diff main...HEAD --stat` and the full diff of changed files.
+Base: `origin/develop`. Exception: on a `release/*` branch or a PR into `main`, use `origin/main`.
+Always diff against the remote ref, so a stale local branch in a worktree cannot widen the diff.
+
+1. Get the diff: `git fetch origin develop`, then `git diff origin/develop...HEAD --stat` and the
+   full diff of changed files (for the exception above, fetch `main` and put `origin/main` in place of `origin/develop`).
 2. In parallel, delegate to:
    - `security-auditor` always;
    - `ui-reviewer` when files under apps/web or content changed (start the dev server first if needed);
