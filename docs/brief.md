@@ -16,7 +16,7 @@ interviewer concrete things to ask about.
 ## Audience and what each needs
 | Who | Time spent | Must find |
 |---|---|---|
-| Recruiter | 30 seconds | Role, domain, years, location, availability, resume PDF, LinkedIn |
+| Recruiter | 30 seconds | Role, domain, years, location, resume PDF, LinkedIn |
 | Hiring manager | 5 minutes | Settlement Lab write-up, decisions and trade-offs, experience |
 | Interviewer | 30 minutes | Settlement Lab running live, public code, specs, ADRs, tests |
 
@@ -50,10 +50,14 @@ About ₹1,000–1,300 per year (domain only). Everything else on free tiers.
 ## Timeline
 About 4 weeks at 15+ hours per week. Blueprint: docs/blueprint.html
 
-## Open questions for Siddhesh
-1. Domain name preference (e.g. siddheshfulawade.dev / .com)?
-2. Notice period and availability line to show on the home page?
-3. Which contact details may be public (email only? LinkedIn only?)
-4. Is it OK to name ReBIT and e-Kuber 3.0 on the site? (Check your employment terms.)
+## Decisions (answered 2026-11-16)
+1. Domain: siddheshfulawade.com
+2. No notice period or availability line anywhere on the site (the current employer may visit).
+   Notice period is 90 days, negotiable: shared directly with recruiters, not published.
+3. Contact: the site shows email, LinkedIn, GitHub and the contact form. The phone number
+   appears only in the resume PDF. Values live in content/profile (added by the content spec),
+   not in this brief.
+4. ReBIT and e-Kuber 3.0 may be named, on the Experience page and in the resume only.
+   Never listed under Projects; Projects holds original work such as Settlement Lab.
 
-Status: DRAFT (change to APPROVED when you are happy with it)
+Status: APPROVED (2026-11-16)
