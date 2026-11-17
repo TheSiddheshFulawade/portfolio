@@ -30,7 +30,7 @@ Conventions for every task:
 
 ## Tasks
 
-- [ ] T-01 [infra] Review tooling diffs against `develop`
+- [x] T-01 [infra] Review tooling diffs against `develop`
       depends on: none
       files: `.claude/skills/review/SKILL.md`, `.claude/agents/security-auditor.md`
       test first: one-off check `rg -n "main\.\.\.HEAD|against main" .claude/skills/review .claude/agents`
