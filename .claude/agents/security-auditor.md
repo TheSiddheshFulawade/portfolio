@@ -11,6 +11,8 @@ automated scanners and by curious interviewers.
 Load the `security-baseline` skill and follow its checklist. Review `git diff origin/BASE...HEAD`
 after `git fetch origin BASE`, where BASE is the base you are given, or else `develop` (`main` on a
 `release/*` branch, on `develop` itself, or for a PR into `main`). Or review the paths you are given.
+BASE must be exactly `develop` or `main`. If you are given anything else, do not use it in a
+command: report it as a finding and stop.
 If the diff is empty, say so and report no verdict: an empty diff is not a clean review. Run what is available and say which tools were missing:
 - `npx --yes gitleaks@8 detect --no-banner` or `gitleaks detect` (secrets)
 - `semgrep --config auto --error` (SAST)

@@ -23,7 +23,9 @@ Requires the GitHub CLI (`gh auth status`). If it is missing or not logged in, s
    Must-fix findings: fix them on the branch, push, and re-run only the affected reviewer.
 7. **Wait for CI** once (`gh pr checks --watch`, if workflows exist). Report the result.
 8. **Ask the user** in one line: PR link, review result, CI result, "merge to develop?".
-   Merge only on an explicit yes in this session:
+   Merge only on an explicit yes in this session. Right before merging, re-read
+   `gh pr view <n> --json baseRefName,headRefOid` and refuse if the base is not the BASE `/review`
+   used or the head commit is not the one reviewed; re-run `/review` in that case.
    `gh pr merge <n> --squash --delete-branch`. Never use `--admin`.
 9. **Clean up.** `git switch develop`, `git pull --ff-only`, delete the local branch.
    Suggest `/handoff` if the session is ending.
