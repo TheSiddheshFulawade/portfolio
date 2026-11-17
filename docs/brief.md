@@ -53,7 +53,7 @@ About 4 weeks at 15+ hours per week. Blueprint: docs/blueprint.html
 ## Decisions (answered 2026-11-16)
 1. Domain: siddheshfulawade.com
 2. No notice period or availability line anywhere on the site (the current employer may visit).
-   Notice period is 90 days, negotiable: shared directly with recruiters, not published.
+   The notice period is shared directly with recruiters (details in docs/private/), not published.
 3. Contact: the site shows email, LinkedIn, GitHub and the contact form. The phone number
    appears only in the resume PDF. Values live in content/profile (added by the content spec),
    not in this brief.
