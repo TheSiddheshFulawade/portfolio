@@ -116,7 +116,7 @@ Conventions for every task:
       - If a test exposes a defect, the hook fix is in this task and named in the PR description.
         A defect that needs more than a small fix is raised with the user instead.
 
-- [ ] T-05 [web] Angular 22 static, zoneless skeleton with exact pins
+- [x] T-05 [web] Angular 22 static, zoneless skeleton with exact pins
       depends on: T-02, T-03
       files: `apps/web/package.json`, `apps/web/package-lock.json`, `apps/web/.npmrc`,
       `apps/web/angular.json`, `apps/web/tsconfig.json`, `apps/web/tsconfig.app.json`,
