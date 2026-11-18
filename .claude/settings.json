@@ -14,10 +14,10 @@
       "Bash(git log*)",
       "Bash(git branch*)",
       "Bash(git add *)",
-      "Bash(node .claude/hooks/*)"
+      "Bash(node .claude/hooks/*)",
+      "Bash(git commit *)"
     ],
     "ask": [
-      "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(git reset *)",
       "Bash(npm install *)",

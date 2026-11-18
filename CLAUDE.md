@@ -53,18 +53,20 @@ Load the matching skill before working in an area:
 
 ## Workflow
 `/spec-new` → you approve → `/spec-design` → you approve → `/spec-tasks` →
-`/implement <spec> <task>` (one task per session) → `/review` → `/ship` → `/handoff`
+batch of 4–5 tasks on `feature/<spec>-batch-<n>` (per task: failing test, code, green suite, tick,
+local commit) → checkpoint: `/review` → fixes → `/ship` (one PR) → `/handoff` (ADR-0003).
+Collect questions for the checkpoint; stop early only for cross-cutting, security or irreversible ones.
 
 ## Branches
 - `main`: production. Changes only through a release PR from `develop` (`/release`), merge commit, tag `vX.Y.Z`.
 - `develop`: integration. Changes only through PRs from short-lived branches, squash-merged.
-- Work branches from `develop`: `feature/<spec>-<task>` (e.g. `feature/010-T03`), `fix/<topic>`, `chore/<topic>`.
+- Work branches from `develop`: `feature/<spec>-batch-<n>` (e.g. `feature/001-batch-1`), `fix/<topic>`, `chore/<topic>`.
 - `/ship` pushes the branch, opens the PR to `develop`, posts the review on it, and merges only after the user says yes.
 - Merging and pushing always need the user's explicit go-ahead in the current session.
 
 ## Definition of done
-Task ticked in tasks.md · tests green · quality gate passes · `/review` has no high findings ·
-CHANGELOG entry · `/handoff` written at the end of the session.
+Per task: failing test first · tests green · ticked in tasks.md · local commit.
+Per batch: `/review` has no high findings · CHANGELOG entry per task · one PR · `/handoff` written.
 
 ## Environment
 Windows 11. Hooks are Node scripts so they run the same in CI. Use forward slashes in paths.
