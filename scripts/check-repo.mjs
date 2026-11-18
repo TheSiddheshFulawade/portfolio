@@ -1,5 +1,7 @@
 // Repo policy check runner: runs every scripts/checks/*.mjs module (except tests) against the repo.
-// Each module exports check(root): string[] (or a Promise of one). Fails closed on broken modules.
+// Each module exports check(root): string[] (or a Promise of one). Fails closed: a module that
+// cannot load, a missing checks dir, or finding no checks at all is an error.
+import { realpathSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -21,7 +23,17 @@ export async function main({
   log = console.log,
   error = console.error,
 } = {}) {
-  const modules = await discover(checksDir);
+  let modules;
+  try {
+    modules = await discover(checksDir);
+  } catch (err) {
+    error(`check-repo: cannot read the checks dir ${checksDir}: ${err?.code ?? err?.message ?? err}`);
+    return 1;
+  }
+  if (modules.length === 0) {
+    error(`check-repo: no check modules found in ${checksDir}`);
+    return 1;
+  }
   let failures = 0;
   for (const file of modules) {
     const name = basename(file, '.mjs');
@@ -45,6 +57,24 @@ export async function main({
   return failures ? 1 : 0;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+if (isEntryPoint(import.meta.url)) {
   process.exitCode = await main();
+}
+
+/**
+ * True when this file is the script Node was started with. Compares real paths: Node resolves
+ * import.meta.url through symlinks and junctions but leaves argv[1] as typed, so a plain string
+ * compare would silently skip main() and exit 0 when the repo is opened through a link.
+ */
+function isEntryPoint(moduleUrl) {
+  if (!process.argv[1]) return false;
+  try {
+    const norm = (p) => {
+      const real = realpathSync.native(p);
+      return process.platform === 'win32' ? real.toLowerCase() : real;
+    };
+    return norm(process.argv[1]) === norm(fileURLToPath(moduleUrl));
+  } catch {
+    return false;
+  }
 }

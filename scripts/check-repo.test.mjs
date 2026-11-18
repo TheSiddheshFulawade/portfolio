@@ -164,3 +164,52 @@ test('REQ-REPO-002 check-repo with a mix of passing, failing and broken modules 
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('REQ-REPO-002 check-repo fails closed when no check modules are found', async () => {
+  const { main } = await load();
+  const dir = await makeChecksDir({ 'only.test.mjs': THROWS_ON_IMPORT });
+  const c = capture();
+  try {
+    assert.equal(await main({ root: dir, checksDir: dir, log: c.log, error: c.error }), 1);
+    assert.ok(c.errors.some((e) => /no check modules/.test(e)), JSON.stringify(c.errors));
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('REQ-REPO-002 check-repo reports a missing checks dir as an error, not a crash', async () => {
+  const { main } = await load();
+  const dir = await mkdtemp(path.join(tmpdir(), 'check-repo-'));
+  const c = capture();
+  try {
+    assert.equal(await main({ root: dir, checksDir: path.join(dir, 'missing'), log: c.log, error: c.error }), 1);
+    assert.ok(c.errors.some((e) => /checks dir/.test(e)), JSON.stringify(c.errors));
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('REQ-REPO-002 check-repo CLI runs the checks, also when started through a symlink or junction', async () => {
+  const fs = await import('node:fs');
+  const { spawnSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const root = await mkdtemp(path.join(tmpdir(), 'check-repo-cli-'));
+  const linkParent = await mkdtemp(path.join(tmpdir(), 'check-repo-link-'));
+  const link = path.join(linkParent, 'scripts');
+  try {
+    await mkdir(path.join(root, 'scripts', 'checks'), { recursive: true });
+    fs.copyFileSync(path.join(repoRoot, 'scripts', 'check-repo.mjs'), path.join(root, 'scripts', 'check-repo.mjs'));
+    await writeFile(path.join(root, 'scripts', 'checks', 'bad.mjs'), FAIL);
+    fs.symlinkSync(path.join(root, 'scripts'), link, process.platform === 'win32' ? 'junction' : 'dir');
+    for (const script of [path.join(root, 'scripts', 'check-repo.mjs'), path.join(link, 'check-repo.mjs')]) {
+      const res = spawnSync(process.execPath, [script], { encoding: 'utf8' });
+      assert.equal(res.status, 1, `${script}: a silent exit 0 means the entry guard failed`);
+      assert.match(res.stderr, /^bad: first problem$/m);
+    }
+  } finally {
+    if (fs.existsSync(link)) fs.unlinkSync(link);
+    await rm(linkParent, { recursive: true, force: true });
+    await rm(root, { recursive: true, force: true });
+  }
+});

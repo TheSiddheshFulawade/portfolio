@@ -87,6 +87,7 @@ test('REQ-REPO-002 root package.json rejects every dependency-bearing field', as
     optionalDependencies: { a: '1.0.0' },
     peerDependencies: { a: '1.0.0' },
     bundleDependencies: ['a'],
+    bundledDependencies: ['a'],
     workspaces: ['apps/*'],
   };
   for (const [field, value] of Object.entries(fields)) {

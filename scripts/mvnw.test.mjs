@@ -43,6 +43,11 @@ const REJECTED = [
   ['LF', '-Dx=a\nb'],
   ['non-ASCII', '-Dx=aéb'],
   ['empty string', ''],
+  ['NUL', '-Dx=a\0b'],
+  ['trailing LF', 'verify\n'],
+  ['fullwidth percent', '-Dx=％PATH％'],
+  ['fullwidth quote', '-Dx=a＂b'],
+  ['leading @', '@args.txt'],
 ];
 
 for (const [label, arg] of REJECTED) {
@@ -51,6 +56,13 @@ for (const [label, arg] of REJECTED) {
     assert.equal(validateArgs(['-B', arg, 'verify']), arg);
   });
 }
+
+test('REQ-REPO-002 mvnw rejects non-string arguments', async () => {
+  const { validateArgs } = await load();
+  for (const arg of [123, null, undefined, new String('verify'), ['verify'], { toString: () => 'verify' }]) {
+    assert.equal(validateArgs([arg]), arg, `${String(arg)} must be rejected`);
+  }
+});
 
 test('REQ-REPO-002 mvnw rejects an argument that starts with a character outside the allowed lead set', async () => {
   const { validateArgs } = await load();
@@ -201,4 +213,66 @@ test('REQ-REPO-002 mvnw CLI exits 2 with the rejection message and spawns nothin
   assert.equal(res.status, 2, `stderr: ${res.stderr}`);
   assert.equal(res.stderr, 'mvnw.mjs: rejected argument "a%b"\n');
   assert.equal(res.stdout, '');
+});
+
+// CLI tests on a copied layout (<tmp>/scripts/mvnw.mjs), so the real repo's apps/api is never run.
+async function cliLayout({ wrapper = false } = {}) {
+  const fs = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const root = fs.mkdtempSync(path.join(tmpdir(), 'mvnw-cli-'));
+  fs.mkdirSync(path.join(root, 'scripts'));
+  fs.copyFileSync(path.join(repoRoot, 'scripts', 'mvnw.mjs'), path.join(root, 'scripts', 'mvnw.mjs'));
+  if (wrapper) {
+    const api = path.join(root, 'apps', 'api');
+    fs.mkdirSync(api, { recursive: true });
+    // Stub wrappers print exactly what they received, to prove that joining on win32 is exact.
+    fs.writeFileSync(path.join(api, 'mvnw.cmd'), '@echo off\r\necho ARGS=%*\r\nexit /b 7\r\n');
+    fs.writeFileSync(path.join(api, 'mvnw'), '#!/bin/sh\necho "ARGS=$*"\nexit 7\n', { mode: 0o755 });
+  }
+  const link = path.join(fs.mkdtempSync(path.join(tmpdir(), 'mvnw-link-')), 'scripts');
+  fs.symlinkSync(path.join(root, 'scripts'), link, process.platform === 'win32' ? 'junction' : 'dir');
+  const cleanup = () => {
+    fs.unlinkSync(link);
+    fs.rmSync(path.dirname(link), { recursive: true, force: true });
+    fs.rmSync(root, { recursive: true, force: true });
+  };
+  return { script: path.join(root, 'scripts', 'mvnw.mjs'), linked: path.join(link, 'mvnw.mjs'), cleanup };
+}
+
+test('REQ-REPO-002 mvnw CLI reaches the spawn path for valid arguments (exit 1, apps/api not found)', async () => {
+  const l = await cliLayout();
+  try {
+    const res = spawnSync(process.execPath, [l.script, '-B', 'verify'], { encoding: 'utf8' });
+    assert.equal(res.status, 1, `stderr: ${res.stderr}`);
+    assert.match(res.stderr, /apps\/api not found/);
+    assert.doesNotMatch(res.stderr, /DEP0190/);
+  } finally {
+    l.cleanup();
+  }
+});
+
+test('REQ-REPO-002 mvnw CLI still runs when started through a symlink or junction', async () => {
+  const l = await cliLayout();
+  try {
+    const rejected = spawnSync(process.execPath, [l.linked, 'a%b'], { encoding: 'utf8' });
+    assert.equal(rejected.status, 2, `a silent exit 0 means the entry guard failed: ${rejected.stderr}`);
+    const valid = spawnSync(process.execPath, [l.linked, 'verify'], { encoding: 'utf8' });
+    assert.equal(valid.status, 1);
+    assert.match(valid.stderr, /apps\/api not found/);
+  } finally {
+    l.cleanup();
+  }
+});
+
+test('REQ-REPO-002 mvnw passes the contract arguments to the wrapper unchanged and forwards its exit code', async () => {
+  const l = await cliLayout({ wrapper: true });
+  try {
+    const args = ['-B', '-ntp', '-Dspotless.check.skip=true', '-Da=b,c+d@e/f:g', 'spotless:check', 'verify'];
+    const res = spawnSync(process.execPath, [l.script, ...args], { encoding: 'utf8' });
+    assert.equal(res.status, 7, `stderr: ${res.stderr}`);
+    assert.equal(res.stdout.trim(), `ARGS=${args.join(' ')}`);
+    assert.doesNotMatch(res.stderr, /DEP0190/);
+  } finally {
+    l.cleanup();
+  }
 });

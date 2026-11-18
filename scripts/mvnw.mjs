@@ -5,9 +5,9 @@
 // expands %VAR% and ^ even inside quotes, so every argument must pass the allow-list before
 // anything is spawned. The executable and the cwd are constants.
 import { spawn as nodeSpawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,6 +64,24 @@ export async function main(
   });
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+if (isEntryPoint(import.meta.url)) {
   process.exitCode = await main(process.argv.slice(2));
+}
+
+/**
+ * True when this file is the script Node was started with. Compares real paths: Node resolves
+ * import.meta.url through symlinks and junctions but leaves argv[1] as typed, so a plain string
+ * compare would silently skip main() and exit 0 when the repo is opened through a link.
+ */
+function isEntryPoint(moduleUrl) {
+  if (!process.argv[1]) return false;
+  try {
+    const norm = (p) => {
+      const real = realpathSync.native(p);
+      return process.platform === 'win32' ? real.toLowerCase() : real;
+    };
+    return norm(process.argv[1]) === norm(fileURLToPath(moduleUrl));
+  } catch {
+    return false;
+  }
 }

@@ -12,7 +12,8 @@ export const REQUIRED_SCRIPTS = [
 ];
 
 const FORBIDDEN_FIELDS = [
-  'dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies', 'bundleDependencies', 'workspaces',
+  'dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies', 'bundleDependencies',
+  'bundledDependencies', 'workspaces',
 ];
 
 export function check(root) {
