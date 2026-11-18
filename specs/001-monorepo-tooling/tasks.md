@@ -149,7 +149,7 @@ Conventions for every task:
       - From the root: `npm run install:web`, `typecheck:web`, `test:web`, `build:web` and `audit:web` exit 0;
         `check:repo` passes. If `audit:web` reports a high finding in dev tooling, follow risk R-4 (never lower the level).
 
-- [ ] T-06 [web] ESLint (angular-eslint) and Prettier gate
+- [x] T-06 [web] ESLint (angular-eslint) and Prettier gate
       depends on: T-05
       files: `apps/web/eslint.config.js`, `apps/web/.prettierrc.json`, `apps/web/.prettierignore`,
       `apps/web/package.json`, `apps/web/package-lock.json`, `apps/web/angular.json` (lint target),

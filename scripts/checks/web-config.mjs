@@ -1,4 +1,4 @@
-// apps/web policy checks (spec 001: REQ-WEB-001, REQ-WEB-006, REQ-REPO-001, REQ-REPO-003; later tasks extend this file).
+// apps/web policy checks (spec 001: REQ-WEB-001, REQ-WEB-005, REQ-WEB-006, REQ-REPO-001, REQ-REPO-003; later tasks extend this file).
 // Zero dependencies. Each rule reads files under `root` and returns error strings.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -83,6 +83,48 @@ export function enginesErrors(nvmrc, engines) {
   return [];
 }
 
+const LINT_SCRIPT = 'ng lint && prettier --check .';
+
+/** REQ-WEB-005: lint = ng lint then prettier --check; format scripts exist; Prettier uses LF and ignores build output. */
+export function lintErrors(root, pkg) {
+  const errors = [];
+  const scripts = pkg.scripts ?? {};
+  if (scripts.lint !== LINT_SCRIPT) errors.push(`${WEB}/package.json script "lint" must be "${LINT_SCRIPT}"`);
+  if (!scripts.format) errors.push(`${WEB}/package.json script "format" is missing`);
+  if (!scripts['format:check']) errors.push(`${WEB}/package.json script "format:check" is missing`);
+
+  const rc = join(root, WEB, '.prettierrc.json');
+  if (!existsSync(rc)) errors.push(`${WEB}/.prettierrc.json is missing`);
+  else {
+    try {
+      if (JSON.parse(readFileSync(rc, 'utf8')).endOfLine !== 'lf') errors.push(`${WEB}/.prettierrc.json must set endOfLine "lf"`);
+    } catch (e) {
+      errors.push(`${WEB}/.prettierrc.json is not valid JSON: ${e.message}`);
+    }
+  }
+  const ignore = join(root, WEB, '.prettierignore');
+  const ignored = existsSync(ignore)
+    ? readFileSync(ignore, 'utf8')
+        .split(/\r?\n/)
+        .map((l) => l.trim().replace(/^\/|\/$/g, ''))
+    : null;
+  if (!ignored) errors.push(`${WEB}/.prettierignore is missing`);
+  else for (const dir of ['dist', 'coverage', '.angular']) if (!ignored.includes(dir)) errors.push(`${WEB}/.prettierignore must ignore ${dir}`);
+
+  const eslint = join(root, WEB, 'eslint.config.js');
+  if (!existsSync(eslint)) errors.push(`${WEB}/eslint.config.js is missing`);
+  else {
+    const text = readFileSync(eslint, 'utf8');
+    for (const needle of ['tsRecommended', 'templateRecommended', 'templateAccessibility', 'prefer-on-push-component-change-detection']) {
+      if (!text.includes(needle)) errors.push(`eslint.config.js must enable ${needle}`);
+    }
+    for (const rule of ['component-selector', 'directive-selector']) {
+      if (!new RegExp(`@angular-eslint/${rule}'[^\\]]*prefix:\\s*'sf'`).test(text)) errors.push(`eslint.config.js ${rule} must use prefix 'sf'`);
+    }
+  }
+  return errors;
+}
+
 export function check(root) {
   const errors = [];
   const rootPkg = readJson(root, 'package.json', errors);
@@ -93,6 +135,7 @@ export function check(root) {
   if (!pkg) return errors;
   errors.push(...pinErrors(pkg));
   if (angular) errors.push(...zonelessErrors(root, pkg, angular));
+  errors.push(...lintErrors(root, pkg));
   const nvmrcFile = join(root, '.nvmrc');
   if (existsSync(nvmrcFile)) errors.push(...enginesErrors(readFileSync(nvmrcFile, 'utf8'), pkg.engines?.node));
   return errors;
