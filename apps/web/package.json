@@ -14,7 +14,8 @@
     "e2e": "node scripts/e2e-stub.mjs",
     "lint": "ng lint && prettier --check .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "postbuild": "node scripts/verify-prerender.mjs"
   },
   "dependencies": {
     "@angular/common": "22.2.6",
@@ -32,6 +33,8 @@
     "@angular/cli": "22.2.7",
     "@angular/compiler-cli": "22.2.6",
     "@eslint/js": "10.0.1",
+    "@testing-library/angular": "19.6.0",
+    "@testing-library/dom": "10.4.2",
     "@types/node": "24.19.2",
     "@vitest/coverage-v8": "5.1.0",
     "angular-eslint": "22.7.0",

@@ -182,7 +182,7 @@ Conventions for every task:
       - Negative proof in the PR: an untested component pushes line coverage below 80 % and `npm run test` exits non-zero; reverted.
       - From the root: `npm run test:web` exits 0; `check:repo` passes.
 
-- [ ] T-08 [web] Placeholder home route and prerender verification
+- [x] T-08 [web] Placeholder home route and prerender verification
       depends on: T-07
       files: `apps/web/src/app/features/home/home-page.component.ts`, `.html`, `.scss`, `.spec.ts`,
       `apps/web/src/app/app.routes.ts`, `apps/web/src/app/app.routes.spec.ts`,

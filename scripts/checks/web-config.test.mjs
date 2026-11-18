@@ -364,6 +364,31 @@ test("REQ-WEB-004 angular.json test target sets lines threshold 80", async () =>
   assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["text-summary"])), "lcov"));
 });
 
+test("REQ-WEB-002 verify-prerender fails the build unless the prerendered index.html has the h1 and no server was emitted", () => {
+  const script = path.join(repoRoot, "apps/web/scripts/verify-prerender.mjs");
+  const run = (files) => {
+    const dir = mkdtempSync(path.join(tmpdir(), "prerender-"));
+    try {
+      for (const [rel, text] of Object.entries(files)) {
+        mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true });
+        writeFileSync(path.join(dir, rel), text);
+      }
+      return spawnSync(process.execPath, [script, dir], { encoding: "utf8" });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+  const page = (inner) => "<html><body><sf-root>" + inner + "</sf-root></body></html>";
+  const good = { "browser/index.html": page("<main><h1>Hello</h1></main>") };
+
+  assert.equal(run(good).status, 0);
+  assert.equal(run({ "browser/index.html": page("<main></main>") }).status, 1, "no h1");
+  assert.equal(run({ "browser/index.html": "<html><h1>x</h1><sf-root></sf-root></html>" }).status, 1, "h1 outside sf-root");
+  assert.equal(run({ "browser/index.html": page("<h1></h1>") }).status, 1, "empty h1");
+  assert.equal(run({}).status, 1, "no index.html");
+  assert.equal(run({ ...good, "server/server.mjs": "" }).status, 1, "server.mjs emitted");
+});
+
 test("REQ-REPO-001 the real repository passes the web-config checks", async () => {
   const { check } = await load();
   assert.deepEqual(check(repoRoot), []);
