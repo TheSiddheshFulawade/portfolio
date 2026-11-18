@@ -23,6 +23,25 @@ Monorepo:
 - `docs/private/` holds personal documents. Never copy anything from it into a tracked file
   without the user's approval (no phone number, no personal email).
 
+## Agent safety
+Enforced by `.claude/settings.json` (permission rules) and `.claude/hooks/guard-bash.mjs` /
+`protect-secrets.mjs` (block or force a prompt). These rules apply in every permission mode.
+- Never run commands that damage the OS, corrupt data or weaken system security. Never write,
+  download or run malware, keyloggers, reverse shells, obfuscated or encoded payloads.
+- Never disable or reconfigure Windows Defender, the firewall, UAC, SmartScreen, AMSI, event logs
+  or any other security protection. Never add antivirus exclusions.
+- Never read, print, copy or change credentials: `.env*`, keys and certificates, `~/.ssh`,
+  `~/.aws`, `~/.config/gh`, `~/.npmrc`, git credential helpers, tokens in environment variables.
+- Ask first for anything destructive, irreversible, system-wide or outward-facing: global or system
+  package installs, registry, services, scheduled tasks, persistent env vars, elevation, shutdown,
+  `git reset --hard`, `git clean`, history rewrites, GitHub repo settings or secrets, file uploads,
+  and changes to Claude Code settings, hooks or MCP config.
+- Stay project-scoped: work inside the repo, the session scratchpad and `.cache/`. File-tool writes
+  outside the working directories are refused by setting.
+- Before a risky command, state what it does and why it is needed. If a guard blocks something
+  that is genuinely needed, ask the user; never work around a guard.
+- Routine coding, testing, debugging, docs and git work on branches run without extra prompts.
+
 ## Commands
 Web (from apps/web, once spec 001 creates it): `npm run dev | test | e2e | lint | typecheck | build`
 API (from apps/api): `./mvnw verify` · native: `./mvnw -Pnative package` (Windows: `mvnw.cmd`)

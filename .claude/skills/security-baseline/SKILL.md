@@ -40,6 +40,10 @@ Targets: Mozilla Observatory A+, securityheaders.com A+, SSL Labs A+, zero high/
 
 ## Agent safety
 - [ ] `.claude/settings.json` deny rules and hooks intact; no secrets in prompts, specs or session notes
+- [ ] `disableBypassPermissionsMode` and `blockWritesOutsideWorkingDirectories` still set; no allow rule
+      or hook change weakens CLAUDE.md "Agent safety" (deny wins over ask, ask over allow)
+- [ ] A change to `guard-bash.mjs` or `protect-secrets.mjs` keeps every existing rule and adds a test
+      for each new one (`.claude/hooks/*.test.mjs`, spec 001 T-04)
 - [ ] `docs/private/` never tracked by git
 
 ## Threat model
