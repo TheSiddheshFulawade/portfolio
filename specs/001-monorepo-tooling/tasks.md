@@ -77,7 +77,7 @@ Conventions for every task:
         `mvnw.mjs: rejected argument <JSON-escaped arg>` to stderr and exits 2. The executable and cwd are constants.
       - `npm run test:scripts` and `npm run check:repo` pass on Windows 11.
 
-- [ ] T-03 [infra] Line endings, editor rules and Node pin
+- [x] T-03 [infra] Line endings, editor rules and Node pin
       depends on: T-02
       files: `.gitattributes`, `.editorconfig`, `.gitignore`, `.nvmrc`,
       `scripts/checks/line-endings.mjs`, `scripts/checks/line-endings.test.mjs`,
