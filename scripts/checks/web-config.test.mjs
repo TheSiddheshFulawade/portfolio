@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,6 +18,12 @@ const goodPackage = () => ({
   private: true,
   engines: { node: ">=24.15.0 <25.0.0" },
   scripts: {
+    dev: "ng serve",
+    build: "ng build",
+    test: "ng test --no-watch --coverage",
+    typecheck:
+      "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
+    e2e: "node scripts/e2e-stub.mjs",
     lint: "ng lint && prettier --check .",
     format: "prettier --write .",
     "format:check": "prettier --check .",
@@ -28,6 +35,15 @@ const goodAngular = () => ({
   projects: {
     web: {
       architect: {
+        test: {
+          builder: "@angular/build:unit-test",
+          options: {
+            runner: "vitest",
+            coverageThresholds: { lines: 80 },
+            coverageReporters: ["text-summary", "lcov"],
+            coverageInclude: ["src/app/**/*.ts"],
+          },
+        },
         build: {
           builder: "@angular/build:application",
           options: {
@@ -308,6 +324,44 @@ test("REQ-WEB-005 eslint config enables tsRecommended, templateRecommended, temp
     ),
   );
   assert.ok(has(await errorsFor((p) => (p.eslint = null)), "eslint.config.js"));
+});
+
+test("REQ-WEB-003 web defines dev, test, e2e, lint, typecheck, build", async () => {
+  for (const name of ["dev", "test", "e2e", "lint", "typecheck", "build"]) {
+    const errors = await errorsFor((p) => delete p.pkg.scripts[name]);
+    assert.ok(has(errors, `"${name}"`), `${name} must be required`);
+  }
+  const wrong = {
+    dev: "ng build",
+    test: "ng test --no-watch",
+    typecheck: "tsc --noEmit -p tsconfig.app.json",
+    e2e: "echo skipped",
+  };
+  for (const [name, value] of Object.entries(wrong)) {
+    const errors = await errorsFor((p) => (p.pkg.scripts[name] = value));
+    assert.ok(has(errors, `"${name}"`), `${name} = ${value} must be rejected`);
+  }
+});
+
+test("REQ-WEB-003 e2e stub exits 0", () => {
+  const stub = path.join(repoRoot, "apps/web/scripts/e2e-stub.mjs");
+  const result = spawnSync(process.execPath, [stub], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /^e2e: no tests until spec 004\r?\n$/);
+});
+
+test("REQ-WEB-004 angular.json test target sets lines threshold 80", async () => {
+  const test = (p) => p.angular.projects.web.architect.test;
+  // untested files must count, otherwise the gate is hollow
+  assert.ok(has(await errorsFor((p) => delete test(p).options.coverageInclude), "coverageInclude"));
+  assert.ok(has(await errorsFor((p) => delete p.angular.projects.web.architect.test), "test target"));
+  assert.ok(has(await errorsFor((p) => (test(p).builder = "@angular/build:karma")), "@angular/build:unit-test"));
+  assert.ok(has(await errorsFor((p) => (test(p).options.runner = "karma")), "runner"));
+  assert.ok(has(await errorsFor((p) => (test(p).options.coverageThresholds.lines = 79)), "lines"));
+  assert.ok(has(await errorsFor((p) => delete test(p).options.coverageThresholds), "lines"));
+  assert.deepEqual(await errorsFor((p) => (test(p).options.coverageThresholds.lines = 90)), []); // raising the bar is allowed
+  assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["html"])), "coverageReporters"));
+  assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["text-summary"])), "lcov"));
 });
 
 test("REQ-REPO-001 the real repository passes the web-config checks", async () => {

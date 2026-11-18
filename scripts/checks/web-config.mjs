@@ -125,6 +125,42 @@ export function lintErrors(root, pkg) {
   return errors;
 }
 
+const REQUIRED_SCRIPTS = {
+  dev: (v) => v === 'ng serve',
+  build: (v) => v === 'ng build',
+  test: (v) => v === 'ng test --no-watch --coverage',
+  typecheck: (v) => /tsc --noEmit -p tsconfig\.app\.json/.test(v) && /tsc --noEmit -p tsconfig\.spec\.json/.test(v),
+  e2e: (v) => v === 'node scripts/e2e-stub.mjs',
+};
+
+/** REQ-WEB-003: the script set the root contract calls. */
+export function scriptErrors(pkg) {
+  const errors = [];
+  for (const [name, ok] of Object.entries(REQUIRED_SCRIPTS)) {
+    const value = pkg.scripts?.[name];
+    if (value === undefined) errors.push(WEB + '/package.json script "' + name + '" is missing');
+    else if (!ok(value)) errors.push(WEB + '/package.json script "' + name + '" has an unexpected command: ' + value);
+  }
+  return errors;
+}
+
+/** REQ-WEB-004: unit-test target uses the Vitest runner with an 80 % line threshold and text-summary + lcov reporters. */
+export function coverageErrors(angular) {
+  const test = angular?.projects?.web?.architect?.test;
+  if (!test) return ['angular.json has no test target for project "web"'];
+  const errors = [];
+  const o = test.options ?? {};
+  if (test.builder !== '@angular/build:unit-test') errors.push('angular.json test target must use @angular/build:unit-test');
+  if (o.runner !== 'vitest') errors.push('angular.json test target runner must be "vitest"');
+  const lines = o.coverageThresholds?.lines;
+  if (typeof lines !== 'number' || lines < 80) errors.push('angular.json test target coverageThresholds.lines must be at least 80');
+  for (const reporter of ['text-summary', 'lcov']) {
+    if (!(o.coverageReporters ?? []).includes(reporter)) errors.push('angular.json test target coverageReporters must include ' + reporter);
+  }
+  if (!(o.coverageInclude ?? []).includes('src/app/**/*.ts')) errors.push('angular.json test target coverageInclude must include src/app/**/*.ts (untested files must count)');
+  return errors;
+}
+
 export function check(root) {
   const errors = [];
   const rootPkg = readJson(root, 'package.json', errors);
@@ -135,7 +171,7 @@ export function check(root) {
   if (!pkg) return errors;
   errors.push(...pinErrors(pkg));
   if (angular) errors.push(...zonelessErrors(root, pkg, angular));
-  errors.push(...lintErrors(root, pkg));
+  errors.push(...lintErrors(root, pkg), ...scriptErrors(pkg), ...coverageErrors(angular));
   const nvmrcFile = join(root, '.nvmrc');
   if (existsSync(nvmrcFile)) errors.push(...enginesErrors(readFileSync(nvmrcFile, 'utf8'), pkg.engines?.node));
   return errors;

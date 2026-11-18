@@ -165,7 +165,7 @@ Conventions for every task:
         selector without the `sf` prefix) each make `npm run lint` exit non-zero; both reverted.
       - From the root: `npm run lint:web` and `format:check:web` exit 0; `check:repo` passes.
 
-- [ ] T-07 [web] Web script set, 80 % coverage gate and e2e stub
+- [x] T-07 [web] Web script set, 80 % coverage gate and e2e stub
       depends on: T-06
       files: `apps/web/angular.json` (test target), `apps/web/package.json`, `apps/web/scripts/e2e-stub.mjs`,
       `scripts/checks/web-config.mjs`, `scripts/checks/web-config.test.mjs`

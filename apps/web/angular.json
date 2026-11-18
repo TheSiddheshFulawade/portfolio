@@ -101,7 +101,17 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "runner": "vitest"
+            "runner": "vitest",
+            "coverageThresholds": {
+              "lines": 80
+            },
+            "coverageReporters": ["text-summary", "lcov"],
+            "coverageInclude": ["src/app/**/*.ts"],
+            "coverageExclude": [
+              "src/app/**/*.spec.ts",
+              "src/app/app.config.server.ts",
+              "src/app/app.routes.server.ts"
+            ]
           }
         },
         "lint": {
