@@ -37,3 +37,6 @@ desktop.ini
 
 # Downloaded tool binaries
 .cache/
+
+# Playwright MCP screenshots and snapshots (local review output)
+.playwright-mcp/

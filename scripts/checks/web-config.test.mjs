@@ -82,7 +82,7 @@ function fixture(mutate = () => {}) {
     pkg: goodPackage(),
     angular: goodAngular(),
     serverRoutes: goodServerRoutes,
-    lock: "{}",
+    lock: JSON.stringify({ lockfileVersion: 3, packages: { "": { name: "web" } } }),
     eslint: goodEslint,
     prettier: JSON.stringify(goodPrettier),
     prettierIgnore: goodPrettierIgnore,
@@ -392,4 +392,39 @@ test("REQ-WEB-002 verify-prerender fails the build unless the prerendered index.
 test("REQ-REPO-001 the real repository passes the web-config checks", async () => {
   const { check } = await load();
   assert.deepEqual(check(repoRoot), []);
+});
+
+test("REQ-WEB-006 package-lock.json resolves only from the npm registry with sha512 integrity", async () => {
+  const { lockfileErrors } = await load();
+  const entry = (name) => ({
+    version: "1.0.0",
+    resolved: `https://registry.npmjs.org/${name}/-/${name}-1.0.0.tgz`,
+    integrity: "sha512-abc",
+  });
+  const good = {
+    lockfileVersion: 3,
+    packages: { "": { name: "web" }, "node_modules/a": entry("a"), "node_modules/b": entry("b") },
+  };
+  assert.deepEqual(lockfileErrors(good), []);
+
+  const cases = [
+    [{ ...good, lockfileVersion: 2 }, "lockfileVersion"],
+    [{ ...good, packages: { ...good.packages, "node_modules/c": { ...entry("c"), resolved: "git+https://github.com/x/c.git" } } }, "node_modules/c"],
+    [{ ...good, packages: { ...good.packages, "node_modules/d": { ...entry("d"), resolved: "https://evil.example/d.tgz" } } }, "node_modules/d"],
+    [{ ...good, packages: { ...good.packages, "node_modules/e": { ...entry("e"), integrity: undefined } } }, "node_modules/e"],
+    [{ ...good, packages: { ...good.packages, "node_modules/f": { ...entry("f"), integrity: "sha1-abc" } } }, "node_modules/f"],
+    [{ ...good, packages: { ...good.packages, "node_modules/g": { resolved: "../local-g", link: true } } }, "node_modules/g"],
+  ];
+  for (const [lock, needle] of cases) {
+    const errs = lockfileErrors(lock);
+    assert.ok(errs.some((e) => e.includes(needle)), `${needle}: ${JSON.stringify(errs)}`);
+  }
+});
+
+test("REQ-WEB-006 $ references are allowed only in overrides", async () => {
+  const { pinErrors } = await load();
+  const pkg = { dependencies: { rxjs: "$rxjs" }, overrides: { rxjs: "$rxjs" } };
+  const errs = pinErrors(pkg);
+  assert.ok(errs.some((e) => e.includes("dependencies")), JSON.stringify(errs));
+  assert.ok(!errs.some((e) => e.includes("overrides")), JSON.stringify(errs));
 });

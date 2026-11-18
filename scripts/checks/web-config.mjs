@@ -24,7 +24,8 @@ function readJson(root, rel, errors) {
 function walkPins(prefix, value, errors) {
   if (typeof value === 'string') {
     // overrides may reference another dependency with "$name"; every other value must be an exact version
-    if (!EXACT.test(value) && !value.startsWith('$')) errors.push(`${WEB}/package.json ${prefix} must be an exact version, not "${value}"`);
+    const ref = value.startsWith('$') && prefix.startsWith('overrides');
+    if (!EXACT.test(value) && !ref) errors.push(`${WEB}/package.json ${prefix} must be an exact version, not "${value}"`);
   } else if (value && typeof value === 'object') {
     for (const [k, v] of Object.entries(value)) walkPins(`${prefix}.${k}`, v, errors);
   }
@@ -35,6 +36,28 @@ export function pinErrors(pkg) {
   const errors = [];
   for (const section of [...PIN_SECTIONS, 'overrides']) {
     if (pkg[section]) walkPins(section, pkg[section], errors);
+  }
+  return errors;
+}
+
+const REGISTRY = 'https://registry.npmjs.org/';
+
+/** REQ-WEB-006: the lockfile installs only registry tarballs with sha512 integrity (no git, file, link or other hosts). */
+export function lockfileErrors(lock) {
+  const errors = [];
+  if (lock?.lockfileVersion !== 3) errors.push(`${WEB}/package-lock.json lockfileVersion must be 3`);
+  for (const [path, entry] of Object.entries(lock?.packages ?? {})) {
+    if (path === '') continue;
+    if (entry.link) {
+      errors.push(`${WEB}/package-lock.json ${path} is a link; only registry packages are allowed`);
+      continue;
+    }
+    if (typeof entry.resolved !== 'string' || !entry.resolved.startsWith(REGISTRY)) {
+      errors.push(`${WEB}/package-lock.json ${path} must resolve from ${REGISTRY}, not "${entry.resolved}"`);
+    }
+    if (typeof entry.integrity !== 'string' || !entry.integrity.startsWith('sha512-')) {
+      errors.push(`${WEB}/package-lock.json ${path} must have a sha512 integrity hash`);
+    }
   }
   return errors;
 }
@@ -167,6 +190,10 @@ export function check(root) {
   if (rootPkg?.workspaces !== undefined) errors.push('root package.json must not define workspaces (REQ-REPO-001)');
   const pkg = readJson(root, `${WEB}/package.json`, errors);
   if (!existsSync(join(root, WEB, 'package-lock.json'))) errors.push(`${WEB}/package-lock.json is missing (commit the lockfile)`);
+  else {
+    const lock = readJson(root, `${WEB}/package-lock.json`, errors);
+    if (lock) errors.push(...lockfileErrors(lock));
+  }
   const angular = readJson(root, `${WEB}/angular.json`, errors);
   if (!pkg) return errors;
   errors.push(...pinErrors(pkg));

@@ -2,7 +2,8 @@
 // and force a permission prompt for system-level or irreversible ones.
 // Policy: CLAUDE.md "Agent safety". Pattern rules are a safety net, not a sandbox: they read
 // the command text, so an obfuscated command can still slip past. Deny wins over ask.
-import { readInput, block, allow, ask } from './lib.mjs';
+import { execFileSync } from 'node:child_process';
+import { readInput, block, allow, ask, ROOT } from './lib.mjs';
 
 const input = await readInput();
 const cmd = String(input?.tool_input?.command ?? '');
@@ -136,7 +137,22 @@ const askRules = [
   [/\b(curl|wget)\b[^;&|]*\s(-d|--data(-binary|-raw|-urlencode)?|-F|--form|-T|--upload-file)\s*['"]?[\w-]*=?@|\b(Invoke-RestMethod|Invoke-WebRequest|irm|iwr)\b[^;&|]*-InFile\b|\bscp\b|\brsync\b[^;&|]*\s[\w.-]+@[\w.-]+:/i, 'uploads a local file to a remote host'],
   [/\bfind\b[^;&|]*\s-delete\b|\bfind\b[^;&|]*-exec\s+rm\b|\bxargs\b[^;&|]*\brm\b/i, 'bulk-deletes files'],
   [/(^|[;&|]\s*)(printenv|env|set|Get-ChildItem\s+env:|gci\s+env:|dir\s+env:|ls\s+env:)\s*($|[;&|])/i, 'prints every environment variable, which can include tokens'],
+  [/\bgit\s+commit\b[^;&|]*--amend\b/i, 'rewrites the last commit (--amend)'],
 ];
+
+// Local commits run without a prompt (ADR-0003), so they must land on a work branch:
+// main and develop change only through pull requests.
+if (/\bgit\s+commit\b/.test(c)) {
+  let branch = '';
+  try {
+    branch = execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim();
+  } catch {
+    // Not a git checkout or git unavailable: nothing to protect here.
+  }
+  if (['main', 'master', 'develop'].includes(branch)) {
+    block(`committing directly on ${branch} is not allowed; create a work branch from develop first.\nCommand: ${cmd}`);
+  }
+}
 
 for (const [re, reason] of askRules) {
   if (re.test(c)) ask(`this command ${reason}.`);
