@@ -25,6 +25,20 @@ export function allow() {
   process.exit(0);
 }
 
+/** Force a permission prompt for this call, whatever the permission mode or allow rules say. */
+export function ask(reason) {
+  process.stdout.write(
+    JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'PreToolUse',
+        permissionDecision: 'ask',
+        permissionDecisionReason: `[hook] Needs your approval: ${reason}`,
+      },
+    }),
+  );
+  process.exit(0);
+}
+
 export const exists = (rel) => existsSync(resolve(ROOT, rel));
 
 /** Normalise a path to forward slashes, relative to the repo root when possible. */
