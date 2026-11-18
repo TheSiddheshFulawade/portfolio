@@ -54,18 +54,27 @@ Conventions for every task:
         `REQ-REPO-002 root package.json has no dependencies or workspaces` (fixtures: a good manifest, one with `workspaces`, one with `dependencies`, one missing `typecheck:api`).
       - `check-repo.test.mjs`: discovers every `scripts/checks/*.mjs` except `*.test.mjs`, prints each
         error prefixed with the module name, exits 1 on any error and 0 on none.
-      - `mvnw.test.mjs`: pure `resolveWrapper(platform)` returns `mvnw.cmd` (through a shell) on `win32`
-        and `./mvnw` elsewhere, cwd `apps/api`; the CLI forwards arguments and the child exit code.
+      - `mvnw.test.mjs`: pure `buildSpawn(platform, args)` returns, on `win32`, the single command string
+        `.\mvnw.cmd <args joined by spaces>` with `shell: true` and no args array, and elsewhere `./mvnw`
+        with the args array and no shell, cwd `apps/api` in both; the CLI forwards arguments and the child exit code.
+      - `mvnw.test.mjs` (allow-list, design "Maven runner argument allow-list"): pure `validateArgs(args)`.
+        `REQ-REPO-002 mvnw accepts every argument in the root script contract`; `REQ-REPO-002 mvnw rejects <char>`,
+        one case each for `%`, `^`, `&`, `|`, `<`, `>`, `"`, `'`, `!`, `(`, `)`, `;`, backtick, space, tab, CR, LF,
+        a non-ASCII character and the empty string; `REQ-REPO-002 mvnw spawns nothing and exits 2 on a rejected argument`
+        (CLI run with an injected spawn stub, or a canary file that a successful spawn would create, asserted absent).
       covers: REQ-REPO-002
       done when:
       - Root `package.json` is `private: true`, has no `dependencies`, `devDependencies`, `workspaces`
         or lockfile, and defines every script in the design's root script contract except
-        `check:renovate` (added in T-16). App scripts may fail until their app exists; nothing runs
+        `install:renovate` and `check:renovate` (added in T-16). App scripts may fail until their app exists; nothing runs
         them before T-18.
       - `test:hooks` and `test:scripts` use escaped double-quoted globs (`node --test \".claude/hooks/*.test.mjs\"`)
         so Node expands them on both cmd.exe and sh.
-      - `scripts/mvnw.mjs` spawns `mvnw.cmd` with `shell: true` on Windows (Node refuses to spawn
-        `.cmd` files without a shell since the CVE-2024-27980 fix) and quotes forwarded arguments.
+      - `scripts/mvnw.mjs` spawns `.\mvnw.cmd` with `shell: true` on Windows (Node refuses to spawn
+        `.cmd` files without a shell since the CVE-2024-27980 fix), as one command string, so Node 24
+        prints no DEP0190 warning (checked: a run on Windows 11 shows no `DEP0190` in stderr). Every forwarded argument passes
+        `validateArgs` on every platform before any spawn. A rejection prints
+        `mvnw.mjs: rejected argument <JSON-escaped arg>` to stderr and exits 2. The executable and cwd are constants.
       - `npm run test:scripts` and `npm run check:repo` pass on Windows 11.
 
 - [ ] T-03 [infra] Line endings, editor rules and Node pin
@@ -325,10 +334,13 @@ Conventions for every task:
 
 - [ ] T-16 [infra] Renovate configuration and validator
       depends on: T-15
-      files: `renovate.json`, `package.json` (root: `check:renovate`), `scripts/checks/renovate.mjs`,
+      files: `renovate.json`, `package.json` (root: `install:renovate`, `check:renovate`),
+      `tools/renovate/package.json`, `tools/renovate/package-lock.json`, `scripts/checks/renovate.mjs`,
       `scripts/checks/renovate.test.mjs`
       test first: `renovate.test.mjs`: `REQ-CI-008 renovate is weekly, never automerges, pins action digests, targets develop, groups updates`,
-      plus `REQ-CI-008 custom managers cover tools/osv-scanner.json and the renovate validator version in package.json`.
+      plus `REQ-CI-008 custom managers cover tools/osv-scanner.json`,
+      plus `REQ-CI-008 validator is locked in tools/renovate (exact version, lockfile present, no npx in check:renovate)`
+      (fixtures: a `^` range, a missing lockfile, a `check:renovate` that uses `npx`).
       covers: REQ-CI-008
       done when:
       - `renovate.json` follows the design: `config:best-practices` and `schedule:weekly`, timezone
@@ -336,8 +348,13 @@ Conventions for every task:
         labelled `major`, groups `angular`, `web npm non-major`, `api maven non-major`, `github-actions`, `toolchain`.
       - Target branch `develop`. (verify) the current option name (`baseBranchPatterns` or `baseBranches`),
         the SDKMAN manager name, and that `config:best-practices` still includes `helpers:pinGitHubActionDigests`.
-      - `check:renovate` runs `npx --yes --package renovate@X.Y.Z -- renovate-config-validator --strict renovate.json`
-        with an exact version. (verify) the latest Renovate version.
+      - `tools/renovate/package.json` is `private: true` with one exact `renovate` devDependency, and its
+        `package-lock.json` is committed. (verify) the latest Renovate version.
+      - `install:renovate` runs `npm --prefix tools/renovate ci --ignore-scripts --no-audit --no-fund`.
+        `check:renovate` runs the validator bin from `tools/renovate/node_modules` with `node`, with no `npx`.
+        (verify) the bin's path inside the package.
+      - R-9: `install:renovate` then `check:renovate` run with `--ignore-scripts` on Windows 11 and exit 0.
+        If the validator needs install scripts, stop and bring the choice back to the user.
       - `npm run check:renovate` and `check:repo` exit 0 on Windows 11; the first-run time is noted in the PR.
 
 - [ ] T-17 [infra] CI orchestration scripts: change detection and gate
@@ -346,14 +363,21 @@ Conventions for every task:
       test first:
       - `changes.test.mjs`: `REQ-CI-002 api-only change skips web`, `REQ-CI-002 docs-only change skips both apps`,
         `REQ-CI-002 root config change runs both`, `REQ-CI-002 non-PR event runs both`, plus `content/**` → web
-        and `.claude/hooks/**` → neither app, and `renovate.json changed sets renovate=true` (see open point 2).
-      - `gate.test.mjs`: `REQ-CI-002 skipped needs count as success`, `REQ-CI-003 gate fails and names each failed or cancelled job`.
+        and `.claude/hooks/**` → neither app, `renovate.json changed sets renovate=true` (see open point 2), and
+        `tools/renovate/** changed sets renovate=true`.
+      - `gate.test.mjs` (design "Gate rules"): `REQ-CI-002 skipped app job passes when changes says unchanged`,
+        `REQ-CI-002 skipped app job fails when changes says changed`, `REQ-CI-002 skipped app job fails when changes outputs are missing`,
+        `REQ-CI-002 skipped always-on job fails`, `REQ-CI-002 empty or invalid NEEDS fails`,
+        `REQ-CI-003 gate fails and names each failed or cancelled job`.
       covers: REQ-CI-002, REQ-CI-003
       done when:
       - `classify(paths)` is pure and follows the design's classification list, returning `{ web, api, renovate }`.
         The CLI runs `git diff --name-only HEAD^1 HEAD` only for `pull_request` (every flag is true otherwise),
         writes `web=`, `api=` and `renovate=` to `$GITHUB_OUTPUT` when set and prints them otherwise, and exits 1 if git fails.
-      - `gate.mjs` reads `NEEDS` from the environment only (no interpolation), prints a result table, exits 1 on any `failure` or `cancelled`.
+      - `gate.mjs` reads `NEEDS` from the environment only (no interpolation), prints a result table and
+        applies the design's gate rules, keyed by job id: pure `evaluate(needs)` returns the failing jobs with a reason, and the
+        CLI exits 1 if that list is non-empty. `skipped` passes only for `web`/`api` when `changes` succeeded
+        and its output for that app is exactly `"false"`.
       - Both CLIs run locally on Windows 11; `npm run test:scripts` passes.
 
 - [ ] T-18 [infra] CI workflow
@@ -378,7 +402,9 @@ Conventions for every task:
       done when:
       - `ci.yml` implements the design's job contract, triggers, concurrency, `timeout-minutes` (10; 15 for api),
         `persist-credentials: false`, no trigger-level `paths:`, and untrusted values passed through `env:`.
-        The `repo` job needs `changes` and runs `check:renovate` only when `needs.changes.outputs.renovate == 'true'`.
+        The `repo` job needs `changes` and runs `install:renovate` then `check:renovate` only when
+        `needs.changes.outputs.renovate == 'true'`. Its `setup-node` caches npm keyed on `tools/renovate/package-lock.json`.
+        `ci-ok` passes `toJSON(needs)` through `env:`, so `changes.outputs` reaches the gate.
       - This is the largest task. If it runs past half a day, split it at the test boundary: land
         `workflow.mjs` with its fixture tests first, then `ci.yml`.
       - Q-5: the `schedule` trigger runs weekly on Monday at 03:30 UTC. Schedules only fire on the default
@@ -471,5 +497,9 @@ Conventions for every task:
 4. **T-01 scope. Decided (user, 2026-11-18):** reviews compare against `develop`; `main` is used only
    for release reviews. `.claude/agents/security-auditor.md` also diffs against `main`, so T-01 fixes it
    as well as the review skill.
+5. **Security revision (design.md "Revision 2026-11-18"). Approved 2026-11-18 by the user, who delegated the review:** T-02 adds the mvnw
+   argument allow-list, T-16 locks the Renovate validator in `tools/renovate/`, T-17 tightens the
+   gate's skip rule and tags `tools/renovate/**` as `renovate`, and T-18 wires `install:renovate` and its cache.
+   T-01 (done) is unaffected. No task is added or removed, and dependencies are unchanged.
 
-Status: APPROVED (2026-11-18)
+Status: APPROVED (2026-11-18, security revision)

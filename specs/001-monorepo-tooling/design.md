@@ -8,8 +8,8 @@ for each app, plus repo-level policy checks written as small zero-dependency Nod
 runs. CI is one workflow (`.github/workflows/ci.yml`) with these parts: a change-detection job, one
 job per concern (repo policy, tooling tests on two OSes, web, api, two dependency scans) and a
 final aggregate job `ci-ok`. `ci-ok` always reports, so branch protection can require a single
-stable check name. Skipped app jobs count as success, and failed or cancelled jobs fail the gate
-with the job named.
+stable check name. An app job that is skipped counts as success only when `changes` reported that
+app as unchanged. Any other skip, and any failed or cancelled job, fails the gate with the job named.
 
 Requirements covered: REQ-REPO-001…005, REQ-WEB-001…006, REQ-API-001…006, REQ-CI-001…010,
 plus the non-functional items (speed, parity, security, supply chain, cost).
@@ -36,7 +36,7 @@ confirmed against current docs during design, so the implementing task must conf
 | JaCoCo | 0.8.15 or later | 0.8.14 added official Java 25 support. 0.8.15 (2026-06-04) adds official 26 support (verified) |
 | ArchUnit (`archunit-junit5`) | 1.5.x (verify latest patch) | Max supported class file is Java 25 / major 69 (verified on main) |
 | OSV-Scanner CLI | v2.6.x or later (verify latest) | Resolves `pom.xml` transitively through deps.dev and needs no key (verified) |
-| Renovate (validator only) | exact npm version (verify) | `config:best-practices` contents verified |
+| Renovate (validator only) | exact npm version (verify), locked in `tools/renovate/package-lock.json` | `config:best-practices` contents verified. Bin path of `renovate-config-validator` inside the package (verify) |
 | GitHub Actions | `actions/checkout` v7, `actions/setup-java` v6, `actions/setup-node` (verify major) | Pinned by SHA at T-time |
 
 ## Components
@@ -50,10 +50,11 @@ confirmed against current docs during design, so the implementing task must conf
 | Line endings | `.gitattributes` (extend existing) | Already has `* text=auto eol=lf` and `*.cmd`/`*.bat` CRLF. Add `mvnw text eol=lf`, `*.sh text eol=lf`, and binary rules for `*.jar *.ico *.gif *.jpeg *.webp *.avif *.ttf *.woff` (REQ-REPO-004) |
 | Editor rules | `.editorconfig` (existing) | Already LF. Add `[*.xml] indent_size = 4` for `pom.xml` (REQ-REPO-004) |
 | Ignore rules | `.gitignore` (extend) | Add `.cache/` (downloaded tool binaries) |
-| Maven runner | `scripts/mvnw.mjs` | Runs `mvnw.cmd` on win32 and `./mvnw` elsewhere, with cwd `apps/api`. Forwards args and exit code. This makes root scripts identical on cmd.exe and sh |
+| Maven runner | `scripts/mvnw.mjs` | Runs `mvnw.cmd` on win32 and `./mvnw` elsewhere, with cwd `apps/api`. Forwards args and exit code. This makes root scripts identical on cmd.exe and sh. Every forwarded argument must pass an allow-list before anything is spawned (see "Maven runner argument allow-list") |
 | Repo policy checks | `scripts/check-repo.mjs`, `scripts/checks/*.mjs` | Static checks with no dependencies. Each module exports `check(root): string[]` (list of errors). See the test strategy for which REQ each module proves |
 | Change detection | `scripts/ci/changes.mjs` | Pure `classify(paths)` returns `{web, api}`. The CLI writes `web=`/`api=` to `$GITHUB_OUTPUT`, or prints them locally |
-| CI gate | `scripts/ci/gate.mjs` | Reads `NEEDS` (JSON of `needs`) from env, prints a result table and exits 1 if any job is `failure` or `cancelled` |
+| CI gate | `scripts/ci/gate.mjs` | Reads `NEEDS` (JSON of `needs`, including `changes.outputs`) from env, prints a result table and exits 1 unless every job passes the gate rules (see "Gate rules") |
+| Renovate validator lock | `tools/renovate/package.json`, `tools/renovate/package-lock.json` | `private: true`, one exact `renovate` devDependency, lockfile committed. Installed with `npm ci --ignore-scripts`, so the validator's whole tree is locked and no install scripts run (REQ-CI-008, NFR supply chain) |
 | OSV runner | `scripts/osv-scan.mjs`, `scripts/lib/osv-gate.mjs` | Downloads the pinned OSV-Scanner binary to `.cache/tools/`, verifies its SHA-256, scans `apps/api`, and applies the high/critical gate (ADR-0002) |
 | OSV pin | `tools/osv-scanner.json` | `{ version, assets: { linux_amd64, windows_amd64, darwin_arm64 }: { file, sha256 } }` |
 | Script tests | `scripts/**/*.test.mjs` | `node:test` tests for every script above |
@@ -119,7 +120,8 @@ anything OS-specific goes through a Node script.
 | `test:hooks` | `node --test ".claude/hooks/*.test.mjs"` (escaped double quotes, so Node expands the glob on both shells) | tooling |
 | `test:scripts` | `node --test "scripts/**/*.test.mjs"` | tooling |
 | `check:repo` | `node scripts/check-repo.mjs` | repo |
-| `check:renovate` | `npx --yes --package renovate@X.Y.Z -- renovate-config-validator --strict renovate.json` | repo (when `renovate.json` changed or on push) |
+| `install:renovate` | `npm --prefix tools/renovate ci --ignore-scripts --no-audit --no-fund` | repo (same condition as `check:renovate`) |
+| `check:renovate` | `node tools/renovate/node_modules/renovate/<validator bin> --strict renovate.json` (bin path verified at T-time). No `npx`, so nothing resolves outside the lockfile | repo (when `renovate.json` changed or on push) |
 | `lint`, `format:check`, `typecheck`, `test`, `build`, `audit` | `:web` then `:api` | local convenience |
 | `verify` | `check:repo`, `test:hooks`, `test:scripts`, `lint`, `typecheck`, `test`, `build:web`, `audit` in sequence | local "run what CI runs" |
 
@@ -129,7 +131,7 @@ The workflow is named `CI`. Check names are the job `name:` values and must not 
 | Check name | Runs on | Condition | Steps (all root scripts) |
 |---|---|---|---|
 | `changes` | ubuntu-latest | always | checkout (fetch-depth 2), `node scripts/ci/changes.mjs` |
-| `repo` | ubuntu-latest | always | `check:repo`, then `check:renovate` (if `renovate.json` changed or not a PR) |
+| `repo` | ubuntu-latest | always | `check:repo`, then `install:renovate` and `check:renovate` (if `renovate.json` or `tools/renovate/**` changed, or not a PR). `setup-node` `cache: npm` keyed on `tools/renovate/package-lock.json` |
 | `tooling (ubuntu-latest)` | ubuntu-latest | always | `test:hooks`, `test:scripts` |
 | `tooling (windows-latest)` | windows-latest | always | `test:hooks`, `test:scripts` |
 | `web` | ubuntu-latest | `needs.changes.outputs.web == 'true'` | `install:web`, `lint:web`, `typecheck:web`, `test:web`, `build:web` |
@@ -142,11 +144,47 @@ The workflow is named `CI`. Check names are the job `name:` values and must not 
 its own named check, so the failing job is visible in the PR. Applying protection stays out of
 scope for this spec.
 
+### Gate rules (`gate.mjs`, REQ-CI-002, REQ-CI-003)
+The gate fails closed. `NEEDS` is keyed by job id (`changes`, `repo`, `tooling`, `web`, `api`,
+`deps-web`, `deps-api`), not by check name, and a matrix job (`tooling`) has one aggregated result.
+For each job in `NEEDS`:
+- `success` passes.
+- `failure` and `cancelled` fail.
+- `skipped` passes only for `web` or `api`, and only when `changes.result` is `success` and
+  `changes.outputs.<app>` is exactly the string `"false"`. A skip with the output `"true"`, missing
+  or anything else fails. That catches a wrong `if:` on an app job, which would otherwise skip it silently.
+- `skipped` for any other job (`changes`, `repo`, both `tooling`, `deps-web`, `deps-api`) fails, because they always run.
+- Any other or missing `result` fails. An empty or unparsable `NEEDS` fails.
+The result table prints the job, its result, and for a skipped app job the `changes` output that justified it.
+
+### Maven runner argument allow-list (`scripts/mvnw.mjs`, REQ-REPO-002, NFR security)
+On win32 the runner must start `mvnw.cmd` with `shell: true`, because Node refuses to spawn `.cmd`
+files without a shell since the CVE-2024-27980 fix. cmd.exe still expands `%VAR%` and treats `^ & | < >`
+as metacharacters inside double quotes, so quoting alone is not safe.
+- Each forwarded argument must be non-empty and match `^[A-Za-z0-9][A-Za-z0-9_.:=,+/@-]*$` or
+  `^-{1,2}[A-Za-z0-9][A-Za-z0-9_.:=,+/@-]*$`. That covers every argument in the root script contract
+  (`-B`, `-ntp`, `-q`, `-DskipTests`, `-Dspotless.check.skip=true`, `test-compile`, `spotless:check`,
+  `spotless:apply`, `verify`, `package`).
+- Rejected characters include `% ^ & | < > " ' ! ( ) ; `` ` `` space, tab, CR, LF and every non-ASCII character.
+- The same rule applies on every platform, so a command that works on Linux also works on Windows.
+  Off win32 there is no shell (`./mvnw` with an args array), so the rule is parity and defence in depth there.
+- On rejection the runner spawns nothing, prints `mvnw.mjs: rejected argument <JSON-escaped arg>`
+  to stderr and exits 2.
+- The executable and the cwd are constants, never taken from input.
+- On win32 the runner spawns one command string, `.\mvnw.cmd` followed by the validated arguments
+  joined by single spaces, with `shell: true` and no args array. Passing an args array with
+  `shell: true` prints the DEP0190 deprecation warning at runtime on Node 24 (observed on 24.18.0), and
+  Node only concatenates those args anyway. The allow-list contains no whitespace or metacharacters,
+  so joining is exact. The `.\` prefix pins the file in cwd, so no `PATH` lookup happens and
+  `NoDefaultCurrentDirectoryInExePath` has no effect.
+- Off win32 it spawns `./mvnw` with an args array and no shell.
+
 Change classification (`classify`, tested):
 - `apps/web/**`, `content/**` → web
 - `apps/api/**` → api
 - `docs/**`, `specs/**`, `.claude/skills/**`, `.claude/agents/**`, `*.md` at the root → neither
 - `.claude/hooks/**` → neither app (tooling always runs)
+- `renovate.json`, `tools/renovate/**` → also `renovate` (runs `check:renovate` in `repo`)
 - Anything else (`.github/**`, `scripts/**`, `tools/**`, root `package.json`, `.nvmrc`, `.sdkmanrc`,
   `.gitattributes`, `.editorconfig`, `renovate.json`) → web and api
 - Non-PR events (push, schedule, workflow_dispatch) → web and api, with no filtering
@@ -188,8 +226,9 @@ GitHub scopes caches by ref, so a PR can read caches from `develop` but cannot w
   `github-actions`, `toolchain` (nvm, sdkman (verify manager), maven-wrapper). Majors are
   separate PRs labelled `major`.
 - `customManagers` (regex): the OSV-Scanner version in `tools/osv-scanner.json` (datasource
-  `github-releases`, `google/osv-scanner`) and the `renovate@X.Y.Z` validator version in the root
-  `package.json`. A checksum mismatch makes the OSV bump PR fail until a human updates the SHA-256
+  `github-releases`, `google/osv-scanner`). The validator needs no custom manager: Renovate's npm
+  manager updates `tools/renovate/package.json` and its lockfile, and the 3-day
+  `minimumReleaseAgeNpm` applies. A checksum mismatch makes the OSV bump PR fail until a human updates the SHA-256
   values, which is deliberate (ADR-0002).
 - Security PRs bypass the schedule (Renovate default). The Mend Renovate GitHub App is free for
   public repos. Installing it is a user action (Q-4).
@@ -234,8 +273,8 @@ flowchart LR
   T --> DA[deps-api]
   C -->|web=true| W[web]
   C -->|api=true| A[api]
-  C -.->|web=false: skipped = success| W
-  C -.->|api=false: skipped = success| A
+  C -.->|web=false: skipped, accepted by gate| W
+  C -.->|api=false: skipped, accepted by gate| A
   R --> G{ci-ok<br/>if: always}
   TU --> G
   TW --> G
@@ -284,7 +323,7 @@ sequenceDiagram
   GH-->>GH: merge blocked (required check ci-ok)
 ```
 
-### Failure flow 2: api-only PR (skipped job counts as success)
+### Failure flow 2: api-only PR (skipped job accepted only when changes says so)
 ```mermaid
 sequenceDiagram
   participant CH as changes
@@ -292,11 +331,12 @@ sequenceDiagram
   participant A as api
   participant G as ci-ok
   CH-->>W: web=false
-  W-->>W: skipped (reported as success)
+  W-->>W: skipped
   CH-->>A: api=true
   A-->>G: success
-  G->>G: results: web=skipped, others=success
+  G->>G: web=skipped and changes.outputs.web == "false" → pass
   G-->>G: ci-ok ✓
+  Note over G: If web were skipped while changes.outputs.web == "true"<br/>(a broken if:), the gate fails with "Failed jobs: web (skipped but changed)"
 ```
 
 ### Failure flow 3: change detection fails
@@ -360,9 +400,10 @@ to report.
 **Failure handling.**
 - Each job fails on the first failing step, and the step is named after the root script, so the
   log shows exactly which check failed (REQ-CI-003).
-- `ci-ok` uses `if: always()` and treats `failure` and `cancelled` as red and `success` and
-  `skipped` as green. `changes` is in `needs`, so a skipped app job cannot hide a detection
-  failure.
+- `ci-ok` uses `if: always()` and applies the gate rules: `success` is green. `failure`,
+  `cancelled` and unknown results are red. `skipped` is green only for an app job whose `changes`
+  output is `"false"`. `changes` is in `needs`, so a skipped app job cannot hide a detection
+  failure, and a wrong `if:` cannot hide an app that did change.
 - OSV tool errors (exit 127, 128, or any exit other than 0 and 1) fail closed. A vulnerability with
   no CVSS score counts as high unless it is explicitly ignored with a reason and an expiry date.
 - Network flakiness (npm registry, osv.dev, Maven Central) shows up as a red job. Re-running the
@@ -381,6 +422,10 @@ to report.
   `banDynamicVersions` and `requirePluginVersions` enforcer rules are active. The Maven Wrapper
   distribution is verified by `distributionSha256Sum`. The OSV binary is verified by a pinned
   SHA-256. Renovate waits 3 days for new npm releases (`minimumReleaseAgeNpm`) and never automerges.
+  The Renovate validator runs from a committed lockfile (`tools/renovate/`) installed with
+  `npm ci --ignore-scripts`. It never runs through `npx`, which would resolve an unlocked tree on every run.
+- `scripts/mvnw.mjs` is the only place a shell is used (`mvnw.cmd` on win32). Its arguments pass
+  the allow-list first, and the executable and cwd are constants.
 - The API exposes only `/actuator/health`, with no details or components, and discovery is off
   (REQ-API-002, security-baseline).
 - The hook tests protect the agent-safety controls themselves (guard-bash, protect-secrets) on
@@ -407,6 +452,9 @@ Nothing is measured in this spec. Lighthouse CI and axe arrive with specs 004 an
 |---|---|---|
 | Path filtering | Job-level `if:` from an in-repo `changes` job plus an always-running `ci-ok` gate | Trigger-level `paths:`: skipped workflows leave required checks pending forever. `dorny/paths-filter`: one more third-party action with `pull-requests: read`. Requiring every job name in branch protection: renaming or adding a job silently changes protection, while one gate name is stable |
 | Root wiring | Plain root scripts plus `scripts/mvnw.mjs` | npm workspaces, Nx, Turborepo: ruled out by the user. Inline `./mvnw` in root scripts: breaks on cmd.exe |
+| Windows `.cmd` spawning | `shell: true` plus a strict argument allow-list | Quoting only: cmd.exe still expands `%VAR%` and `^` inside quotes. Running `java -classpath .mvn/wrapper/...` directly: `only-script` commits no jar, so there is nothing to call. Spawning `cmd.exe /d /s /c` by hand: the same parsing problem with more code |
+| Renovate validator | Locked `tools/renovate/` (package.json + lockfile, `npm ci --ignore-scripts`) | `npx renovate@X.Y.Z`: the top-level version is exact but its transitive tree is re-resolved on every run. Docker image pinned by digest: needs Docker locally on Windows (same reason as for OSV) |
+| Skipped-job policy in the gate | `skipped` accepted only for an app job whose `changes` output is `"false"` | Accept any `skipped`: a wrong `if:` silently drops a whole app from CI while `ci-ok` stays green |
 | Maven vuln scanner | OSV-Scanner CLI, pinned plus checksum, with an in-repo severity gate (ADR-0002) | OWASP Dependency-Check: slow NVD download, and an NVD API key is practically required. The OSV reusable workflow: uploads SARIF, needs `security-events: write`, has no severity threshold, and cannot run locally. Snyk or Mend: need accounts or keys. The OSV Docker image: Renovate-friendly digest pinning, but requires Docker locally on Windows |
 | Java lint | javac `-Xlint:all` with `failOnWarning` | **Error Prone deferred.** It needs about 11 `--add-exports` flags for javac internals in `.mvn/jvm.config`, historically lags each new JDK (Java 25 support not verified), lengthens builds, and is not in the agreed core gates. Revisit in spec 010 together with NullAway, once there is real domain code worth analysing. Checkstyle or PMD: overlap with the formatter and add noise on a skeleton |
 | Formatter | Spotless + palantir-java-format (user decision) | google-java-format, the current text of spring-standards: superseded by the user's choice. The skill needs updating (Q-2) |
@@ -424,7 +472,7 @@ that lands the CI task, recorded in the PR description.
 | REQ | Test type | Test name / check |
 |---|---|---|
 | REQ-REPO-001 | node:test (`scripts/checks/layout.test.mjs`) + CI | `REQ-REPO-001 apps are independent projects (no workspaces field, web has its own lockfile, api has its own pom and wrapper)`. The web and api jobs each build from their own folder |
-| REQ-REPO-002 | node:test (`scripts/checks/scripts-contract.test.mjs`) | `REQ-REPO-002 root package.json defines lint, format:check, typecheck, test, build for web and api` and `has no dependencies or workspaces` |
+| REQ-REPO-002 | node:test (`scripts/checks/scripts-contract.test.mjs`, `scripts/mvnw.test.mjs`) | `REQ-REPO-002 root package.json defines lint, format:check, typecheck, test, build for web and api` and `has no dependencies or workspaces`. `mvnw.test.mjs`: `REQ-REPO-002 mvnw accepts every argument in the root script contract`, `REQ-REPO-002 mvnw rejects <char>` (one case per rejected character class: `%`, `^`, `&`, `\|`, `<`, `>`, `"`, `'`, `!`, `(`, `)`, `;`, backtick, space, tab, CR, LF, non-ASCII, empty string), `REQ-REPO-002 mvnw spawns nothing and exits 2 on a rejected argument` |
 | REQ-REPO-003 | node:test (`scripts/checks/toolchain.test.mjs`) | `REQ-REPO-003 .nvmrc is exact and satisfies apps/web engines`, `REQ-REPO-003 .sdkmanrc java major equals pom java.version`, `REQ-REPO-003 workflow uses node-version-file and java-version-file` |
 | REQ-REPO-004 | node:test (`scripts/checks/line-endings.test.mjs`) | `REQ-REPO-004 .gitattributes forces LF and CRLF only for cmd/bat`, `REQ-REPO-004 no tracked text file has CRLF in the index (git ls-files --eol)`, `REQ-REPO-004 mvnw is tracked as 100755` |
 | REQ-REPO-005 | node:test (`.claude/hooks/*.test.mjs`) | guard-bash: `blocks force push`, `blocks push to main and develop`, `allows push of a feature branch`, `allows --dry-run push to main`, `blocks --no-verify`, `blocks gh pr merge --admin`, `blocks curl piped to sh`, `blocks reading .env but allows .env.example`, `blocks git add docs/private`, `allows rm -rf of build folders`, `blocks rm -rf of src`, `blocks Remove-Item -Recurse outside build folders`, `allows ordinary commands`. protect-secrets: `blocks .env, .env.local, secrets/, *.pem, *.key, id_rsa`, `allows .env.example`, `blocks Glob pattern **/.env`, `blocks Write to docs/private but allows Read`, `normalises Windows backslash paths`. lib: `rel() returns repo-relative forward-slash paths`. quality-gate: `exits 0 when stop_hook_active`. All prefixed `REQ-REPO-005` |
@@ -441,13 +489,13 @@ that lands the CI task, recorded in the PR description.
 | REQ-API-005 | ArchUnit (`ArchitectureTest`, `ArchitectureRuleSelfTest`) | `REQ-API-005 domain does not depend on Spring, Jakarta, Jackson or adapters`, `REQ-API-005 rule reports a domain class that imports Spring`, `REQ-API-005 rule reports a domain class that uses an adapters class` |
 | REQ-API-006 | Maven enforcer + node:test | `banDynamicVersions`, `requirePluginVersions`. `scripts/checks/pins.test.mjs`: `REQ-API-006 pom has no version ranges, LATEST or RELEASE` |
 | REQ-CI-001 | node:test (`scripts/checks/workflow.test.mjs`) + acceptance | `REQ-CI-001 workflow triggers on pull_request to develop and main`, `REQ-CI-001 web and api jobs run lint, typecheck, test, build and tooling runs test:hooks` |
-| REQ-CI-002 | node:test (`scripts/ci/changes.test.mjs`, `gate.test.mjs`) + acceptance | `REQ-CI-002 api-only change skips web`, `REQ-CI-002 docs-only change skips both apps`, `REQ-CI-002 root config change runs both`, `REQ-CI-002 non-PR event runs both`, `REQ-CI-002 skipped needs count as success`. Acceptance: an api-only PR shows `web` skipped and `ci-ok` green |
+| REQ-CI-002 | node:test (`scripts/ci/changes.test.mjs`, `gate.test.mjs`) + acceptance | `REQ-CI-002 api-only change skips web`, `REQ-CI-002 docs-only change skips both apps`, `REQ-CI-002 root config change runs both`, `REQ-CI-002 non-PR event runs both`, `REQ-CI-002 skipped app job passes when changes says unchanged`, `REQ-CI-002 skipped app job fails when changes says changed`, `REQ-CI-002 skipped app job fails when changes outputs are missing`, `REQ-CI-002 skipped always-on job fails`, `REQ-CI-002 empty or invalid NEEDS fails`. Acceptance: an api-only PR shows `web` skipped and `ci-ok` green |
 | REQ-CI-003 | node:test (`gate.test.mjs`) + acceptance | `REQ-CI-003 gate fails and names each failed or cancelled job` |
 | REQ-CI-004 | node:test (`workflow.test.mjs`) | `REQ-CI-004 every uses: is pinned to a 40-hex SHA with a version comment` |
 | REQ-CI-005 | node:test (`workflow.test.mjs`) | `REQ-CI-005 top-level permissions are contents: read and no job escalates`, `REQ-CI-005 pull_request_target is absent`, `no secrets.* reference` |
 | REQ-CI-006 | node:test (`scripts/lib/osv-gate.test.mjs`, `scripts/osv-scan.test.mjs`) + CI | `REQ-CI-006 CVSS 7.0 fails`, `6.9 passes`, `missing severity fails`, `ignored id with reason passes`, `exit 128 fails closed`, `checksum mismatch fails`. The `deps-web` and `deps-api` jobs |
 | REQ-CI-007 | node:test (`workflow.test.mjs`) + acceptance | `REQ-CI-007 setup-node caches npm keyed on apps/web/package-lock.json`, `REQ-CI-007 setup-java caches maven keyed on apps/api/pom.xml`. Acceptance: the second run logs a cache hit |
-| REQ-CI-008 | `check:renovate` + node:test (`scripts/checks/renovate.test.mjs`) | `REQ-CI-008 renovate is weekly, never automerges, pins action digests, targets develop, groups updates` plus `renovate-config-validator --strict` |
+| REQ-CI-008 | `check:renovate` + node:test (`scripts/checks/renovate.test.mjs`) | `REQ-CI-008 renovate is weekly, never automerges, pins action digests, targets develop, groups updates`, `REQ-CI-008 validator is locked in tools/renovate (exact version, lockfile present, no npx in check:renovate)` plus `renovate-config-validator --strict` |
 | REQ-CI-009 | node:test (`workflow.test.mjs`) + acceptance | `REQ-CI-009 workflow triggers on push to develop and main`. Acceptance: the run after the first merge to develop |
 | REQ-CI-010 | node:test (`workflow.test.mjs`) + acceptance | `REQ-CI-010 tooling matrix is ubuntu-latest and windows-latest, every other job is ubuntu-latest` |
 | NFR speed | acceptance | Warm-cache wall time ≤ 10 min, recorded in the PR |
@@ -466,7 +514,8 @@ top-level `permissions:` block, `on:` keys, `runs-on:`). The acceptance runs cov
 | R-4 | `npm audit --audit-level=high` includes dev tooling, so a transitive high CVE in the Angular CLI can block every PR | Fix through a Renovate bump. Otherwise use a time-boxed `overrides` entry recorded in the PR. Never lower the level |
 | R-5 | OSV resolves `pom.xml` through deps.dev and does not include test-scope dependencies | Accepted: test dependencies are not shipped. Spec 016 adds an SBOM-based image scan |
 | R-6 | The pinned OSV checksum makes Renovate's OSV bump PR red until a human updates the SHA-256 values | Deliberate trust-on-first-use step. The steps are documented in `tools/osv-scanner.json` (`_comment`) and ADR-0002 |
-| R-7 | Windows runners are slower and have quirks (paths, `shell: true` spawning) | Hooks spawn with `process.execPath` (no shell). Tests use `path` helpers. Only the tooling job runs on Windows |
+| R-7 | Windows runners are slower and have quirks (paths, `shell: true` spawning) | Hooks spawn with `process.execPath` (no shell). Tests use `path` helpers. Only the tooling job runs on Windows. `mvnw.mjs` is the one shell spawn, and its argument allow-list is tested on both OSes in the tooling matrix |
+| R-9 | `npm ci --ignore-scripts` may break the validator if a Renovate dependency needs an install script (for example a native module) | Verify at T-16 that `renovate-config-validator --strict` runs on Windows 11 and Linux with scripts off. If it does not, stop and bring the choice back to the user. Do not drop `--ignore-scripts` silently |
 | R-8 | `useMainMethod = ALWAYS` and `@AutoConfigureRestTestClient` are verified in Boot 4.1 docs, but the name of the test starter that provides `RestTestClient` is not (verify) | Use `TestRestTemplate` with `@AutoConfigureTestRestTemplate` (also documented in 4.1) |
 
 ## Decisions on open questions (user, 2026-11-17)
@@ -481,8 +530,14 @@ top-level `permissions:` block, `on:` keys, `runs-on:`). The acceptance runs cov
 - **Q-7 Branch protection:** after the CI task merges, require `ci-ok` on `develop` and `main` as a
   separate, user-approved step outside this spec.
 
+## Revision 2026-11-18: security fixes from the PR #4 review
+This revision fixes the three medium design findings. Requirements are unchanged.
+1. **Maven runner shell injection:** arguments are allow-listed before spawning, and on win32 they are passed as one validated command string, which also avoids the Node 24 DEP0190 warning (see "Maven runner argument allow-list"). Affects T-02.
+2. **Gate accepted any skip:** `skipped` now passes only for an app job that `changes` reported as unchanged (see "Gate rules"). Affects T-17 and T-18.
+3. **Unlocked Renovate run:** the validator is locked in `tools/renovate/` and installed with `npm ci --ignore-scripts`, with no `npx` (see the Renovate validator lock component). Affects T-16, T-17 and T-18.
+
 ## ADRs
 - docs/adr/0001-baseline-runtime-dependencies.md
 - docs/adr/0002-dependency-vulnerability-scanning.md
 
-Status: APPROVED (2026-11-17)
+Status: APPROVED (2026-11-18, security revision; first approved 2026-11-17)
