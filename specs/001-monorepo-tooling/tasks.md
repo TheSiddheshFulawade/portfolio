@@ -44,7 +44,7 @@ Conventions for every task:
       - `security-auditor.md` uses the same base.
       - The one-off check above returns no matches.
 
-- [ ] T-02 [infra] Root script contract, check runner and Maven runner
+- [x] T-02 [infra] Root script contract, check runner and Maven runner
       depends on: none
       files: `package.json` (root), `scripts/check-repo.mjs`, `scripts/check-repo.test.mjs`,
       `scripts/checks/scripts-contract.mjs`, `scripts/checks/scripts-contract.test.mjs`,

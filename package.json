@@ -1,0 +1,32 @@
+{
+  "name": "portfolio",
+  "private": true,
+  "description": "Root script contract (spec 001, REQ-REPO-002). Scripts only: no dependencies, no workspaces, no lockfile.",
+  "scripts": {
+    "install:web": "npm --prefix apps/web ci",
+    "lint:web": "npm --prefix apps/web run lint",
+    "format:check:web": "npm --prefix apps/web run format:check",
+    "typecheck:web": "npm --prefix apps/web run typecheck",
+    "test:web": "npm --prefix apps/web run test",
+    "build:web": "npm --prefix apps/web run build",
+    "audit:web": "npm --prefix apps/web audit --audit-level=high",
+    "format:web": "npm --prefix apps/web run format",
+    "lint:api": "node scripts/mvnw.mjs -B -ntp -q test-compile",
+    "format:check:api": "node scripts/mvnw.mjs -B -ntp spotless:check",
+    "typecheck:api": "node scripts/mvnw.mjs -B -ntp -q test-compile",
+    "test:api": "node scripts/mvnw.mjs -B -ntp verify",
+    "build:api": "node scripts/mvnw.mjs -B -ntp -DskipTests package",
+    "audit:api": "node scripts/osv-scan.mjs apps/api",
+    "format:api": "node scripts/mvnw.mjs -B -ntp spotless:apply",
+    "test:hooks": "node --test \".claude/hooks/*.test.mjs\"",
+    "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
+    "check:repo": "node scripts/check-repo.mjs",
+    "lint": "npm run lint:web && npm run lint:api",
+    "format:check": "npm run format:check:web && npm run format:check:api",
+    "typecheck": "npm run typecheck:web && npm run typecheck:api",
+    "test": "npm run test:web && npm run test:api",
+    "build": "npm run build:web && npm run build:api",
+    "audit": "npm run audit:web && npm run audit:api",
+    "verify": "npm run check:repo && npm run test:hooks && npm run test:scripts && npm run lint && npm run typecheck && npm run test && npm run build:web && npm run audit"
+  }
+}
