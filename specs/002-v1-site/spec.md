@@ -122,6 +122,7 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 - [ ] V1-13 [infra] Release v1.0.0: `/review`, `/release`, merge to `main`, connect siddheshfulawade.com in
       Cloudflare Pages (**user actions: domain, DNS, Email Routing**). Checks: HTTPS on the apex domain, `www` redirects.
 - [ ] V1-14 [web] **Stretch:** visitor counter (Pages Function plus D1; hash and count tests first). Otherwise it moves to v1.1.
+      Status: not started; moved out of the v1 launch. Plan and the user's decisions: `docs/tonight-review.md` §1.
 
 ## 5. Out of scope (v1)
 
