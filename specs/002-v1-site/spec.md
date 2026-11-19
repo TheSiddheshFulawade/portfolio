@@ -88,7 +88,7 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 - [x] V1-02 [web] Content build and `ContentService`. Tests first: valid content builds; an invalid field fails the
       build naming file and field; unpublished items are dropped; sort order; Markdown renders to HTML.
       Checks: `npm run build` produces `content.json`; the home placeholder reads its text from content.
-- [ ] V1-03 [web] Design tokens, base styles, fonts, light and dark themes with the toggle logic and reduced motion.
+- [x] V1-03 [web] Design tokens, base styles, fonts, light and dark themes with the toggle logic and reduced motion.
       Checks: both themes meet contrast (body ≥4.5:1); no literal colours in components; no theme flash on reload.
 
 ### Fri 20 Nov (day 2): layout, Home, Experience
