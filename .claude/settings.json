@@ -92,28 +92,28 @@
   "hooks": {
     "SessionStart": [
       {
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/spec-status.mjs" }]
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/spec-status.mjs\"" }]
       }
     ],
     "PreToolUse": [
       {
         "matcher": "Bash|PowerShell",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/guard-bash.mjs" }]
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.mjs\"" }]
       },
       {
         "matcher": "Read|Edit|Write|MultiEdit|Grep|Glob|NotebookEdit",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/protect-secrets.mjs" }]
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-secrets.mjs\"" }]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/format.mjs" }]
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format.mjs\"" }]
       }
     ],
     "Stop": [
       {
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/quality-gate.mjs", "timeout": 300 }]
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/quality-gate.mjs\"", "timeout": 60 }]
       }
     ]
   }

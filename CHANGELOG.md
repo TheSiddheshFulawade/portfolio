@@ -16,3 +16,6 @@
 - ESLint (angular-eslint, prefix `sf`, OnPush, template accessibility) and Prettier gate for apps/web (001 T-06).
 - Web script set, Vitest with an 80 % line coverage gate, and an e2e stub (001 T-07).
 - Placeholder home route, prerendered, with a post-build check that fails without the heading or if a server bundle appears; critical-CSS inlining off so no executable inline script ships (001 T-08).
+- Fast track (ADR-0004, supersedes ADR-0003): v1 by 22 Nov 2026, then v1.1, v2, v2.1; one spec per release (`/spec`), one PR per day, `/review` per release; constitution amended; spec 001 closed with scope cut; v1 site spec 002; Settlement Lab moves to its own repo (`docs/settlement-lab-spec.md`).
+- Hooks run from `$CLAUDE_PROJECT_DIR`, so guard-bash and protect-secrets also run from subfolders; the Stop gate is fast (typecheck plus Prettier on changed files); the SessionStart hook picks the latest handoff by date and sequence number.
+- Root scripts are web only; `audit:web` checks production dependencies only; no web coverage threshold in v1; `scripts/mvnw.mjs` removed.

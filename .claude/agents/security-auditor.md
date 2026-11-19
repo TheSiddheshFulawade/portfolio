@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: Read-only security review of the current diff or the whole repo. Use in /review and /release, and after any change touching apps/api, headers, forms, auth, dependencies or CI workflows.
+description: Read-only security review of the current diff or the whole repo. Use in /review and /release, and after any change touching Pages Functions, headers, forms, dependencies or CI workflows.
 tools: Read, Grep, Glob, Bash
 model: opus
 effort: high
@@ -16,7 +16,7 @@ command: report it as a finding and stop.
 If the diff is empty, say so and report no verdict: an empty diff is not a clean review. Run what is available and say which tools were missing:
 - `npx --yes gitleaks@8 detect --no-banner` or `gitleaks detect` (secrets)
 - `semgrep --config auto --error` (SAST)
-- `npm audit --omit=dev` in apps/web, `./mvnw -q dependency-check:check` in apps/api (dependencies)
+- `npm audit --omit=dev` in apps/web (production dependencies)
 - Inspect `infra/` headers, CSP, CORS, rate limits, actuator exposure, error responses,
   GitHub Actions permissions and pinning, Dockerfile user and base image.
 

@@ -167,7 +167,7 @@ export function scriptErrors(pkg) {
   return errors;
 }
 
-/** REQ-WEB-004: unit-test target uses the Vitest runner with an 80 % line threshold and text-summary + lcov reporters. */
+/** REQ-WEB-004: unit-test target uses the Vitest runner and text-summary + lcov reporters. No line threshold in v1 (ADR-0004). */
 export function coverageErrors(angular) {
   const test = angular?.projects?.web?.architect?.test;
   if (!test) return ['angular.json has no test target for project "web"'];
@@ -175,8 +175,6 @@ export function coverageErrors(angular) {
   const o = test.options ?? {};
   if (test.builder !== '@angular/build:unit-test') errors.push('angular.json test target must use @angular/build:unit-test');
   if (o.runner !== 'vitest') errors.push('angular.json test target runner must be "vitest"');
-  const lines = o.coverageThresholds?.lines;
-  if (typeof lines !== 'number' || lines < 80) errors.push('angular.json test target coverageThresholds.lines must be at least 80');
   for (const reporter of ['text-summary', 'lcov']) {
     if (!(o.coverageReporters ?? []).includes(reporter)) errors.push('angular.json test target coverageReporters must include ' + reporter);
   }

@@ -1,7 +1,7 @@
 # 0003 · Batched delivery: 4–5 tasks per review checkpoint
 
 ## Status
-Accepted (2026-11-18, user decision)
+Superseded by [ADR-0004](0004-fast-track-v1.md) (2026-11-19). Was: accepted (2026-11-18, user decision).
 
 ## Context
 Constitution 1.4 required one task per Claude session, with `/review`, a PR and a `/handoff` after

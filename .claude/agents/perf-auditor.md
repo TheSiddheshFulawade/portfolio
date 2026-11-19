@@ -12,8 +12,9 @@ CLS ≤0.05, INP ≤200 ms, initial JS ≤120 KB gzipped.
 
 Steps:
 1. Production build: `npm run build` in apps/web. Report initial and lazy chunk sizes (gzipped).
-2. Lighthouse CI (`npx lhci autorun` if configured) on the changed routes, mobile preset.
-3. Chrome DevTools MCP: record a performance trace of the home page and the Lab page; identify
+2. Lighthouse (Chrome DevTools MCP `lighthouse_audit`, mobile) on Home and the changed routes.
+   Lighthouse CI arrives in v2.1.
+3. Chrome DevTools MCP: record a performance trace of the home page (and `/lab` from v2); identify
    the LCP element, long tasks, layout shifts and render-blocking resources.
 4. Check images (format, dimensions, lazy loading), fonts (subset, preload, display swap),
    and that animations only touch transform and opacity.

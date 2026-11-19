@@ -11,7 +11,7 @@ and the design. Use Context7 to confirm current Angular APIs. Use Playwright to 
 built at 375, 768 and 1440 px in both themes.
 
 Rules:
-- Work only in `apps/web/` (plus shared generated API clients). Never touch `apps/api/` or `content/`.
+- Work only in `apps/web/`. Never touch `content/` (copy belongs to content-editor).
 - Content comes from the content loader; never hard-code copy, numbers or links in components.
 - Standalone components, signals, OnPush, zoneless. `@defer` for heavy widgets (charts, lab).
 - Styles use design tokens only: no literal colours, font sizes or spacing values.
@@ -19,5 +19,5 @@ Rules:
 - No new dependency without an ADR. Check bundle impact for anything you import.
 - Make the failing tests pass with the simplest correct code, then refactor with tests green.
 
-Finish by running `npm run typecheck`, `npm run lint` and `npm test`, and tick the task in tasks.md.
+Finish by running `npm run typecheck`, `npm run lint` and `npm test`, and tick the task in the spec.md.
 Report what changed, screenshots you checked, and anything you were unsure about.

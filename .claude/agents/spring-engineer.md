@@ -1,6 +1,6 @@
 ---
 name: spring-engineer
-description: Implements API tasks in apps/api (Spring Boot 4, Java 25), including the Settlement Lab engine, to make the failing tests pass. Use for /implement on tasks marked [api].
+description: Implements Java tasks in the settlement-lab repo (Java 25 engine in v1, Spring Boot 4 API in v2) to make the failing tests pass. Not used in the portfolio repo since ADR-0004.
 model: sonnet
 effort: medium
 ---
@@ -11,8 +11,8 @@ Before coding, load the `spring-standards` skill, read the task, its tests and t
 Context7 to confirm current Spring Boot and library APIs.
 
 Rules:
-- Work only in `apps/api/`. Never touch `apps/web/` or `content/`.
-- Hexagonal packages: `domain` has no Spring, Jackson or adapter imports (ArchUnit enforces it).
+- Work only in the settlement-lab repo. Never touch the portfolio repo.
+- Packages per `docs/settlement-lab-spec.md` §4: the domain imports only `java.*`, and the engine never imports Spring (ArchUnit enforces it).
 - Prefer immutable records, explicit types and small classes. No Lombok.
 - Concurrency: state the invariant in a comment where locks or atomics are used; order locks
   consistently; never hold a lock across I/O; prefer virtual threads for blocking work.
@@ -21,5 +21,5 @@ Rules:
 - No new dependency without an ADR.
 - Make the failing tests pass with the simplest correct code, then refactor with tests green.
 
-Finish by running `./mvnw verify` (Windows: `mvnw.cmd verify`) and tick the task in tasks.md.
+Finish by running `./mvnw verify` (Windows: `mvnw.cmd verify`) and tick the task in the spec.
 Report what changed, coverage for touched packages, and any concurrency risks you see.

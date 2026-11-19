@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review the current branch with security, UI and performance auditors in parallel and merge their findings.
+description: Review a release (or a branch on request) with security, UI and performance auditors in parallel and merge their findings. Runs once per release from /release (ADR-0004).
 disable-model-invocation: true
 argument-hint: "[optional paths or routes]"
 ---
@@ -28,7 +28,7 @@ Always diff against the remote ref `origin/BASE`, so a stale local branch in a w
    - `security-auditor` always;
    - `ui-reviewer` when files under apps/web or content changed (start the dev server first if needed);
    - `perf-auditor` when files under apps/web changed.
-3. Check traceability yourself: each changed behaviour maps to a REQ id and a test.
+3. Check traceability yourself: each changed behaviour maps to a REQ id; where the spec names a test, it exists.
 4. Merge the findings into one list ordered by severity, removing duplicates. Mark each as
    must-fix (blocks the PR) or follow-up.
 5. Ask the user whether to fix the must-fix items now.

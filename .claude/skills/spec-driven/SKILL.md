@@ -1,28 +1,37 @@
 ---
 name: spec-driven
-description: The spec-driven development process for this repo - spec folder layout, EARS acceptance criteria, approval gates, task format and templates. Load whenever creating or working from a spec.
+description: The spec-driven development process for this repo - one spec.md per release, EARS acceptance criteria, the single approval gate, task format and template. Load whenever creating or working from a spec.
 ---
-# Spec-driven development
 
-Flow: `requirements.md` → user approves → `design.md` → user approves → `tasks.md` → one task per session.
-Templates are in `templates/` next to this file. Specs live in `specs/NNN-kebab-name/`.
+# Spec-driven development (ADR-0004)
+
+Flow: `/spec` writes `specs/NNN-release/spec.md` → the user approves once → tasks run day by day on
+`feature/<release>-day-N`. Template: `templates/spec.md` next to this file.
+Older specs (001) used requirements.md, design.md and tasks.md; leave them as they are.
 
 ## Status line
-Each spec file ends with `Status: DRAFT` or `Status: APPROVED (YYYY-MM-DD)`. Only the user approves.
-Never design from an unapproved requirements.md, or create tasks from an unapproved design.md.
+
+Each spec ends with `Status: DRAFT` or `Status: APPROVED (YYYY-MM-DD)`. Only the user approves.
+Never implement tasks from a DRAFT spec.
+
+## Task checkboxes
+
+`- [ ]` open · `- [x]` done · `- [~]` closed without doing it (dropped, moved or replaced; say why).
+Tasks are feature-sized (a page, a component, an engine module) with observable acceptance checks.
 
 ## EARS patterns
+
 - Ubiquitous: THE <system> SHALL <response>.
 - Event: WHEN <trigger>, THE <system> SHALL <response>.
 - State: WHILE <state>, THE <system> SHALL <response>.
 - Unwanted: IF <condition>, THEN THE <system> SHALL <response>.
 - Optional: WHERE <feature is included>, THE <system> SHALL <response>.
 
-IDs: `REQ-<AREA>-NNN` (AREA such as HOME, LAB, CONTENT, SEC). Every criterion must be testable.
+IDs: `REQ-<AREA>-NNN` (AREA such as PAGE, CONTENT, UI, SEO, DEP). Every criterion must be checkable.
 
-## Planned specs
-000 constitution · 001 monorepo & tooling · 002 design system · 003 content model & CMS ·
-004 app shell · 005 home · 006 experience · 007 project write-up template · 008 projects ·
-009 notes · 010 settlement-lab engine · 011 settlement-lab UI · 012 contact ·
-013 engineering page · 014 security hardening · 015 observability · 016 deploy & release ·
-017 resume PDF from content · 018 visitor analytics & public counter
+## Release specs
+
+000 constitution · 001 monorepo & tooling (done, scope cut) · 002 v1 site (22 Nov) ·
+003 v1.1 counter, analytics, notes, headers, CI (~29 Nov) · 004 v2 Lab dashboard and contact form (~13 Dec) ·
+005 v2.1 engineering page, generated resume, Lighthouse CI (~20 Dec).
+Settlement Lab engine: `docs/settlement-lab-spec.md`, built in the `settlement-lab` repo.
