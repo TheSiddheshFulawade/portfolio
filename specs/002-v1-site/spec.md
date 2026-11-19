@@ -100,12 +100,14 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 
 ### Sat 21 Nov (day 3): Projects, About, Contact, first deploy
 
-- [ ] V1-07 [web] Projects list and detail template, prerendered per slug (REQ-PAGE-004).
+- [x] V1-07 [web] Projects list and detail template, prerendered per slug (REQ-PAGE-004).
 - [ ] V1-08 [web] About and Contact pages and resume links (REQ-PAGE-006, 007, 008). Needs the user's
       `apps/web/public/resume.pdf`.
+      Status: pages and links done (day 3); open until the user adds `resume.pdf`.
 - [ ] V1-09 [web] Playwright smoke test (replaces and deletes `scripts/e2e-stub.mjs`); first Cloudflare Pages
       preview deploy from `develop` (**the user connects the repo in the Cloudflare dashboard**).
       Checks: smoke test green locally; the preview URL serves every route.
+      Status: smoke test done (day 3, 12 tests green); open until the user connects Cloudflare Pages and the preview serves every route.
 
 ### Sun 22 Nov (day 4): write-up, SEO, polish, launch
 

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -23,7 +23,7 @@ const goodPackage = () => ({
     test: "ng test --no-watch --coverage",
     typecheck:
       "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
-    e2e: "node scripts/e2e-stub.mjs",
+    e2e: "playwright test",
     lint: "ng lint && prettier --check .",
     format: "prettier --write .",
     "format:check": "prettier --check .",
@@ -343,11 +343,11 @@ test("REQ-WEB-003 web defines dev, test, e2e, lint, typecheck, build", async () 
   }
 });
 
-test("REQ-WEB-003 e2e stub exits 0", () => {
-  const stub = path.join(repoRoot, "apps/web/scripts/e2e-stub.mjs");
-  const result = spawnSync(process.execPath, [stub], { encoding: "utf8" });
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /^e2e: no tests until spec 004\r?\n$/);
+test("REQ-WEB-003 e2e runs the Playwright smoke test against a server that answers like Cloudflare Pages", async () => {
+  const pkg = JSON.parse(readFileSync(path.join(repoRoot, "apps/web/package.json"), "utf8"));
+  assert.equal(pkg.scripts.e2e, "playwright test");
+  assert.ok(existsSync(path.join(repoRoot, "apps/web/e2e/smoke.spec.ts")), "smoke spec exists");
+  assert.ok(!existsSync(path.join(repoRoot, "apps/web/scripts/e2e-stub.mjs")), "stub deleted");
 });
 
 test("REQ-WEB-004 angular.json test target reports coverage; no line threshold in v1 (ADR-0004)", async () => {
@@ -363,7 +363,7 @@ test("REQ-WEB-004 angular.json test target reports coverage; no line threshold i
   assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["text-summary"])), "lcov"));
 });
 
-test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.html, experience and 404.html have the h1 and no server was emitted", () => {
+test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless every required page has the h1 and no server was emitted", () => {
   const script = path.join(repoRoot, "apps/web/scripts/verify-prerender.mjs");
   const run = (files) => {
     const dir = mkdtempSync(path.join(tmpdir(), "prerender-"));
@@ -381,6 +381,10 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.htm
   const good = {
     "browser/index.html": page("<main><h1>Hello</h1></main>"),
     "browser/experience/index.html": page("<main><h1>Experience</h1></main>"),
+    "browser/projects/index.html": page("<main><h1>Projects</h1></main>"),
+    "browser/projects/settlement-lab/index.html": page("<main><h1>Settlement Lab</h1></main>"),
+    "browser/about/index.html": page("<main><h1>About</h1></main>"),
+    "browser/contact/index.html": page("<main><h1>Contact</h1></main>"),
     "browser/404.html": page("<main><h1>Page not found</h1></main>"),
   };
 
@@ -391,6 +395,10 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.htm
   const without = (rel) => Object.fromEntries(Object.entries(good).filter(([k]) => k !== rel));
   assert.equal(run(without("browser/index.html")).status, 1, "no index.html");
   assert.equal(run(without("browser/experience/index.html")).status, 1, "no experience page");
+  assert.equal(run(without("browser/projects/index.html")).status, 1, "no projects page");
+  assert.equal(run(without("browser/projects/settlement-lab/index.html")).status, 1, "no Settlement Lab page");
+  assert.equal(run(without("browser/about/index.html")).status, 1, "no about page");
+  assert.equal(run(without("browser/contact/index.html")).status, 1, "no contact page");
   assert.equal(run(without("browser/404.html")).status, 1, "no 404.html");
   assert.equal(run({ ...good, "server/server.mjs": "" }).status, 1, "server.mjs emitted");
 });

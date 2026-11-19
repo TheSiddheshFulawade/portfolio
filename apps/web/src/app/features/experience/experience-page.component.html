@@ -6,7 +6,7 @@
 <ol class="roles">
   @for (role of roles; track role.id) {
     <li>
-      <article class="role" [attr.aria-labelledby]="'role-' + role.id">
+      <article class="role" [id]="role.id" [attr.aria-labelledby]="'role-' + role.id">
         <header class="role-head">
           <h2 [id]="'role-' + role.id">{{ role.title }}</h2>
           <p class="company">{{ role.company }}</p>

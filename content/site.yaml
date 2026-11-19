@@ -23,12 +23,16 @@ pages:
     description: Roles, responsibilities and impact, from central banking payments to startup backends.
   projects:
     title: Projects · Siddhesh Fulawade
+    heading: Projects
     description: Original work, led by Settlement Lab, a concurrency-safe settlement engine with property and stress tests.
   about:
     title: About · Siddhesh Fulawade
+    heading: About
     description: How I work, the skills I use and the evidence behind them, and my education.
   contact:
     title: Contact · Siddhesh Fulawade
+    heading: Contact
+    body: Email is the quickest way to reach me.
     description: Email, LinkedIn and GitHub. Resume available as a PDF.
   notFound:
     title: Page not found · Siddhesh Fulawade
@@ -53,6 +57,13 @@ ui:
   metricSource: Source
   featuredHeading: Featured work
   allProjects: All projects
+  repoLink: Source code on GitHub
   present: Present
   recognition: Recognition
   stack: Stack
+  skillsHeading: Skills
+  evidence: Evidence
+  educationHeading: Education
+  certificationsHeading: Certifications
+  achievementsHeading: Achievements
+  email: Email

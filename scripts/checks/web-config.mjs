@@ -153,7 +153,7 @@ const REQUIRED_SCRIPTS = {
   build: (v) => v === 'ng build',
   test: (v) => v === 'ng test --no-watch --coverage',
   typecheck: (v) => /tsc --noEmit -p tsconfig\.app\.json/.test(v) && /tsc --noEmit -p tsconfig\.spec\.json/.test(v),
-  e2e: (v) => v === 'node scripts/e2e-stub.mjs',
+  e2e: (v) => v === 'playwright test', // spec 002 V1-09: Playwright smoke test (replaced the stub)
 };
 
 /** REQ-WEB-003: the script set the root contract calls. */
