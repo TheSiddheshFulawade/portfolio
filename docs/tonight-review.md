@@ -2,6 +2,15 @@
 
 Things that need you. Delete this file once each item is done or moved into a spec.
 
+## Status at a glance
+
+- **v1 site**: built and merged to `develop` (PRs #14, #15, #16). Release review: no must-fix findings.
+- **Waiting on you for the v1.0.0 release**: `resume.pdf` (§2), Cloudflare Pages, domain, DNS and Email
+  Routing (§4). Then the agent opens the release PR to `main`; you merge it.
+- **To review tonight**: PR #17 (hook change, this list, the release review) and the DRAFT spec 003 for v1.1
+  (counter, analytics, notes, headers, CI), which needs your approval before any of it is built.
+- **Correction**: event replay is on, not off as the day-2 PR said (§5).
+
 ## 1. Visitor counter (V1-14, moved out of v1)
 
 Planned in ADR-0004 for v1.1. Nothing is built yet. Decisions and actions for tonight:
