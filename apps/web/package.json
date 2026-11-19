@@ -20,7 +20,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "postbuild": "node scripts/emit-404.mjs && node scripts/verify-prerender.mjs",
-    "content:check": "node scripts/build-content.mjs --check"
+    "content:check": "node scripts/build-content.mjs --check",
+    "og-image": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@angular/common": "22.2.6",

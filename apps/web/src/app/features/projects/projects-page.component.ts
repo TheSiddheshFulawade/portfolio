@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 import { StatusPillComponent } from '../../shared/ui/status-pill.component';
 
@@ -18,4 +19,8 @@ export class ProjectsPageComponent {
   protected readonly ui = this.content.site.ui;
   protected readonly current = this.content.currentProjects;
   protected readonly earlier = this.content.earlierProjects;
+
+  constructor() {
+    inject(SeoService).page('projects', '/projects');
+  }
 }

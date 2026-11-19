@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 import { formatMonthRange } from '../../shared/format/month';
 
@@ -18,4 +19,8 @@ export class ExperiencePageComponent {
     ...role,
     dates: formatMonthRange(role.start, role.end, this.ui['present'], this.content.site.locale),
   }));
+
+  constructor() {
+    inject(SeoService).page('experience', '/experience');
+  }
 }

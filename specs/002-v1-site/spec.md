@@ -111,11 +111,13 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 
 ### Sun 22 Nov (day 4): write-up, SEO, polish, launch
 
-- [ ] V1-10 [content] Settlement Lab write-up at `/projects/settlement-lab` (REQ-PAGE-005), from
+- [x] V1-10 [content] Settlement Lab write-up at `/projects/settlement-lab` (REQ-PAGE-005), from
       `docs/settlement-lab-spec.md` and, if ready, `results/results.md` from the settlement-lab repo.
-- [ ] V1-11 [web] SEO: per-route meta from content (retires the Q-1 placeholder `<title>`), OG image,
+      Status: problem, design, decisions and trade-offs, "Results coming" and the repo link are in place; numbers go in when
+      the settlement-lab repo publishes `results/results.md`.
+- [x] V1-11 [web] SEO: per-route meta from content (retires the Q-1 placeholder `<title>`), OG image,
       canonical, `sitemap.xml`, `robots.txt` (REQ-SEO-001, 002).
-- [ ] V1-12 [web] Mobile and accessibility pass at 320, 375 and 768 px in both themes, manual Lighthouse run.
+- [x] V1-12 [web] Mobile and accessibility pass at 320, 375 and 768 px in both themes, manual Lighthouse run.
       Checks: Lighthouse mobile ≥95 performance and 100 accessibility on Home, or the gaps written down.
 - [ ] V1-13 [infra] Release v1.0.0: `/review`, `/release`, merge to `main`, connect siddheshfulawade.com in
       Cloudflare Pages (**user actions: domain, DNS, Email Routing**). Checks: HTTPS on the apex domain, `www` redirects.

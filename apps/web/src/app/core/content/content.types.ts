@@ -28,6 +28,8 @@ export interface Site {
   title: string;
   url: string;
   locale: string;
+  ogImage: string;
+  ogImageAlt: string;
   nav: NavItem[];
   pages: Record<PageKey, PageMeta>;
   footer: { note: string; sourceLabel: string; sourceUrl: string };

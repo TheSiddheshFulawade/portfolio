@@ -3,7 +3,17 @@
   "$id": "site.schema.json",
   "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
   "type": "object",
-  "required": ["title", "url", "locale", "nav", "pages", "footer", "ui"],
+  "required": [
+    "title",
+    "url",
+    "locale",
+    "ogImage",
+    "ogImageAlt",
+    "nav",
+    "pages",
+    "footer",
+    "ui"
+  ],
   "definitions": {
     "page": {
       "type": "object",
@@ -27,6 +37,8 @@
     "title": { "$ref": "common.schema.json#/definitions/text" },
     "url": { "type": "string", "pattern": "^https://[^/]+$" },
     "locale": { "type": "string" },
+    "ogImage": { "type": "string", "pattern": "^/[^/].*\\.(png|jpg)$" },
+    "ogImageAlt": { "$ref": "common.schema.json#/definitions/text" },
     "nav": {
       "type": "array",
       "minItems": 1,

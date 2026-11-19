@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 import { StatusPillComponent } from '../../shared/ui/status-pill.component';
 import { NotFoundPageComponent } from '../not-found/not-found-page.component';
@@ -22,4 +23,19 @@ export class ProjectPageComponent {
   readonly slug = input('');
   protected readonly project = computed(() => this.content.project(this.slug()));
   protected readonly ui = this.content.site.ui;
+
+  constructor() {
+    const seo = inject(SeoService);
+    // An unknown slug renders <sf-not-found-page>, which sets the noindex meta itself.
+    effect(() => {
+      const project = this.project();
+      if (project) {
+        seo.item({
+          title: `${project.title} · ${this.content.site.title}`,
+          description: project.tagline,
+          path: `/projects/${project.id}`,
+        });
+      }
+    });
+  }
 }

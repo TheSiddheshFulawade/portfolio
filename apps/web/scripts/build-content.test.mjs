@@ -5,7 +5,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildContent } from './build-content.mjs';
+import { buildContent, robotsTxt, sitemapXml } from './build-content.mjs';
 
 const REAL = resolve(dirname(fileURLToPath(import.meta.url)), '../../../content');
 
@@ -173,4 +173,42 @@ test('REQ-CONTENT-005 employer names outside the Experience page are rejected', 
   c.done();
 
   assert.match(joined(errors), /profile\.yaml: .*employer name/);
+});
+
+test('REQ-SEO-002 the sitemap lists every published route with the site origin, and not /404', async () => {
+  const { content } = await buildContent({ contentDir: REAL });
+
+  const xml = sitemapXml(content);
+  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+
+  assert.match(xml, /^<\?xml version="1.0" encoding="UTF-8"\?>/);
+  assert.deepEqual(locs, [
+    'https://siddheshfulawade.com/',
+    'https://siddheshfulawade.com/experience',
+    'https://siddheshfulawade.com/projects',
+    ...content.projects.map((p) => `https://siddheshfulawade.com/projects/${p.id}`),
+    'https://siddheshfulawade.com/about',
+    'https://siddheshfulawade.com/contact',
+  ]);
+  assert.ok(!xml.includes('/404'));
+});
+
+test('REQ-SEO-002 REQ-CONTENT-003 an unpublished project is left out of the sitemap', async () => {
+  const c = withContent((d) =>
+    edit(d, 'projects/pennywise.md', (s) => s.replace('published: true', 'published: false')),
+  );
+
+  const { content } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.ok(!sitemapXml(content).includes('/projects/pennywise'));
+});
+
+test('REQ-SEO-002 robots.txt allows crawling and points at the sitemap', async () => {
+  const { content } = await buildContent({ contentDir: REAL });
+
+  assert.equal(
+    robotsTxt(content),
+    'User-agent: *\nAllow: /\n\nSitemap: https://siddheshfulawade.com/sitemap.xml\n',
+  );
 });

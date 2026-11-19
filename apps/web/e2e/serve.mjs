@@ -14,6 +14,7 @@ const TYPES = {
   '.css': 'text/css',
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
+  '.png': 'image/png',
   '.pdf': 'application/pdf',
   '.xml': 'application/xml',
   '.txt': 'text/plain',

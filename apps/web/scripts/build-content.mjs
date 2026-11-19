@@ -1,6 +1,7 @@
 // Spec 002 V1-02: build-time content pipeline. Reads content/ (YAML and Markdown), validates every file
 // against content/_schema, enforces the disclosure rules, drops unpublished items, sorts, renders
-// Markdown to HTML and writes src/generated/content.json for ContentService.
+// Markdown to HTML and writes src/generated/content.json for ContentService, plus public/sitemap.xml and
+// public/robots.txt from the published routes (REQ-SEO-002).
 // Usage: node scripts/build-content.mjs [--check]   (--check validates only and writes nothing)
 import { mkdirSync, readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -12,6 +13,7 @@ import { parse as parseYaml } from 'yaml';
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_CONTENT_DIR = resolve(HERE, '../../../content');
 export const DEFAULT_OUT_FILE = resolve(HERE, '../src/generated/content.json');
+export const DEFAULT_PUBLIC_DIR = resolve(HERE, '../public');
 
 const SITE_EMAIL = 'hello@siddheshfulawade.com';
 
@@ -188,9 +190,42 @@ export async function buildContent({ contentDir = DEFAULT_CONTENT_DIR } = {}) {
   return { content, errors };
 }
 
+/**
+ * Published routes in navigation order (REQ-PAGE-001). Keep in sync with src/app/app.routes.ts; the smoke test
+ * fails if a sitemap route does not render. /404 is not a page to index.
+ */
+export function siteRoutes(content) {
+  return [
+    '/',
+    '/experience',
+    '/projects',
+    ...content.projects.map((p) => `/projects/${p.id}`),
+    '/about',
+    '/contact',
+  ];
+}
+
+/** REQ-SEO-002: sitemap.xml of the published routes on the production origin. */
+export function sitemapXml(content) {
+  const urls = siteRoutes(content)
+    .map((route) => `  <url><loc>${content.site.url}${route}</loc></url>`)
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+/** REQ-SEO-002: robots.txt that allows everything and points at the sitemap. */
+export function robotsTxt(content) {
+  return `User-agent: *\nAllow: /\n\nSitemap: ${content.site.url}/sitemap.xml\n`;
+}
+
 export async function main(
   argv = process.argv.slice(2),
-  { out = DEFAULT_OUT_FILE, log = console.log, error = console.error } = {},
+  {
+    out = DEFAULT_OUT_FILE,
+    publicDir = DEFAULT_PUBLIC_DIR,
+    log = console.log,
+    error = console.error,
+  } = {},
 ) {
   const { content, errors } = await buildContent();
   if (errors.length) {
@@ -205,7 +240,11 @@ export async function main(
   }
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, JSON.stringify(content) + '\n');
-  log(`build-content: wrote ${relative(process.cwd(), out).replace(/\\/g, '/')}`);
+  writeFileSync(join(publicDir, 'sitemap.xml'), sitemapXml(content));
+  writeFileSync(join(publicDir, 'robots.txt'), robotsTxt(content));
+  log(
+    `build-content: wrote ${relative(process.cwd(), out).replace(/\\/g, '/')}, sitemap.xml and robots.txt`,
+  );
   return 0;
 }
 
