@@ -110,7 +110,7 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 
 ### Day 2: visitor counter
 
-- [ ] V11-03 [web] Counter Function and D1 migration (REQ-COUNT-002, 003, 004, 006). Tests first: hashing (same
+- [x] V11-03 [web] Counter Function and D1 migration (REQ-COUNT-002, 003, 004, 006). Tests first: hashing (same
       visitor same day gives the same hash; a new day gives a different hash; the raw IP never appears in what is
       stored), counting (first visit counts, repeat visit does not, concurrent visits counted once each, using an
       in-memory D1 stand-in), method and origin checks, problem details.
