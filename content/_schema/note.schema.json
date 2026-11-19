@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "note.schema.json",
+  "description": "Front matter of content/notes/<id>.md (spec 003 REQ-NOTE-001). The file name must equal the id.",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": ["title", "summary", "date", "tags"],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "title": { "$ref": "common.schema.json#/definitions/text" },
+    "summary": { "type": "string", "minLength": 20, "maxLength": 170 },
+    "date": { "$ref": "common.schema.json#/definitions/date" },
+    "tags": {
+      "$ref": "common.schema.json#/definitions/stringList",
+      "minItems": 1,
+      "maxItems": 5
+    }
+  },
+  "additionalProperties": false
+}

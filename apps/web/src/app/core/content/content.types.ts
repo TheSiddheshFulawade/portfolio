@@ -22,7 +22,8 @@ export interface PageMeta {
   action?: string;
 }
 
-export type PageKey = 'home' | 'experience' | 'projects' | 'about' | 'contact' | 'notFound';
+export type PageKey =
+  'home' | 'experience' | 'projects' | 'notes' | 'about' | 'contact' | 'notFound';
 
 export interface Site {
   title: string;
@@ -86,6 +87,20 @@ export interface Project extends Shared {
   html: string;
 }
 
+export interface Note extends Omit<Shared, 'order'> {
+  /** Notes sort by date, newest first; order is not used. */
+  order?: number;
+  title: string;
+  summary: string;
+  /** Publication date, YYYY-MM-DD. */
+  date: string;
+  tags: string[];
+  /** Computed at build time from the word count. */
+  readingMinutes: number;
+  /** Rendered from the Markdown body at build time. */
+  html: string;
+}
+
 export interface SkillGroup {
   id: string;
   order: number;
@@ -113,6 +128,7 @@ export interface SiteContent {
   metrics: Metric[];
   experience: Experience[];
   projects: Project[];
+  notes: Note[];
   skills: SkillGroup[];
   education: Education;
 }

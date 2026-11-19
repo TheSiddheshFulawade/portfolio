@@ -16,6 +16,8 @@ export const DEFAULT_OUT_FILE = resolve(HERE, '../src/generated/content.json');
 export const DEFAULT_PUBLIC_DIR = resolve(HERE, '../public');
 
 const SITE_EMAIL = 'hello@siddheshfulawade.com';
+/** Reading speed for a note's reading time (REQ-NOTE-001). */
+const WORDS_PER_MINUTE = 200;
 
 /** Disclosure and format rules (constitution 6, ADR-0004 C1). `where` limits a rule to some files. */
 const RULES = [
@@ -155,6 +157,34 @@ export async function buildContent({ contentDir = DEFAULT_CONTENT_DIR } = {}) {
     return { ...front, html: marked.parse(parts.body, { async: false, gfm: true }) };
   });
 
+  const notesAll = collection('notes', '.md', (path, stem) => {
+    const file = rel(path);
+    const parts = splitFrontMatter(readFileSync(path, 'utf8'));
+    if (!parts) return errors.push(`${file}: missing front matter (--- ... ---)`) && null;
+    let front;
+    try {
+      front = parseYaml(parts.front);
+    } catch (err) {
+      return errors.push(`${file}: invalid front matter: ${err.message.split('\n')[0]}`) && null;
+    }
+    // YAML reads an unquoted date as a Date; the schema and the site use the YYYY-MM-DD text.
+    for (const key of ['date', 'updated']) {
+      if (front[key] instanceof Date) front[key] = front[key].toISOString().slice(0, 10);
+    }
+    check(file, 'note', front);
+    errors.push(...disclosureErrors(file, parts.body));
+    if (front.id !== stem) errors.push(`${file}: id "${front.id}" must match the file name`);
+    const words = parts.body.split(/\s+/).filter(Boolean).length;
+    return {
+      ...front,
+      readingMinutes: Math.max(1, Math.ceil(words / WORDS_PER_MINUTE)),
+      html: marked.parse(parts.body, { async: false, gfm: true }),
+    };
+  });
+  const notes = notesAll
+    .filter((n) => n.published)
+    .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+
   const known = new Set([...experienceAll, ...projectsAll].map((x) => x.id));
   const published = new Set(
     [...experienceAll, ...projectsAll].filter((x) => x.published).map((x) => x.id),
@@ -174,12 +204,18 @@ export async function buildContent({ contentDir = DEFAULT_CONTENT_DIR } = {}) {
     .sort(byOrderThenNewest('id'));
 
   const sortList = (list) => [...(list ?? [])].sort(byOrderThenNewest('id'));
+  // REQ-NOTE-002, REQ-CONTENT-003: no published notes means no Notes link anywhere.
+  const site = single.site && {
+    ...single.site,
+    nav: (single.site.nav ?? []).filter((item) => item.path !== '/notes' || notes.length > 0),
+  };
   const content = {
-    site: single.site,
+    site,
     profile: single.profile,
     metrics: sortList(single.metrics?.items),
     experience: experienceAll.filter((e) => e.published).sort(byOrderThenNewest('start')),
     projects: projectsAll.filter((p) => p.published).sort(byOrderThenNewest('updated')),
+    notes,
     skills,
     education: single.education && {
       degrees: sortList(single.education.degrees),
@@ -200,6 +236,7 @@ export function siteRoutes(content) {
     '/experience',
     '/projects',
     ...content.projects.map((p) => `/projects/${p.id}`),
+    ...(content.notes.length ? ['/notes', ...content.notes.map((n) => `/notes/${n.id}`)] : []),
     '/about',
     '/contact',
   ];
