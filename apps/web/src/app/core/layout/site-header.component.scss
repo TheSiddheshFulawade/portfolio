@@ -56,6 +56,18 @@
   padding: 0;
 }
 
+// Below 400 px the brand, Menu and theme buttons only fit on one row with the label hidden visually.
+@media (max-width: 24.99rem) {
+  .menu-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 // Dark theme (default): offer the sun. Light theme: offer the moon. Mirrors the selectors in tokens.css.
 .icon-moon {
   display: none;

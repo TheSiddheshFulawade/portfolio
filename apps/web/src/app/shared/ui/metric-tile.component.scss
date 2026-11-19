@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  cursor: help;
+}
+
+.value {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-size: var(--step-3);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.label {
+  color: var(--dim);
+  font-size: var(--step--1);
+}
+
+.source {
+  position: absolute;
+  inset: auto var(--space-2) calc(100% + var(--space-2)) var(--space-2);
+  z-index: 5;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--raise);
+  color: var(--text);
+  font-size: var(--step--1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity var(--dur-hover) var(--ease),
+    transform var(--dur-hover) var(--ease),
+    visibility var(--dur-hover);
+}
+
+.tile:hover .source,
+.tile:focus-visible .source {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.tile[data-dismissed] .source {
+  opacity: 0;
+  visibility: hidden;
+}

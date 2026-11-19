@@ -95,7 +95,7 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 
 - [x] V1-04 [web] App shell: header and mobile nav, theme toggle, skip link, footer, 404, focus on route change.
       Checks: keyboard-only pass; 320 px with no horizontal scroll.
-- [ ] V1-05 [web] Home page (REQ-PAGE-002). Checks: all copy from content; metrics show their source on hover or focus.
+- [x] V1-05 [web] Home page (REQ-PAGE-002). Checks: all copy from content; metrics show their source on hover or focus.
 - [ ] V1-06 [web] Experience page (REQ-PAGE-003). Checks: newest first; dates in one format.
 
 ### Sat 21 Nov (day 3): Projects, About, Contact, first deploy
