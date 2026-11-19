@@ -1,0 +1,25 @@
+<header class="intro">
+  <h1>{{ page.heading }}</h1>
+  <p class="lede">{{ page.body }}</p>
+</header>
+
+<dl class="channels">
+  <div class="channel">
+    <dt>{{ ui['email'] }}</dt>
+    <dd>
+      <a class="email" [href]="'mailto:' + profile.email">{{ profile.email }}</a>
+    </dd>
+  </div>
+  @for (link of links; track link.id) {
+    <div class="channel">
+      <dt>{{ link.label }}</dt>
+      <dd>
+        <a [href]="link.url" rel="me noopener">{{ link.display }}</a>
+      </dd>
+    </div>
+  }
+</dl>
+
+<p>
+  <a class="button" [href]="profile.resume.url">{{ profile.resume.label }}</a>
+</p>

@@ -4,8 +4,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, skip } from 'rxjs';
 
 /**
- * Moves focus to the page's main heading after every client-side route change, but not on the first
- * load (REQ-UI-005), so screen reader and keyboard users start at the new content.
+ * Moves focus to the page's main heading (or the URL fragment's target) after every client-side route
+ * change, but not on the first load (REQ-UI-005), so screen reader and keyboard users start at the new content.
  */
 @Injectable({ providedIn: 'root' })
 export class RouteFocus {
@@ -21,17 +21,24 @@ export class RouteFocus {
         skip(1),
         takeUntilDestroyed(destroyRef),
       )
-      .subscribe(() =>
-        afterNextRender({ read: () => this.focusHeading() }, { injector: this.injector }),
-      );
+      .subscribe((e) => {
+        const fragment = this.router.parseUrl(e.urlAfterRedirects).fragment;
+        afterNextRender({ read: () => this.focusTarget(fragment) }, { injector: this.injector });
+      });
   }
 
-  /** Focuses the main heading, or <main> itself when the page has no h1. */
-  focusHeading(): void {
+  /**
+   * Focuses the element named by the URL fragment (e.g. /experience#2024-11-rebit), else the main heading,
+   * else <main> itself.
+   */
+  focusTarget(fragment?: string | null): void {
     const main = this.document.getElementById('main');
-    const target = main?.querySelector<HTMLElement>('h1') ?? main;
+    const target =
+      (fragment ? this.document.getElementById(fragment) : null) ??
+      main?.querySelector<HTMLElement>('h1') ??
+      main;
     if (!target) return;
     if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-    target.focus({ preventScroll: true });
+    target.focus({ preventScroll: !fragment });
   }
 }

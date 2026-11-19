@@ -383,6 +383,8 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless every req
     "browser/experience/index.html": page("<main><h1>Experience</h1></main>"),
     "browser/projects/index.html": page("<main><h1>Projects</h1></main>"),
     "browser/projects/settlement-lab/index.html": page("<main><h1>Settlement Lab</h1></main>"),
+    "browser/about/index.html": page("<main><h1>About</h1></main>"),
+    "browser/contact/index.html": page("<main><h1>Contact</h1></main>"),
     "browser/404.html": page("<main><h1>Page not found</h1></main>"),
   };
 
@@ -395,6 +397,8 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless every req
   assert.equal(run(without("browser/experience/index.html")).status, 1, "no experience page");
   assert.equal(run(without("browser/projects/index.html")).status, 1, "no projects page");
   assert.equal(run(without("browser/projects/settlement-lab/index.html")).status, 1, "no Settlement Lab page");
+  assert.equal(run(without("browser/about/index.html")).status, 1, "no about page");
+  assert.equal(run(without("browser/contact/index.html")).status, 1, "no contact page");
   assert.equal(run(without("browser/404.html")).status, 1, "no 404.html");
   assert.equal(run({ ...good, "server/server.mjs": "" }).status, 1, "server.mjs emitted");
 });
