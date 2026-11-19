@@ -1,5 +1,7 @@
 # 001 · Monorepo and tooling · Tasks
 
+> **Status: done, scope cut by ADR-0004 (2026-11-19).** `[~]` marks tasks dropped, moved or replaced.
+
 Each task: half a day or less, test written first, build green afterwards.
 Tags: [web] [api] [content] [infra]
 
@@ -98,7 +100,7 @@ Conventions for every task:
       - `git add --renormalize .` produces no change (or the change is committed in this task).
       - `npm run check:repo` and `npm run test:scripts` pass.
 
-- [ ] T-04 [infra] Hook test suite
+- [~] T-04 [infra] Hook test suite · **dropped (ADR-0004)**
       depends on: T-02
       files: `.claude/hooks/_spawn-hook.mjs`, `.claude/hooks/guard-bash.test.mjs`,
       `.claude/hooks/protect-secrets.test.mjs`, `.claude/hooks/lib.test.mjs`,
@@ -206,7 +208,7 @@ Conventions for every task:
       - Negative proof in the PR: removing the `<h1>` makes `npm run build` exit non-zero; reverted.
       - From the root: `npm run lint:web`, `typecheck:web`, `test:web` (≥ 80 % lines), `build:web` exit 0.
 
-- [ ] T-09 [api] Maven wrapper, pom baseline, Java pin and bootstrap class
+- [~] T-09 [api] Maven wrapper, pom baseline, Java pin and bootstrap class · **moved to the settlement-lab repo, simplified (docs/settlement-lab-spec.md §5)**
       depends on: T-02, T-03
       files: `apps/api/mvnw`, `apps/api/mvnw.cmd`, `apps/api/.mvn/wrapper/maven-wrapper.properties`,
       `apps/api/pom.xml`, `apps/api/src/main/java/dev/sf/portfolio/PortfolioApplication.java`,
@@ -234,7 +236,7 @@ Conventions for every task:
       - Negative proof in the PR: a temporary version range (`[1.0,)`) makes the enforcer fail; reverted.
       - From the root on Windows 11: `npm run lint:api`, `typecheck:api`, `build:api` and `test:api` exit 0; `check:repo` passes.
 
-- [ ] T-10 [api] Health-only actuator exposure
+- [~] T-10 [api] Health-only actuator exposure · **moved to the settlement-lab repo, simplified (docs/settlement-lab-spec.md §5)**
       depends on: T-09
       files: `apps/api/src/main/resources/application.yaml`,
       `apps/api/src/test/java/dev/sf/portfolio/HealthEndpointIT.java`, `apps/api/pom.xml` (only if the test starter changes)
@@ -252,7 +254,7 @@ Conventions for every task:
       - The health response body is exactly `{"status":"UP"}` with the actuator v3 media type.
       - From the root: `npm run test:api` exits 0 and runs the IT through failsafe.
 
-- [ ] T-11 [api] JaCoCo merged line coverage gate at 85 %
+- [~] T-11 [api] JaCoCo merged line coverage gate at 85 % · **moved to the settlement-lab repo, simplified (docs/settlement-lab-spec.md §5)**
       depends on: T-10
       files: `apps/api/pom.xml`, `scripts/checks/api-build.mjs`, `scripts/checks/api-build.test.mjs`
       test first: `api-build.test.mjs`: `REQ-API-003 jacoco check enforces LINE COVEREDRATIO 0.85 on the merged data at verify`.
@@ -266,7 +268,7 @@ Conventions for every task:
       - Negative proof in the PR: an untested class makes `npm run test:api` fail on the coverage check; reverted.
       - From the root: `npm run test:api` exits 0; `check:repo` passes.
 
-- [ ] T-12 [api] Spotless with palantir-java-format, and formatter docs (Q-2)
+- [~] T-12 [api] Spotless with palantir-java-format, and formatter docs (Q-2) · **moved to the settlement-lab repo, simplified (docs/settlement-lab-spec.md §5)**
       depends on: T-11
       files: `apps/api/pom.xml`, `apps/api/.mvn/jvm.config` (only if risk R-2 needs exports), every
       Java file under `apps/api/src` (reformatted), `scripts/checks/api-build.mjs`,
@@ -282,7 +284,7 @@ Conventions for every task:
       - Negative proof in the PR: a misformatted Java file makes both `npm run format:check:api` and `npm run test:api` fail; reverted.
       - From the root: `npm run format:check:api` and `test:api` exit 0; `npm run test:hooks` still passes.
 
-- [ ] T-13 [api] ArchUnit rule: domain is framework-free
+- [~] T-13 [api] ArchUnit rule: domain is framework-free · **moved to the settlement-lab repo, simplified (docs/settlement-lab-spec.md §5)**
       depends on: T-12
       files: `apps/api/pom.xml` (`archunit-junit5`, test scope),
       `apps/api/src/test/java/dev/sf/portfolio/architecture/ArchitectureRules.java`,
@@ -301,7 +303,7 @@ Conventions for every task:
       - (verify) ArchUnit 1.5.x latest patch reads Java 25 class files (major 69).
       - From the root: `npm run test:api` exits 0 with coverage still ≥ 85 %.
 
-- [ ] T-14 [infra] OSV severity gate (pure logic)
+- [~] T-14 [infra] OSV severity gate (pure logic) · **dropped (ADR-0004)**
       depends on: T-02
       files: `scripts/lib/osv-gate.mjs`, `scripts/lib/osv-gate.test.mjs`, `scripts/lib/fixtures/osv-*.json`
       test first: `osv-gate.test.mjs`: `REQ-CI-006 CVSS 7.0 fails`, `REQ-CI-006 CVSS 6.9 passes`,
@@ -314,7 +316,7 @@ Conventions for every task:
         `interpretExit(code)` fails closed on tool errors. No I/O in this module.
       - `npm run test:scripts` passes.
 
-- [ ] T-15 [infra] OSV runner: pinned binary, checksum and scan
+- [~] T-15 [infra] OSV runner: pinned binary, checksum and scan · **dropped (ADR-0004)**
       depends on: T-14, T-09
       files: `scripts/osv-scan.mjs`, `scripts/osv-scan.test.mjs`, `tools/osv-scanner.json`,
       `apps/api/osv-scanner.toml`, `scripts/checks/osv-config.mjs`, `scripts/checks/osv-config.test.mjs`
@@ -332,7 +334,7 @@ Conventions for every task:
         removed from the JSON output (if so, the gate does not re-parse the toml; the test still holds).
       - From the root: `npm run audit:api` exits 0 on Windows 11 with no API key; a second run reuses the cached binary.
 
-- [ ] T-16 [infra] Renovate configuration and validator
+- [~] T-16 [infra] Renovate configuration and validator · **dropped (ADR-0004)**
       depends on: T-15
       files: `renovate.json`, `package.json` (root: `install:renovate`, `check:renovate`),
       `tools/renovate/package.json`, `tools/renovate/package-lock.json`, `scripts/checks/renovate.mjs`,
@@ -357,7 +359,7 @@ Conventions for every task:
         If the validator needs install scripts, stop and bring the choice back to the user.
       - `npm run check:renovate` and `check:repo` exit 0 on Windows 11; the first-run time is noted in the PR.
 
-- [ ] T-17 [infra] CI orchestration scripts: change detection and gate
+- [~] T-17 [infra] CI orchestration scripts: change detection and gate · **replaced by the single v1.1 CI workflow (ADR-0004)**
       depends on: T-02
       files: `scripts/ci/changes.mjs`, `scripts/ci/changes.test.mjs`, `scripts/ci/gate.mjs`, `scripts/ci/gate.test.mjs`
       test first:
@@ -380,7 +382,7 @@ Conventions for every task:
         and its output for that app is exactly `"false"`.
       - Both CLIs run locally on Windows 11; `npm run test:scripts` passes.
 
-- [ ] T-18 [infra] CI workflow
+- [~] T-18 [infra] CI workflow · **replaced by the single v1.1 CI workflow (ADR-0004)**
       depends on: T-04, T-08, T-13, T-15, T-16, T-17
       files: `.github/workflows/ci.yml` (replaces `.github/workflows/.gitkeep`), `scripts/checks/workflow.mjs`,
       `scripts/checks/workflow.test.mjs`
@@ -418,7 +420,7 @@ Conventions for every task:
         Maven cache hits; warm-cache wall time ≤ 10 min.
       - `npm run check:repo` and `test:scripts` pass locally.
 
-- [ ] T-19 [infra] Root commands in CLAUDE.md and docs-only CI acceptance
+- [~] T-19 [infra] Root commands in CLAUDE.md and docs-only CI acceptance · **folded into the fast-track docs change (ADR-0004)**
       depends on: T-18
       files: `CLAUDE.md` (Commands section only)
       test first: one-off check `rg -n "once spec 001 creates it" CLAUDE.md` matches today (stale text); it must not match afterwards.
@@ -503,3 +505,4 @@ Conventions for every task:
    T-01 (done) is unaffected. No task is added or removed, and dependencies are unchanged.
 
 Status: APPROVED (2026-11-18, security revision)
+Status: DONE, scope cut by ADR-0004 (2026-11-19)

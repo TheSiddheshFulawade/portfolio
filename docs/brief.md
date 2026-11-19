@@ -49,14 +49,15 @@ About ₹1,000–1,300 per year (domain only). Everything else on free tiers.
 
 ## Timeline
 About 4 weeks at 15+ hours per week. Blueprint: docs/blueprint.html
+Superseded on 2026-11-19 by ADR-0004 (fast track): v1 live Sun 22 Nov 2026, then v1.1, v2 and v2.1.
 
 ## Decisions (answered 2026-11-16)
 1. Domain: siddheshfulawade.com
 2. No notice period or availability line anywhere on the site (the current employer may visit).
    The notice period is shared directly with recruiters (details in docs/private/), not published.
-3. Contact: the site shows email, LinkedIn, GitHub and the contact form. The phone number
-   appears only in the resume PDF. Values live in content/profile (added by the content spec),
-   not in this brief.
+3. Contact: the site shows email (hello@siddheshfulawade.com), LinkedIn and GitHub (the contact form
+   follows in v2). The public resume PDF has no phone number; the full resume is shared with
+   recruiters directly. Values live in content/profile, not in this brief. (Updated 2026-11-19.)
 4. ReBIT and e-Kuber 3.0 may be named, on the Experience page and in the resume only.
    Never listed under Projects; Projects holds original work such as Settlement Lab.
 
