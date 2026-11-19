@@ -139,9 +139,16 @@ Lighthouse CI (v2.1); Renovate (later, own ADR); comments and newsletters (never
 
 ## 6. Open questions for the user
 
-1. Counter placement: footer only (as designed), or also on Home?
-2. Notes topics: suggested (a) exactly-once processing without distributed transactions, (b) ordered locking vs
-   CAS in the Settlement Lab ledger, (c) what a JSON Schema content pipeline buys a static site. Which two or three?
-3. Should v1.1 also split project write-ups out of the main bundle (initial JS is 87 KB of 120 and grows with notes)?
+**Still open** (the user is away from a laptop; answer tonight). Until answered, the defaults in brackets apply,
+and no task that depends on an answer is started.
 
-Status: DRAFT
+1. [Footer only] Counter placement: footer only (as designed), or also on Home?
+2. Notes topics: suggested (a) exactly-once processing without distributed transactions, (b) ordered locking vs
+   CAS in the Settlement Lab ledger, (c) what a JSON Schema content pipeline buys a static site. Which two or three? [No default: V11-07 waits for the answer.]
+3. Should v1.1 also split project write-ups out of the main bundle (initial JS is 87 KB of 120 and grows with notes)? [No split in v1.1 unless initial JS passes 100 KB.]
+
+Start: 2026-11-19, the user asked from mobile to start the tasks and to decide routine questions.
+Started on that basis: V11-01, V11-02 (no product choices). Waiting for the user: V11-03, V11-04, V11-05 (visitor
+counter, to be worked on together tonight) and V11-07 (note topics). Full approval of this spec is still to come.
+
+Status: DRAFT (partly started at the user's request, 2026-11-19)
