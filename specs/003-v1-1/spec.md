@@ -121,7 +121,7 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 
 ### Day 3: Notes
 
-- [ ] V11-06 [web] Notes schema, content build, list and detail pages, navigation, sitemap and SEO
+- [x] V11-06 [web] Notes schema, content build, list and detail pages, navigation, sitemap and SEO
       (REQ-NOTE-001, 002). Tests first: content build tests for notes (validation, unpublished dropped, newest first,
       reading time); unit tests for both pages. Checks: smoke test covers the new routes.
 - [ ] V11-07 [content] Two or three notes drafted for the user's approval (REQ-NOTE-003). Checks: the content build's
@@ -148,7 +148,7 @@ and no task that depends on an answer is started.
 3. Should v1.1 also split project write-ups out of the main bundle (initial JS is 87 KB of 120 and grows with notes)? [No split in v1.1 unless initial JS passes 100 KB.]
 
 Start: 2026-11-19, the user asked from mobile to start the tasks and to decide routine questions.
-Started on that basis: V11-01, V11-02 (no product choices); both done on 2026-11-19. Waiting for the user: V11-03, V11-04, V11-05 (visitor
+Started on that basis: V11-01, V11-02 (no product choices); both done on 2026-11-19. V11-06 (notes pages, no content) done the same day; Notes stays hidden until a note is published. Waiting for the user: V11-03, V11-04, V11-05 (visitor
 counter, to be worked on together tonight) and V11-07 (note topics). Full approval of this spec is still to come.
 
 Status: DRAFT (partly started at the user's request, 2026-11-19)

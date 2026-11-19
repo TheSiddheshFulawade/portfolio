@@ -1,0 +1,23 @@
+@if (note(); as note) {
+  <article class="note">
+    <header class="head">
+      <p>
+        <a class="back" routerLink="/notes">{{ ui['allNotes'] }}</a>
+      </p>
+      <h1>{{ note.title }}</h1>
+      <p class="meta">
+        <time [attr.datetime]="note.date">{{ shownDate() }}</time>
+        <span aria-hidden="true">·</span>
+        <span>{{ note.readingMinutes }} {{ ui['readingTime'] }}</span>
+      </p>
+      <ul class="tags" [attr.aria-label]="ui['tags']">
+        @for (tag of note.tags; track tag) {
+          <li>{{ tag }}</li>
+        }
+      </ul>
+    </header>
+    <div class="prose" [innerHTML]="note.html"></div>
+  </article>
+} @else {
+  <sf-not-found-page />
+}

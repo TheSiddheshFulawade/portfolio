@@ -8,6 +8,8 @@ const routes = [
   '/experience',
   '/projects',
   ...content.projects.map((p) => `/projects/${p.id}`),
+  // Notes are listed only once one is published (REQ-NOTE-002), matching the sitemap.
+  ...(content.notes.length ? ['/notes', ...content.notes.map((n) => `/notes/${n.id}`)] : []),
   '/about',
   '/contact',
 ];

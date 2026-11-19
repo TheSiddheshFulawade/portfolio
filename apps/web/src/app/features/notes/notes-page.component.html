@@ -1,0 +1,31 @@
+<header class="intro">
+  <h1>{{ page.heading }}</h1>
+  <p class="lede">{{ page.description }}</p>
+</header>
+
+@if (notes.length) {
+  <ol class="notes">
+    @for (note of notes; track note.id) {
+      <li>
+        <article class="note" [attr.aria-labelledby]="'note-' + note.id">
+          <p class="meta">
+            <time [attr.datetime]="note.date">{{ note.shownDate }}</time>
+            <span aria-hidden="true">·</span>
+            <span>{{ note.readingMinutes }} {{ ui['readingTime'] }}</span>
+          </p>
+          <h2 [id]="'note-' + note.id">
+            <a [routerLink]="['/notes', note.id]">{{ note.title }}</a>
+          </h2>
+          <p>{{ note.summary }}</p>
+          <ul class="tags" [attr.aria-label]="ui['tags']">
+            @for (tag of note.tags; track tag) {
+              <li>{{ tag }}</li>
+            }
+          </ul>
+        </article>
+      </li>
+    }
+  </ol>
+} @else {
+  <p>{{ page.body }}</p>
+}

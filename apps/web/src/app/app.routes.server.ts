@@ -10,6 +10,12 @@ export const serverRoutes: ServerRoute[] = [
     getPrerenderParams: async () => inject(ContentService).projects.map((p) => ({ slug: p.id })),
   },
   {
+    // One prerendered page per published note (REQ-NOTE-001).
+    path: 'notes/:slug',
+    renderMode: RenderMode.Prerender,
+    getPrerenderParams: async () => inject(ContentService).notes.map((n) => ({ slug: n.id })),
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
   },

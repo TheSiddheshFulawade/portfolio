@@ -12,6 +12,8 @@ nav:
   - { label: Home, path: / }
   - { label: Experience, path: /experience }
   - { label: Projects, path: /projects }
+  # Shown only while at least one note is published (the content build drops it otherwise).
+  - { label: Notes, path: /notes }
   - { label: About, path: /about }
   - { label: Contact, path: /contact }
 pages:
@@ -28,6 +30,11 @@ pages:
     title: Projects · Siddhesh Fulawade
     heading: Projects
     description: Original work, led by Settlement Lab, a concurrency-safe settlement engine with property and stress tests.
+  notes:
+    title: Notes · Siddhesh Fulawade
+    description: Short technical notes on payments, concurrency and the engineering behind this site.
+    heading: Notes
+    body: No notes yet.
   about:
     title: About · Siddhesh Fulawade
     heading: About
@@ -70,3 +77,6 @@ ui:
   certificationsHeading: Certifications
   achievementsHeading: Achievements
   email: Email
+  readingTime: min read
+  tags: Tags
+  allNotes: All notes

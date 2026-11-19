@@ -1,7 +1,7 @@
 // Spec 002 V1-02: content build. Each test copies the real content/ to a temp dir and changes one thing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -211,4 +211,88 @@ test('REQ-SEO-002 robots.txt allows crawling and points at the sitemap', async (
     robotsTxt(content),
     'User-agent: *\nAllow: /\n\nSitemap: https://siddheshfulawade.com/sitemap.xml\n',
   );
+});
+
+const NOTE = `---
+id: exactly-once
+published: true
+updated: 2026-11-25
+title: Exactly-once without distributed transactions
+summary: How idempotency keys and an outbox give an exactly-once effect.
+date: 2026-11-25
+tags: [payments, idempotency]
+---
+
+${'word '.repeat(450)}
+`;
+const addNote = (dir, name, text) => {
+  mkdirSync(join(dir, 'notes'), { recursive: true });
+  writeFileSync(join(dir, 'notes', name), text);
+};
+
+test('REQ-NOTE-001 notes build with HTML, reading time, newest first, and unpublished notes dropped', async () => {
+  const c = withContent((d) => {
+    addNote(d, 'exactly-once.md', NOTE);
+    addNote(
+      d,
+      'older.md',
+      NOTE.replace('id: exactly-once', 'id: older').replaceAll('2026-11-25', '2026-11-20'),
+    );
+    addNote(
+      d,
+      'draft.md',
+      NOTE.replace('id: exactly-once', 'id: draft').replace('published: true', 'published: false'),
+    );
+  });
+
+  const { content, errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.deepEqual(errors, []);
+  assert.deepEqual(
+    content.notes.map((n) => n.id),
+    ['exactly-once', 'older'],
+  );
+  assert.equal(content.notes[0].readingMinutes, 3);
+  assert.match(content.notes[0].html, /<p>word word/);
+});
+
+test('REQ-NOTE-001 an invalid note fails with the file and the field', async () => {
+  const c = withContent((d) =>
+    addNote(d, 'exactly-once.md', NOTE.replace('date: 2026-11-25', 'date: soon')),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /notes\/exactly-once\.md: \/date /);
+});
+
+test('REQ-NOTE-003 a note that names the employer is rejected (employer work stays on the Experience page)', async () => {
+  const c = withContent((d) =>
+    addNote(d, 'exactly-once.md', NOTE.replace('word word', 'At ReBIT we did this')),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /notes\/exactly-once\.md: .*employer name/);
+});
+
+test('REQ-NOTE-002 with no published notes, Notes is left out of the navigation and the sitemap', async () => {
+  const { content } = await buildContent({ contentDir: REAL });
+
+  assert.deepEqual(content.notes, []);
+  assert.ok(!content.site.nav.some((n) => n.path === '/notes'));
+  assert.ok(!sitemapXml(content).includes('/notes'));
+});
+
+test('REQ-NOTE-002 published notes appear in the navigation and the sitemap', async () => {
+  const c = withContent((d) => addNote(d, 'exactly-once.md', NOTE));
+
+  const { content } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.ok(content.site.nav.some((n) => n.path === '/notes'));
+  assert.match(sitemapXml(content), /\/notes<\/loc>[\s\S]*\/notes\/exactly-once<\/loc>/);
 });

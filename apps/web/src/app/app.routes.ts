@@ -27,6 +27,16 @@ export const routes: Routes = [
       import('./features/projects/project-page.component').then((m) => m.ProjectPageComponent),
   },
   {
+    path: 'notes',
+    loadComponent: () =>
+      import('./features/notes/notes-page.component').then((m) => m.NotesPageComponent),
+  },
+  {
+    path: 'notes/:slug',
+    loadComponent: () =>
+      import('./features/notes/note-page.component').then((m) => m.NotePageComponent),
+  },
+  {
     path: 'about',
     loadComponent: () =>
       import('./features/about/about-page.component').then((m) => m.AboutPageComponent),

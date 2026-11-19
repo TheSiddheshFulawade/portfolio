@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import generated from '../../../generated/content.json';
-import { PageKey, PageMeta, Project, SiteContent } from './content.types';
+import { Note, PageKey, PageMeta, Project, SiteContent } from './content.types';
 
 /**
  * The only way components read copy (constitution 6.1, REQ-CONTENT-001). The data is generated at
@@ -18,11 +18,17 @@ export class ContentService {
   readonly featuredProjects = this.projects.filter((p) => p.featured);
   readonly currentProjects = this.projects.filter((p) => !p.earlier);
   readonly earlierProjects = this.projects.filter((p) => p.earlier);
+  /** Published notes, newest first (REQ-NOTE-001). */
+  readonly notes: Note[] = this.content.notes;
   readonly skills = this.content.skills;
   readonly education = this.content.education;
 
   project(id: string): Project | undefined {
     return this.projects.find((p) => p.id === id);
+  }
+
+  note(id: string): Note | undefined {
+    return this.notes.find((n) => n.id === id);
   }
 
   page(key: PageKey): PageMeta {
