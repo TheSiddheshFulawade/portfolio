@@ -102,7 +102,7 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 
 ### Day 1: CI and headers
 
-- [ ] V11-01 [infra] CI workflow (REQ-CI-001, 002). Tests first: none (the workflow is the test). Checks: a PR with a
+- [x] V11-01 [infra] CI workflow (REQ-CI-001, 002). Tests first: none (the workflow is the test). Checks: a PR with a
       failing unit test is red; a clean PR is green; every `uses:` is pinned by a 40-character SHA.
 - [ ] V11-02 [web] Security headers and CSP (REQ-SEC-001). Tests first: a script test that parses `_headers` for every
       required header; the post-build inline-script hash check. Checks: smoke test green with the CSP enforced by the
