@@ -6,7 +6,7 @@ description: Visual language of the portfolio - colour tokens, typography, spaci
 
 Concept: an observability console for a payment engine, applied to a career.
 Dark-first, light theme supported. One accent (settlement teal) plus amber for in-flight/warning.
-Spec 002 turns this into code (`apps/web/src/styles/tokens.css`). Until then these values are the source.
+Spec 002 task V1-03 turns this into code (`apps/web/src/styles/tokens.css`). Until then these values are the source.
 
 ## Colour tokens
 | Token | Dark | Light | Use |
@@ -51,7 +51,6 @@ Contrast: body text ≥ 4.5:1, large text and UI ≥ 3:1 in both themes. Never u
 - Metric row: mono number + small label + sparkline
 - Message-flow strip: nodes joined by wires with travelling packets
 - Decision card (ADR style): label, decision, trade-off
-- Command palette (Ctrl/Cmd K)
 - Footer visitor counter: `visitors.total 4,218 · today 37`
 
 ## Don't

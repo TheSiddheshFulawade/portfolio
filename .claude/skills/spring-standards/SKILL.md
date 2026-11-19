@@ -1,8 +1,11 @@
 ---
 name: spring-standards
-description: Conventions for apps/api - Spring Boot 4 on Java 25, hexagonal packages, concurrency rules, error handling, security and testing. Load before writing or reviewing Java code.
+description: Java conventions for the settlement-lab repo - Java 25 engine (v1) and its Spring Boot 4 API (v2), packages, concurrency rules, error handling and testing. Load before writing or reviewing Java code.
 ---
-# Spring standards
+# Java and Spring standards (settlement-lab repo)
+
+Since ADR-0004 this repo has no Java code. These rules apply in `settlement-lab`; the v1 engine package
+layout is in `docs/settlement-lab-spec.md` §4, and the engine never imports Spring.
 
 Verify current Spring Boot 4 and library APIs with Context7 before using anything uncertain.
 
@@ -41,8 +44,8 @@ Money: `long` minor units or `BigDecimal` with explicit scale. Never `double`.
 - OpenAPI 3.1 is the contract (`infra/openapi.yaml`); generated docs must match it.
 
 ## Build
-Maven wrapper, Java 25, Spotless (google-java-format), JaCoCo ≥85%, PIT on `lab.domain`,
-GraalVM native profile `-Pnative`. Container: distroless, non-root, read-only filesystem.
+Maven wrapper (checksum pinned), Java 25, Spotless (palantir-java-format), JaCoCo ≥85 %, ArchUnit.
+Container (v2 only): small JRE base, non-root user.
 
 ## Testing
 JUnit 5, AssertJ, Mockito (adapters only), jqwik for properties, Awaitility for async,

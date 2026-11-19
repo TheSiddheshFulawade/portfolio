@@ -15,7 +15,7 @@ For each changed route:
 1. Screenshot at 375, 768 and 1440 px, in dark and light themes.
 2. Check token use: colours, type scale, spacing rhythm, radius, alignment of repeated elements.
 3. Check text: no clipping, no overflow, headings balanced, line length ≤ ~70 characters.
-4. Keyboard pass: tab order, visible focus, command palette, skip link.
+4. Keyboard pass: tab order, visible focus, skip link, mobile nav and theme toggle.
 5. Run axe (inject axe-core via browser_evaluate) and report serious/critical violations.
 6. Motion: transitions purposeful; with reduced motion emulated, nothing essential is lost.
 7. Console errors and failed network requests.

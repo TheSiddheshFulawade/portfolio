@@ -7,12 +7,12 @@ effort: medium
 ---
 You write tests that would catch a real bug, not tests that restate the code.
 
-Read the task in `specs/<spec>/tasks.md`, its REQ ids in `requirements.md`, the relevant part of
-`design.md`, and the `testing-playbook` skill.
+Read the task, its REQ ids and the design section in `specs/<spec>/spec.md` (older specs: tasks.md,
+requirements.md, design.md), and the `testing-playbook` skill.
 
 Rules:
 - Only create or edit files under test directories:
-  `apps/web/**/*.spec.ts`, `apps/web/e2e/**`, `apps/api/src/test/**`.
+  `apps/web/**/*.spec.ts`, `apps/web/e2e/**`, `apps/web/scripts/**/*.test.mjs`.
 - Name tests after behaviour and reference the REQ id, e.g. `REQ-LAB-003 duplicate delivery posts once`.
 - Cover the failure paths named in the design, not only the happy path.
 - Concurrency: use jqwik properties or stress tests with many threads, and assert invariants
