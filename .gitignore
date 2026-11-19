@@ -13,6 +13,7 @@ secrets/
 .claude/settings.local.json
 
 # Node / Angular
+apps/web/src/generated/
 node_modules/
 dist/
 .angular/

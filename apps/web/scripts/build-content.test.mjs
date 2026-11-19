@@ -1,0 +1,176 @@
+// Spec 002 V1-02: content build. Each test copies the real content/ to a temp dir and changes one thing.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildContent } from './build-content.mjs';
+
+const REAL = resolve(dirname(fileURLToPath(import.meta.url)), '../../../content');
+
+function withContent(mutate) {
+  const dir = mkdtempSync(join(tmpdir(), 'content-'));
+  cpSync(REAL, dir, { recursive: true });
+  mutate?.(dir);
+  return { dir, done: () => rmSync(dir, { recursive: true, force: true }) };
+}
+const edit = (dir, file, fn) =>
+  writeFileSync(join(dir, file), fn(readFileSync(join(dir, file), 'utf8')));
+const joined = (errors) => errors.join('\n');
+
+test('REQ-CONTENT-002 the real content builds without errors', async () => {
+  const { content, errors } = await buildContent({ contentDir: REAL });
+
+  assert.deepEqual(errors, []);
+  assert.equal(content.profile.name, 'Siddhesh Fulawade');
+  assert.ok(content.experience.length >= 1);
+  assert.ok(content.projects.some((p) => p.id === 'settlement-lab'));
+});
+
+test('REQ-CONTENT-002 an invalid field fails with the file and the field', async () => {
+  const c = withContent((d) =>
+    edit(d, 'experience/2024-07-lumu.yaml', (s) => s.replace('mode: Remote', 'mode: Sometimes')),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /experience\/2024-07-lumu\.yaml: \/mode /);
+});
+
+test('REQ-CONTENT-002 a missing required field fails with the file', async () => {
+  const c = withContent((d) => edit(d, 'metrics.yaml', (s) => s.replace(/^    source: .*\n/m, '')));
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /metrics\.yaml: \/items\/0 must have required property 'source'/);
+});
+
+test('REQ-CONTENT-002 a file name that differs from its id fails', async () => {
+  const c = withContent((d) =>
+    edit(d, 'projects/pennywise.md', (s) => s.replace('id: pennywise', 'id: penny')),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /projects\/pennywise\.md: id "penny" must match the file name/);
+});
+
+test('REQ-CONTENT-003 unpublished projects and roles are dropped', async () => {
+  const c = withContent((d) => {
+    edit(d, 'projects/pennywise.md', (s) => s.replace('published: true', 'published: false'));
+    edit(d, 'experience/2024-07-lumu.yaml', (s) =>
+      s.replace('published: true', 'published: false'),
+    );
+  });
+
+  const { content, errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.deepEqual(errors, []);
+  assert.ok(!content.projects.some((p) => p.id === 'pennywise'));
+  assert.ok(!content.experience.some((e) => e.id === '2024-07-lumu'));
+});
+
+test('REQ-CONTENT-003 skill evidence pointing at an unpublished item is dropped, unknown ids fail', async () => {
+  const hidden = withContent((d) =>
+    edit(d, 'projects/pennywise.md', (s) => s.replace('published: true', 'published: false')),
+  );
+  const { content } = await buildContent({ contentDir: hidden.dir });
+  hidden.done();
+  const evidence = content.skills.flatMap((g) => g.skills.flatMap((s) => s.evidence));
+  assert.ok(!evidence.includes('pennywise'));
+
+  const unknown = withContent((d) =>
+    edit(d, 'skills.yaml', (s) => s.replace('evidence: [pennywise]', 'evidence: [no-such-thing]')),
+  );
+  const { errors } = await buildContent({ contentDir: unknown.dir });
+  unknown.done();
+  assert.match(
+    joined(errors),
+    /skills\.yaml: evidence "no-such-thing" is not a known experience or project id/,
+  );
+});
+
+test('REQ-CONTENT-004 lists sort by order, then newest first', async () => {
+  const c = withContent((d) =>
+    edit(d, 'projects/helmet-detection.md', (s) => s.replace('order: 40', 'order: 5')),
+  );
+
+  const { content } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.equal(content.projects[0].id, 'helmet-detection');
+  assert.deepEqual(
+    content.metrics.map((m) => m.order),
+    [...content.metrics.map((m) => m.order)].sort((a, b) => a - b),
+  );
+});
+
+test('REQ-CONTENT-004 equal order falls back to the newest start date', async () => {
+  const c = withContent((d) => {
+    edit(d, 'experience/2024-07-lumu.yaml', (s) => s.replace('order: 20', 'order: 99'));
+    edit(d, 'experience/2023-12-iit-bombay.yaml', (s) => s.replace('order: 30', 'order: 99'));
+  });
+
+  const { content } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.deepEqual(
+    content.experience.slice(-2).map((e) => e.id),
+    ['2024-07-lumu', '2023-12-iit-bombay'],
+  );
+});
+
+test('REQ-PAGE-004 project Markdown is rendered to HTML', async () => {
+  const { content } = await buildContent({ contentDir: REAL });
+
+  const lab = content.projects.find((p) => p.id === 'settlement-lab');
+  assert.match(lab.html, /<h2[^>]*>The problem<\/h2>/);
+  assert.match(lab.html, /<table>/);
+  assert.equal(lab.body, undefined);
+});
+
+test('REQ-CONTENT-005 employer throughput figures and non-international numbers are rejected', async () => {
+  const c = withContent((d) =>
+    edit(d, 'experience/2024-11-rebit.yaml', (s) =>
+      s.replace('  - Cut database calls', '  - Processed 1,00,000+ TPH.\n  - Cut database calls'),
+    ),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /experience\/2024-11-rebit\.yaml: .*throughput/);
+  assert.match(joined(errors), /experience\/2024-11-rebit\.yaml: .*international format/);
+});
+
+test('REQ-CONTENT-005 phone numbers and other email addresses are rejected', async () => {
+  const c = withContent((d) =>
+    edit(d, 'profile.yaml', (s) =>
+      s.replace('location: Navi Mumbai, India', 'location: Call +91 98765 43210 or me@example.com'),
+    ),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /profile\.yaml: .*phone/);
+  assert.match(joined(errors), /profile\.yaml: .*email/);
+});
+
+test('REQ-CONTENT-005 employer names outside the Experience page are rejected', async () => {
+  const c = withContent((d) =>
+    edit(d, 'profile.yaml', (s) =>
+      s.replace('large-value payment systems', 'large-value payment systems at ReBIT'),
+    ),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /profile\.yaml: .*employer name/);
+});

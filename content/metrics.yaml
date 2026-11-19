@@ -1,0 +1,27 @@
+# Home metrics. Every metric has a source (constitution 6.3). No employer volume or throughput
+# figure (ADR-0004, C1): describe guarantees instead. Sources shown on the site must not name the
+# employer (brief decision 4: employer names appear on the Experience page only).
+id: metrics
+published: true
+updated: 2026-11-19
+items:
+  - id: exactly-once
+    order: 10
+    value: Exactly-once
+    label: thread-safe transaction processing under concurrent load
+    source: Current role, 2024 to present. Details on the Experience page.
+  - id: db-calls
+    order: 20
+    value: 30%
+    label: fewer database calls through batching and a distributed cache
+    source: Current role, 2024 to present. Details on the Experience page.
+  - id: deploy-time
+    order: 30
+    value: 40%
+    label: shorter deployments after automating OpenShift releases
+    source: Current role, 2024 to present. Details on the Experience page.
+  - id: coverage
+    order: 40
+    value: 85%
+    label: unit test coverage on critical payment flows
+    source: Current role, 2024 to present. Details on the Experience page.

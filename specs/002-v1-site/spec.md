@@ -82,13 +82,13 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 
 ### Thu 19 Nov (day 1): content and tokens
 
-- [ ] V1-01 [content] Content YAML and JSON Schemas: `site`, `profile`, `metrics`, `experience`, `projects`
+- [x] V1-01 [content] Content YAML and JSON Schemas: `site`, `profile`, `metrics`, `experience`, `projects`
       (Settlement Lab write-up stub), `skills`, `education`; copy drafted from the resume for the user's approval.
       Checks: every file validates; no phone, personal email, employer volume or throughput figure; every metric has `source`.
-- [ ] V1-02 [web] Content build and `ContentService`. Tests first: valid content builds; an invalid field fails the
+- [x] V1-02 [web] Content build and `ContentService`. Tests first: valid content builds; an invalid field fails the
       build naming file and field; unpublished items are dropped; sort order; Markdown renders to HTML.
       Checks: `npm run build` produces `content.json`; the home placeholder reads its text from content.
-- [ ] V1-03 [web] Design tokens, base styles, fonts, light and dark themes with the toggle logic and reduced motion.
+- [x] V1-03 [web] Design tokens, base styles, fonts, light and dark themes with the toggle logic and reduced motion.
       Checks: both themes meet contrast (body ≥4.5:1); no literal colours in components; no theme flash on reload.
 
 ### Fri 20 Nov (day 2): layout, Home, Experience
