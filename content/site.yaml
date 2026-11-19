@@ -19,6 +19,7 @@ pages:
       ISO 20022, Kafka, IBM MQ and exactly-once processing.
   experience:
     title: Experience · Siddhesh Fulawade
+    heading: Experience
     description: Roles, responsibilities and impact, from central banking payments to startup backends.
   projects:
     title: Projects · Siddhesh Fulawade
@@ -42,7 +43,16 @@ footer:
 ui:
   skipLink: Skip to main content
   menu: Menu
+  navLabel: Main
   themeToggle: Switch colour theme
   themeLight: Light theme
   themeDark: Dark theme
   earlierWork: Earlier work
+  contactCta: Get in touch
+  metricsHeading: Track record
+  metricSource: Source
+  featuredHeading: Featured work
+  allProjects: All projects
+  present: Present
+  recognition: Recognition
+  stack: Stack

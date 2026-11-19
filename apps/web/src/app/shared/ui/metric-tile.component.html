@@ -1,0 +1,15 @@
+<div
+  class="tile"
+  tabindex="0"
+  [attr.aria-describedby]="'metric-source-' + metric().id"
+  [attr.data-dismissed]="dismissed() || null"
+  (keydown.escape)="dismissed.set(true)"
+  (blur)="dismissed.set(false)"
+  (mouseleave)="dismissed.set(false)"
+>
+  <span class="value">{{ metric().value }}</span>
+  <span class="label">{{ metric().label }}</span>
+  <span class="source" role="tooltip" [id]="'metric-source-' + metric().id"
+    >{{ sourceLabel() }}: {{ metric().source }}</span
+  >
+</div>

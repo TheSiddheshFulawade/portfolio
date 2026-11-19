@@ -1,0 +1,155 @@
+:host {
+  display: block;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: var(--space-3) var(--gutter);
+}
+
+.brand {
+  margin-right: auto;
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--step--1);
+  cursor: pointer;
+  transition: background-color var(--dur-hover) var(--ease);
+
+  &:hover {
+    background: var(--raise);
+  }
+
+  svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+  }
+}
+
+.theme-button {
+  padding: 0;
+}
+
+// Below 400 px the brand, Menu and theme buttons only fit on one row with the label hidden visually.
+@media (max-width: 24.99rem) {
+  .menu-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+// Dark theme (default): offer the sun. Light theme: offer the moon. Mirrors the selectors in tokens.css.
+.icon-moon {
+  display: none;
+}
+
+:host-context(:root[data-theme='light']) {
+  .icon-sun {
+    display: none;
+  }
+  .icon-moon {
+    display: block;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :host-context(:root:not([data-theme='dark'])) {
+    .icon-sun {
+      display: none;
+    }
+    .icon-moon {
+      display: block;
+    }
+  }
+}
+
+.nav {
+  display: none;
+  order: 10;
+  flex-basis: 100%;
+
+  &.open {
+    display: block;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: var(--space-2) 0;
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    padding: var(--space-3) var(--space-2);
+    border-radius: var(--radius-control);
+    color: var(--text);
+    text-decoration: none;
+
+    &:hover {
+      background: var(--raise);
+    }
+
+    &.active {
+      color: var(--accent);
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+  }
+}
+
+@media (min-width: 48rem) {
+  .menu-button {
+    display: none;
+  }
+
+  .nav {
+    display: block;
+    order: 0;
+    flex-basis: auto;
+
+    ul {
+      flex-direction: row;
+      padding: 0;
+    }
+
+    a {
+      padding: var(--space-2) var(--space-3);
+
+      &.active {
+        box-shadow: inset 0 -2px 0 var(--accent);
+      }
+    }
+  }
+}

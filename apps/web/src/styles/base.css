@@ -112,3 +112,42 @@ td {
     scroll-behavior: auto !important;
   }
 }
+
+/* Eyebrow label (design system: mono, 0.72rem, uppercase, accent). */
+.eyebrow {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Skip link (REQ-UI-001): hidden until focused. */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 10;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  color: var(--accent);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* Main heading and <main> take programmatic focus on route change (REQ-UI-005) without a ring for mouse users. */
+[tabindex='-1']:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Page container: layout max width and side gutter (REQ-UI-003). */
+.container {
+  width: 100%;
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}

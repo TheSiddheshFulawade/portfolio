@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -363,7 +363,7 @@ test("REQ-WEB-004 angular.json test target reports coverage; no line threshold i
   assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["text-summary"])), "lcov"));
 });
 
-test("REQ-WEB-002 verify-prerender fails the build unless the prerendered index.html has the h1 and no server was emitted", () => {
+test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.html, experience and 404.html have the h1 and no server was emitted", () => {
   const script = path.join(repoRoot, "apps/web/scripts/verify-prerender.mjs");
   const run = (files) => {
     const dir = mkdtempSync(path.join(tmpdir(), "prerender-"));
@@ -378,14 +378,36 @@ test("REQ-WEB-002 verify-prerender fails the build unless the prerendered index.
     }
   };
   const page = (inner) => "<html><body><sf-root>" + inner + "</sf-root></body></html>";
-  const good = { "browser/index.html": page("<main><h1>Hello</h1></main>") };
+  const good = {
+    "browser/index.html": page("<main><h1>Hello</h1></main>"),
+    "browser/experience/index.html": page("<main><h1>Experience</h1></main>"),
+    "browser/404.html": page("<main><h1>Page not found</h1></main>"),
+  };
 
   assert.equal(run(good).status, 0);
-  assert.equal(run({ "browser/index.html": page("<main></main>") }).status, 1, "no h1");
-  assert.equal(run({ "browser/index.html": "<html><h1>x</h1><sf-root></sf-root></html>" }).status, 1, "h1 outside sf-root");
-  assert.equal(run({ "browser/index.html": page("<h1></h1>") }).status, 1, "empty h1");
-  assert.equal(run({}).status, 1, "no index.html");
+  assert.equal(run({ ...good, "browser/index.html": page("<main></main>") }).status, 1, "no h1");
+  assert.equal(run({ ...good, "browser/index.html": "<html><h1>x</h1><sf-root></sf-root></html>" }).status, 1, "h1 outside sf-root");
+  assert.equal(run({ ...good, "browser/index.html": page("<h1></h1>") }).status, 1, "empty h1");
+  const without = (rel) => Object.fromEntries(Object.entries(good).filter(([k]) => k !== rel));
+  assert.equal(run(without("browser/index.html")).status, 1, "no index.html");
+  assert.equal(run(without("browser/experience/index.html")).status, 1, "no experience page");
+  assert.equal(run(without("browser/404.html")).status, 1, "no 404.html");
   assert.equal(run({ ...good, "server/server.mjs": "" }).status, 1, "server.mjs emitted");
+});
+
+test("REQ-PAGE-001 emit-404 copies the prerendered /404 route to 404.html and fails without it", () => {
+  const script = path.join(repoRoot, "apps/web/scripts/emit-404.mjs");
+  const dir = mkdtempSync(path.join(tmpdir(), "emit404-"));
+  try {
+    assert.equal(spawnSync(process.execPath, [script, dir], { encoding: "utf8" }).status, 1, "no /404 page");
+    mkdirSync(path.join(dir, "browser/404"), { recursive: true });
+    writeFileSync(path.join(dir, "browser/404/index.html"), "<h1>Page not found</h1>");
+
+    assert.equal(spawnSync(process.execPath, [script, dir], { encoding: "utf8" }).status, 0);
+    assert.equal(readFileSync(path.join(dir, "browser/404.html"), "utf8"), "<h1>Page not found</h1>");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("REQ-REPO-001 the real repository passes the web-config checks", async () => {

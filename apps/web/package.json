@@ -19,7 +19,7 @@
     "lint": "ng lint && prettier --check .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "postbuild": "node scripts/verify-prerender.mjs",
+    "postbuild": "node scripts/emit-404.mjs && node scripts/verify-prerender.mjs",
     "content:check": "node scripts/build-content.mjs --check"
   },
   "dependencies": {
