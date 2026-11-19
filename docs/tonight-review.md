@@ -42,4 +42,11 @@ Tests: `.claude/hooks/guard-bash.test.mjs` (run with `npm run test:hooks`).
 
 - PennyWise repo URL (for `content/projects/pennywise.md`).
 - Wording of the UI labels added on day 2 ("Track record", "Featured work", "Get in touch").
-- Event replay before hydration (off; turning it on adds an inline script).
+- Correction to the day-2 PR: hydration event replay is **on** (Angular's default), so taps before hydration are
+  replayed, not lost. It ships two small inline scripts per page; fine for v1 (no CSP yet). For the v1.1
+  security headers, use Angular `autoCsp` (it hashes them) or turn event replay off. Details: `docs/v1-release-review.md`.
+
+## 6. Release review
+
+`docs/v1-release-review.md`: no must-fix findings. Before merging the release PR: add `resume.pdf`, and check
+canonical URLs against Cloudflare's trailing-slash behaviour on the preview.
