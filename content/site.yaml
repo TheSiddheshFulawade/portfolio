@@ -23,6 +23,7 @@ pages:
     description: Roles, responsibilities and impact, from central banking payments to startup backends.
   projects:
     title: Projects · Siddhesh Fulawade
+    heading: Projects
     description: Original work, led by Settlement Lab, a concurrency-safe settlement engine with property and stress tests.
   about:
     title: About · Siddhesh Fulawade
@@ -53,6 +54,7 @@ ui:
   metricSource: Source
   featuredHeading: Featured work
   allProjects: All projects
+  repoLink: Source code on GitHub
   present: Present
   recognition: Recognition
   stack: Stack

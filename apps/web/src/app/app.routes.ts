@@ -16,6 +16,16 @@ export const routes: Routes = [
         (m) => m.ExperiencePageComponent,
       ),
   },
+  {
+    path: 'projects',
+    loadComponent: () =>
+      import('./features/projects/projects-page.component').then((m) => m.ProjectsPageComponent),
+  },
+  {
+    path: 'projects/:slug',
+    loadComponent: () =>
+      import('./features/projects/project-page.component').then((m) => m.ProjectPageComponent),
+  },
   // Prerendered to /404/index.html; scripts/emit-404.mjs copies it to 404.html for the host.
   { path: '404', loadComponent: notFound },
   { path: '**', loadComponent: notFound },

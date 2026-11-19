@@ -151,3 +151,59 @@ td {
   margin: 0 auto;
   padding-inline: var(--gutter);
 }
+
+/* Markdown write-ups rendered with [innerHTML] (REQ-PAGE-004). Global because the injected HTML carries no
+   component style scope. Tables wrap their text to fit, so neither the page nor the table scrolls sideways
+   (REQ-UI-003; a scrolling table would need to be keyboard-focusable). */
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--prose);
+}
+
+.prose h2 {
+  margin-top: var(--space-5);
+}
+
+.prose ul,
+.prose ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.prose blockquote {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--accent);
+  background: var(--panel);
+  color: var(--dim);
+}
+
+.prose table {
+  font-size: var(--step--1);
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 30rem) {
+  .prose th,
+  .prose td {
+    padding: var(--space-2) var(--space-1);
+  }
+}
+
+.prose th {
+  color: var(--text-strong);
+  font-weight: 500;
+}
+
+.prose code {
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--raise);
+  font-size: 0.9em;
+}

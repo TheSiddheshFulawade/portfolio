@@ -1,0 +1,25 @@
+@if (project(); as project) {
+  <article class="project">
+    <header class="head">
+      <p>
+        <a class="back" routerLink="/projects">{{ ui['allProjects'] }}</a>
+      </p>
+      <h1>{{ project.title }}</h1>
+      <p class="lede">{{ project.tagline }}</p>
+      <div class="meta">
+        <sf-status-pill [label]="project.status" />
+        @if (project.repo) {
+          <a [href]="project.repo" rel="noopener">{{ ui['repoLink'] }}</a>
+        }
+      </div>
+      <ul class="stack" [attr.aria-label]="ui['stack']">
+        @for (tech of project.stack; track tech) {
+          <li>{{ tech }}</li>
+        }
+      </ul>
+    </header>
+    <div class="prose" [innerHTML]="project.html"></div>
+  </article>
+} @else {
+  <sf-not-found-page />
+}

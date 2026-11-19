@@ -1,0 +1,39 @@
+<header class="intro">
+  <h1 id="projects-title">{{ page.heading }}</h1>
+  <p class="lede">{{ page.description }}</p>
+</header>
+
+<ul class="cards" aria-labelledby="projects-title">
+  @for (project of current; track project.id) {
+    <li class="card">
+      <div class="card-top">
+        <h2>
+          <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
+        </h2>
+        <sf-status-pill [label]="project.status" />
+      </div>
+      <p>{{ project.tagline }}</p>
+      <ul class="stack" [attr.aria-label]="ui['stack']">
+        @for (tech of project.stack; track tech) {
+          <li>{{ tech }}</li>
+        }
+      </ul>
+    </li>
+  }
+</ul>
+
+@if (earlier.length) {
+  <section class="earlier" aria-labelledby="earlier-title">
+    <h2 id="earlier-title">{{ ui['earlierWork'] }}</h2>
+    <ul class="earlier-list">
+      @for (project of earlier; track project.id) {
+        <li>
+          <h3>
+            <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
+          </h3>
+          <p>{{ project.tagline }}</p>
+        </li>
+      }
+    </ul>
+  </section>
+}

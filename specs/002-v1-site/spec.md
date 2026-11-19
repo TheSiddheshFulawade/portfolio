@@ -100,7 +100,7 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 
 ### Sat 21 Nov (day 3): Projects, About, Contact, first deploy
 
-- [ ] V1-07 [web] Projects list and detail template, prerendered per slug (REQ-PAGE-004).
+- [x] V1-07 [web] Projects list and detail template, prerendered per slug (REQ-PAGE-004).
 - [ ] V1-08 [web] About and Contact pages and resume links (REQ-PAGE-006, 007, 008). Needs the user's
       `apps/web/public/resume.pdf`.
 - [ ] V1-09 [web] Playwright smoke test (replaces and deletes `scripts/e2e-stub.mjs`); first Cloudflare Pages
