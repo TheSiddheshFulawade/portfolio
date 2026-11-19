@@ -77,6 +77,8 @@ export interface Project extends Shared {
   tagline: string;
   status: string;
   stack: string[];
+  /** Shown under "Earlier work", without a repo link. */
+  earlier?: boolean;
   repo?: string;
   /** Rendered from the Markdown body at build time. */
   html: string;

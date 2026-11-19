@@ -19,6 +19,16 @@ describe('ContentService', () => {
     expect(service().project('does-not-exist')).toBeUndefined();
   });
 
+  it('REQ-PAGE-004 splits current projects from earlier work, and earlier work has no repo link', () => {
+    const current = service().currentProjects.map((p) => p.id);
+    const earlier = service().earlierProjects;
+
+    expect(current).toEqual(['settlement-lab', 'pennywise']);
+    expect(earlier.map((p) => p.id).sort()).toEqual(['anomaly-detection', 'helmet-detection']);
+    expect(earlier.every((p) => p.repo === undefined)).toBe(true);
+    expect(service().site.ui['earlierWork']).toBe('Earlier work');
+  });
+
   it('REQ-PAGE-002 lists featured projects only', () => {
     const featured = service().featuredProjects;
 

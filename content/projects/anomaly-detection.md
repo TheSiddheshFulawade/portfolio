@@ -2,6 +2,7 @@
 id: anomaly-detection
 published: true
 featured: false
+earlier: true
 order: 20
 updated: 2026-11-19
 title: Real-time anomaly detection

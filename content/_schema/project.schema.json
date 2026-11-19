@@ -15,6 +15,10 @@
     "tagline": { "$ref": "common.schema.json#/definitions/text" },
     "status": { "$ref": "common.schema.json#/definitions/text" },
     "stack": { "$ref": "common.schema.json#/definitions/stringList" },
+    "earlier": {
+      "type": "boolean",
+      "description": "Shown under Earlier work, without a repo link"
+    },
     "repo": { "$ref": "common.schema.json#/definitions/url" }
   },
   "additionalProperties": false

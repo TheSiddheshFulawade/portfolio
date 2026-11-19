@@ -16,6 +16,8 @@ export class ContentService {
   readonly experience = this.content.experience;
   readonly projects = this.content.projects;
   readonly featuredProjects = this.projects.filter((p) => p.featured);
+  readonly currentProjects = this.projects.filter((p) => !p.earlier);
+  readonly earlierProjects = this.projects.filter((p) => p.earlier);
   readonly skills = this.content.skills;
   readonly education = this.content.education;
 

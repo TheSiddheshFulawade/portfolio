@@ -2,6 +2,7 @@
 id: helmet-detection
 published: true
 featured: false
+earlier: true
 order: 40
 updated: 2026-11-19
 title: Helmet detection and number plate recognition
