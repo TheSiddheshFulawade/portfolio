@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "project.schema.json",
+  "description": "Front matter of content/projects/<id>.md. The file name must equal the id.",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": ["order", "title", "tagline", "status", "stack"],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "title": { "$ref": "common.schema.json#/definitions/text" },
+    "tagline": { "$ref": "common.schema.json#/definitions/text" },
+    "status": { "$ref": "common.schema.json#/definitions/text" },
+    "stack": { "$ref": "common.schema.json#/definitions/stringList" },
+    "repo": { "$ref": "common.schema.json#/definitions/url" }
+  },
+  "additionalProperties": false
+}

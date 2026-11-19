@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "education.schema.json",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": ["degrees", "certifications", "achievements"],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "degrees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "order", "institution", "degree", "start", "end"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/definitions/id" },
+          "order": { "type": "integer" },
+          "institution": { "$ref": "common.schema.json#/definitions/text" },
+          "degree": { "$ref": "common.schema.json#/definitions/text" },
+          "start": { "type": "integer" },
+          "end": { "type": "integer" },
+          "grade": { "$ref": "common.schema.json#/definitions/text" }
+        }
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "order", "name", "issuer"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/definitions/id" },
+          "order": { "type": "integer" },
+          "name": { "$ref": "common.schema.json#/definitions/text" },
+          "issuer": { "$ref": "common.schema.json#/definitions/text" }
+        }
+      }
+    },
+    "achievements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "order", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/definitions/id" },
+          "order": { "type": "integer" },
+          "text": { "$ref": "common.schema.json#/definitions/text" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

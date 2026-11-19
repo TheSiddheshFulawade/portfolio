@@ -1,0 +1,23 @@
+id: education
+published: true
+updated: 2026-11-19
+degrees:
+  - id: pce-btech
+    order: 10
+    institution: Pillai College of Engineering, New Panvel
+    degree: B.Tech in Information Technology
+    start: 2020
+    end: 2024
+    grade: CGPA 8.81
+certifications:
+  - id: nptel-networks
+    order: 10
+    name: Computer Networks and Internet Protocol
+    issuer: NPTEL (IIT Kharagpur)
+achievements:
+  - id: anomaly-copyright
+    order: 10
+    text: Copyright registered with the Government of India for the real-time anomaly detection project.
+  - id: iitb-teams
+    order: 20
+    text: Led four teams of 5 to 6 members on med-tech projects during the IIT Bombay internship.

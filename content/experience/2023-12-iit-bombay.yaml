@@ -1,0 +1,28 @@
+id: 2023-12-iit-bombay
+published: true
+featured: false
+order: 30
+updated: 2026-11-19
+company: IIT Bombay, NanoBios Lab
+title: Software Engineer Intern
+location: Mumbai, India
+mode: Hybrid
+start: 2023-12
+end: 2024-06
+summary: Built backends and REST APIs for four med-tech research projects, and led the teams building them.
+highlights:
+  - Developed end-to-end backends and REST APIs for four projects with Django REST Framework.
+  - Applied Vision Transformer (ViT) and YOLOv8 for image analysis; integrated Gemini for text classification and Whisper for transcription.
+  - Integrated Google Maps and the Razorpay payment gateway; hosted the projects behind Cloudflare.
+  - Led four teams of 5 to 6 members and pitched a product to senior industry leaders.
+recognition: []
+stack:
+  [
+    Python,
+    Django REST Framework,
+    YOLOv8,
+    Vision Transformer,
+    Gemini API,
+    Whisper,
+    Razorpay,
+  ]

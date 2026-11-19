@@ -1,0 +1,57 @@
+# Skill groups. Each skill links to evidence: an experience id or a project id. No percentage bars.
+id: skills
+published: true
+updated: 2026-11-19
+groups:
+  - id: languages
+    order: 10
+    label: Languages
+    skills:
+      - { name: Java, evidence: [2024-11-rebit, settlement-lab] }
+      - { name: TypeScript, evidence: [] }
+      - {
+          name: Python,
+          evidence: [2023-12-iit-bombay, anomaly-detection, pennywise],
+        }
+      - { name: SQL, evidence: [2024-11-rebit, 2024-07-lumu] }
+  - id: backend
+    order: 20
+    label: Backend and frameworks
+    skills:
+      - { name: Spring Boot, evidence: [2024-11-rebit] }
+      - { name: Angular, evidence: [] }
+      - {
+          name: Django REST Framework,
+          evidence: [2023-12-iit-bombay, pennywise],
+        }
+      - { name: Apache Camel, evidence: [] }
+  - id: payments
+    order: 30
+    label: Payments and distributed systems
+    skills:
+      - { name: ISO 20022, evidence: [2024-11-rebit] }
+      - {
+          name: Concurrency and exactly-once processing,
+          evidence: [2024-11-rebit, settlement-lab],
+        }
+      - name: "Resilience: retry, circuit breaker, fallback"
+        evidence: [2024-11-rebit, settlement-lab]
+      - { name: Event-driven microservices, evidence: [2024-11-rebit] }
+  - id: messaging
+    order: 40
+    label: Messaging, caching and data
+    skills:
+      - { name: Apache Kafka, evidence: [2024-11-rebit] }
+      - { name: IBM MQ, evidence: [2024-11-rebit] }
+      - { name: Hazelcast and OpenShift Data Grid, evidence: [2024-11-rebit] }
+      - { name: Redis, evidence: [pennywise] }
+      - { name: Oracle Database, evidence: [2024-11-rebit] }
+      - { name: MySQL and MongoDB, evidence: [] }
+  - id: delivery
+    order: 50
+    label: Delivery and cloud
+    skills:
+      - { name: OpenShift, evidence: [2024-11-rebit] }
+      - { name: Docker and Jenkins, evidence: [2024-11-rebit] }
+      - { name: Azure, evidence: [2024-07-lumu] }
+      - { name: JUnit 5 and Mockito, evidence: [2024-11-rebit] }
