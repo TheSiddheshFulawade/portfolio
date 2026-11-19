@@ -6,7 +6,8 @@ The rules every spec, agent and session must follow. Changing this file requires
 1.1 Every change traces to a spec in `specs/NNN-name/`. Bug fixes may use a short spec.
 1.2 Each spec has two human approval gates: after `requirements.md` and after `design.md`.
 1.3 `tasks.md` lists small tasks (≤ half a day). Each task names the test written first.
-1.4 One task per Claude session. Sessions end with `/handoff`.
+1.4 Tasks are delivered in batches of 4–5 per review checkpoint (ADR-0003). Each task still has
+    its failing test first and a green suite before the next starts. Each checkpoint ends with `/handoff`.
 1.5 All work lands through pull requests: work branches → `develop` (squash merge) →
     `main` (release PR, merge commit, version tag). `main` is always deployable; `develop` always builds.
 1.6 Every PR to `develop` carries the `/review` findings as a PR comment, and no high or critical

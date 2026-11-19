@@ -77,7 +77,7 @@ Conventions for every task:
         `mvnw.mjs: rejected argument <JSON-escaped arg>` to stderr and exits 2. The executable and cwd are constants.
       - `npm run test:scripts` and `npm run check:repo` pass on Windows 11.
 
-- [ ] T-03 [infra] Line endings, editor rules and Node pin
+- [x] T-03 [infra] Line endings, editor rules and Node pin
       depends on: T-02
       files: `.gitattributes`, `.editorconfig`, `.gitignore`, `.nvmrc`,
       `scripts/checks/line-endings.mjs`, `scripts/checks/line-endings.test.mjs`,
@@ -116,7 +116,7 @@ Conventions for every task:
       - If a test exposes a defect, the hook fix is in this task and named in the PR description.
         A defect that needs more than a small fix is raised with the user instead.
 
-- [ ] T-05 [web] Angular 22 static, zoneless skeleton with exact pins
+- [x] T-05 [web] Angular 22 static, zoneless skeleton with exact pins
       depends on: T-02, T-03
       files: `apps/web/package.json`, `apps/web/package-lock.json`, `apps/web/.npmrc`,
       `apps/web/angular.json`, `apps/web/tsconfig.json`, `apps/web/tsconfig.app.json`,
@@ -149,7 +149,7 @@ Conventions for every task:
       - From the root: `npm run install:web`, `typecheck:web`, `test:web`, `build:web` and `audit:web` exit 0;
         `check:repo` passes. If `audit:web` reports a high finding in dev tooling, follow risk R-4 (never lower the level).
 
-- [ ] T-06 [web] ESLint (angular-eslint) and Prettier gate
+- [x] T-06 [web] ESLint (angular-eslint) and Prettier gate
       depends on: T-05
       files: `apps/web/eslint.config.js`, `apps/web/.prettierrc.json`, `apps/web/.prettierignore`,
       `apps/web/package.json`, `apps/web/package-lock.json`, `apps/web/angular.json` (lint target),
@@ -165,7 +165,7 @@ Conventions for every task:
         selector without the `sf` prefix) each make `npm run lint` exit non-zero; both reverted.
       - From the root: `npm run lint:web` and `format:check:web` exit 0; `check:repo` passes.
 
-- [ ] T-07 [web] Web script set, 80 % coverage gate and e2e stub
+- [x] T-07 [web] Web script set, 80 % coverage gate and e2e stub
       depends on: T-06
       files: `apps/web/angular.json` (test target), `apps/web/package.json`, `apps/web/scripts/e2e-stub.mjs`,
       `scripts/checks/web-config.mjs`, `scripts/checks/web-config.test.mjs`
@@ -182,7 +182,7 @@ Conventions for every task:
       - Negative proof in the PR: an untested component pushes line coverage below 80 % and `npm run test` exits non-zero; reverted.
       - From the root: `npm run test:web` exits 0; `check:repo` passes.
 
-- [ ] T-08 [web] Placeholder home route and prerender verification
+- [x] T-08 [web] Placeholder home route and prerender verification
       depends on: T-07
       files: `apps/web/src/app/features/home/home-page.component.ts`, `.html`, `.scss`, `.spec.ts`,
       `apps/web/src/app/app.routes.ts`, `apps/web/src/app/app.routes.spec.ts`,
