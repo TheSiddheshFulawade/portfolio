@@ -12,7 +12,7 @@
     "audit:web": "npm --prefix apps/web audit --omit=dev --audit-level=high",
     "format:web": "npm --prefix apps/web run format",
     "test:hooks": "node --test \".claude/hooks/*.test.mjs\"",
-    "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
+    "test:scripts": "node --test \"scripts/**/*.test.mjs\" \"apps/web/scripts/**/*.test.mjs\"",
     "check:repo": "node scripts/check-repo.mjs",
     "lint": "npm run lint:web",
     "format:check": "npm run format:check:web",
