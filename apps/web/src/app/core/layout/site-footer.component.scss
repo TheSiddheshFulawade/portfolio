@@ -37,3 +37,10 @@
   gap: var(--space-2) var(--space-4);
   max-width: none;
 }
+
+.counter {
+  min-height: 1.6em;
+  max-width: none;
+  color: var(--dim);
+  font-size: var(--step--1);
+}

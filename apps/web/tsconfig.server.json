@@ -1,0 +1,18 @@
+/* Spec 003 V11-03: the visitor counter's Pages Function (functions/) and its logic and tests (server/).
+   Type-checked only; Cloudflare bundles functions/, and Node runs the tests with built-in type stripping. */
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["server/**/*.ts", "functions/**/*.ts"]
+}

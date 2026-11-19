@@ -89,7 +89,10 @@
               "outputHashing": "all",
               "optimization": {
                 "scripts": true,
-                "styles": { "minify": true, "inlineCritical": false },
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
                 "fonts": true
               }
             },
@@ -129,7 +132,12 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html",
+              "server/**/*.ts",
+              "functions/**/*.ts"
+            ]
           }
         }
       }

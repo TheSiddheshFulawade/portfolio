@@ -10,6 +10,10 @@
         <a [href]="'mailto:' + profile.email">{{ profile.email }}</a>
       </li>
     </ul>
+    <!-- Fixed-height slot so the counter never shifts the layout (REQ-COUNT-005). -->
+    <p class="counter">
+      <sf-visitor-counter />
+    </p>
     <p class="meta">
       <span class="mono">© {{ year }} {{ profile.name }}</span>
       <span>{{ footer.note }}</span>

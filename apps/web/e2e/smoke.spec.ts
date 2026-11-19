@@ -165,3 +165,23 @@ test('REQ-SEC-001 no CSP violations on any route or during client-side navigatio
   await page.getByRole('button', { name: content.site.ui['themeToggle'] }).click();
   expect(await violations()).toEqual([]);
 });
+
+test('REQ-COUNT-001 REQ-COUNT-005 the footer shows the visitor counter without shifting the layout', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as { shift: number };
+    w.shift = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries() as unknown as { value: number }[])
+        w.shift += entry.value;
+    }).observe({ type: 'layout-shift', buffered: true });
+  });
+
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  await expect(page.locator('footer')).toContainText('visitors.total 4,218 · today 37');
+  expect(
+    await page.evaluate(() => (window as unknown as { shift: number }).shift),
+  ).toBeLessThanOrEqual(0.05);
+});

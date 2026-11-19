@@ -20,6 +20,7 @@
     "test": "npm run test:web",
     "build": "npm run build:web",
     "audit": "npm run audit:web",
-    "verify": "npm run check:repo && npm run test:hooks && npm run test:scripts && npm run lint && npm run typecheck && npm run test && npm run build && npm run audit"
+    "verify": "npm run check:repo && npm run test:hooks && npm run test:scripts && npm run lint && npm run typecheck && npm run test && npm run test:functions:web && npm run build && npm run audit",
+    "test:functions:web": "npm --prefix apps/web run test:functions"
   }
 }

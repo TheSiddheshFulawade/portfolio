@@ -80,3 +80,6 @@ ui:
   readingTime: min read
   tags: Tags
   allNotes: All notes
+  counterLabel: Unique visitors
+  counterTotal: visitors.total
+  counterToday: today
