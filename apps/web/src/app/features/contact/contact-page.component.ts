@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 
 /** Contact (REQ-PAGE-007, 008): site email, public links and the resume. No form in v1. */
@@ -19,4 +20,8 @@ export class ContactPageComponent {
     ...link,
     display: link.url.replace(/^https?:\/\/(www\.)?/, ''),
   }));
+
+  constructor() {
+    inject(SeoService).page('contact', '/contact');
+  }
 }

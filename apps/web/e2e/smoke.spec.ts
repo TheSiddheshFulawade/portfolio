@@ -81,3 +81,37 @@ test('REQ-UI-005 keyboard: the mobile menu opens, navigates and moves focus to t
   await expect(menu).toHaveAttribute('aria-expanded', 'false');
   await expect(page.locator('h1')).toBeFocused();
 });
+
+test('REQ-SEO-001 every route ships its title, description, canonical URL and Open Graph image in the HTML', async ({
+  request,
+}) => {
+  for (const route of routes) {
+    const html = await (await request.get(route)).text();
+
+    expect(html, route).toMatch(
+      /<title>[^<]+ · Siddhesh Fulawade<\/title>|<title>Siddhesh Fulawade · /,
+    );
+    expect(html, route).toMatch(/<meta name="description" content="[^"]{20,}"/);
+    expect(html, route).toContain(`<link rel="canonical" href="${content.site.url}${route}"`);
+    expect(html, route).toContain(`<meta property="og:image" content="${content.site.url}/og.png"`);
+  }
+});
+
+test('REQ-SEO-001 the 404 page is noindex and has no canonical URL', async ({ request }) => {
+  const html = await (await request.get('/no-such-page')).text();
+
+  expect(html).toContain('<meta name="robots" content="noindex"');
+  expect(html).not.toContain('rel="canonical"');
+});
+
+test('REQ-SEO-002 the sitemap lists exactly the smoke-tested routes, and robots.txt points at it', async ({
+  request,
+}) => {
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  const robots = await (await request.get('/robots.txt')).text();
+
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  expect(locs).toEqual(routes.map((r) => content.site.url + r));
+  expect(robots).toContain(`Sitemap: ${content.site.url}/sitemap.xml`);
+  expect((await request.get('/og.png')).headers()['content-type']).toBe('image/png');
+});

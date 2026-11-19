@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 import { formatMonthRange } from '../../shared/format/month';
 
@@ -37,6 +38,10 @@ export class AboutPageComponent {
         .filter((e): e is EvidenceLink => e !== undefined),
     })),
   }));
+
+  constructor() {
+    inject(SeoService).page('about', '/about');
+  }
 
   /** Resolves an evidence id to a link; unpublished or unknown ids are dropped (REQ-CONTENT-003). */
   private evidence(id: string): EvidenceLink | undefined {

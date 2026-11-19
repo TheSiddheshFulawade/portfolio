@@ -14,6 +14,9 @@ secrets/
 
 # Node / Angular
 apps/web/src/generated/
+# Written by apps/web/scripts/build-content.mjs (REQ-SEO-002)
+apps/web/public/sitemap.xml
+apps/web/public/robots.txt
 node_modules/
 dist/
 .angular/

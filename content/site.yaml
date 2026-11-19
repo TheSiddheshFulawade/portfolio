@@ -5,6 +5,9 @@ updated: 2026-11-19
 title: Siddhesh Fulawade
 url: https://siddheshfulawade.com
 locale: en
+# Open Graph image for link previews (1200 x 630, public/og.png) and its alt text.
+ogImage: /og.png
+ogImageAlt: Siddhesh Fulawade, full stack Java engineer, payments and distributed systems
 nav:
   - { label: Home, path: / }
   - { label: Experience, path: /experience }

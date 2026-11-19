@@ -113,7 +113,7 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 
 - [ ] V1-10 [content] Settlement Lab write-up at `/projects/settlement-lab` (REQ-PAGE-005), from
       `docs/settlement-lab-spec.md` and, if ready, `results/results.md` from the settlement-lab repo.
-- [ ] V1-11 [web] SEO: per-route meta from content (retires the Q-1 placeholder `<title>`), OG image,
+- [x] V1-11 [web] SEO: per-route meta from content (retires the Q-1 placeholder `<title>`), OG image,
       canonical, `sitemap.xml`, `robots.txt` (REQ-SEO-001, 002).
 - [ ] V1-12 [web] Mobile and accessibility pass at 320, 375 and 768 px in both themes, manual Lighthouse run.
       Checks: Lighthouse mobile ≥95 performance and 100 accessibility on Home, or the gaps written down.
