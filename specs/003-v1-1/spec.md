@@ -129,6 +129,7 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 
 ### Day 4: release
 
+      Status: two drafts committed with `published: false` (topics a and b from §6); waiting for the user's review and approval.
 - [ ] V11-08 [web] Trailing-slash fix if the v1 preview showed redirects (REQ-SEO-003), observatory and
       securityheaders checks (REQ-SEC-002), Lighthouse re-run, `/release` v1.1.0.
 
