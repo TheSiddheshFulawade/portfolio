@@ -114,7 +114,7 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
       visitor same day gives the same hash; a new day gives a different hash; the raw IP never appears in what is
       stored), counting (first visit counts, repeat visit does not, concurrent visits counted once each, using an
       in-memory D1 stand-in), method and origin checks, problem details.
-- [ ] V11-04 [web] Footer counter component (REQ-COUNT-001, 005). Tests first: renders formatted numbers; renders
+- [x] V11-04 [web] Footer counter component (REQ-COUNT-001, 005). Tests first: renders formatted numbers; renders
       nothing on error; no layout shift. Checks: initial bundle grows by ≤2 KB gzipped.
 - [ ] V11-05 [infra] **User actions**: create the D1 database, bind it as `VISITS_DB`, set the `VISIT_SALT` secret,
       apply the migration, add the WAF rate rule, enable Web Analytics (REQ-ANA-001). Checks: counter works on the preview.

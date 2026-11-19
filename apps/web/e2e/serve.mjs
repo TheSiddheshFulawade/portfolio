@@ -41,8 +41,20 @@ async function file(path) {
   }
 }
 
+/** Stand-in for the visitor counter Pages Function (spec 003 V11-03), which this static server cannot run. */
+export const STUB_TOTALS = { total: 4218, today: 37 };
+
 createServer(async (req, res) => {
   const pathname = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
+  if (pathname === '/api/visits') {
+    res.writeHead(200, {
+      ...securityHeaders,
+      'content-type': 'application/json',
+      'cache-control': 'no-store',
+    });
+    res.end(JSON.stringify(STUB_TOTALS));
+    return;
+  }
   const safe = normalize(join(root, pathname));
   const found = safe.startsWith(root)
     ? ((await file(safe)) ?? (await file(join(safe, 'index.html'))))
