@@ -42,6 +42,7 @@ footer:
 ui:
   skipLink: Skip to main content
   menu: Menu
+  navLabel: Main
   themeToggle: Switch colour theme
   themeLight: Light theme
   themeDark: Dark theme

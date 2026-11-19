@@ -1,5 +1,5 @@
-// REQ-WEB-002 / REQ-WEB-001: runs as `postbuild`. Fails the build unless the static output has a prerendered
-// browser/index.html with a non-empty <h1> inside <sf-root>, and no server bundle (server.mjs) was emitted.
+// REQ-WEB-002 / REQ-WEB-001 / REQ-PAGE-001: runs as `postbuild`. Fails the build unless the static output has prerendered
+// pages (index.html, 404.html) with a non-empty <h1> inside <sf-root>, and no server bundle (server.mjs) was emitted.
 // Usage: node scripts/verify-prerender.mjs [distDir]   (default: dist/web)
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -18,14 +18,18 @@ function find(dir, name) {
 }
 
 const errors = [];
-const index = join(dist, 'browser', 'index.html');
-if (!existsSync(index)) {
-  errors.push(`${index} does not exist (the route was not prerendered)`);
-} else {
-  const html = readFileSync(index, 'utf8');
+// Every prerendered page that must exist, relative to dist/web/browser (REQ-PAGE-001).
+const PAGES = ['index.html', '404.html'];
+for (const page of PAGES) {
+  const file = join(dist, 'browser', page);
+  if (!existsSync(file)) {
+    errors.push(`${file} does not exist (the route was not prerendered)`);
+    continue;
+  }
+  const html = readFileSync(file, 'utf8');
   const root = /<sf-root\b[^>]*>([\s\S]*?)<\/sf-root>/.exec(html);
   if (!root || !/<h1\b[^>]*>\s*[^<\s][\s\S]*?<\/h1>/.test(root[1])) {
-    errors.push(`${index} has no non-empty <h1> inside <sf-root>`);
+    errors.push(`${file} has no non-empty <h1> inside <sf-root>`);
   }
 }
 for (const server of find(dist, 'server.mjs'))

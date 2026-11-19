@@ -36,6 +36,6 @@ export class ThemeService {
     } catch {
       // Storage blocked: fall back to the system preference.
     }
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return window.matchMedia?.('(prefers-color-scheme: light)')?.matches ? 'light' : 'dark';
   }
 }
