@@ -8,8 +8,7 @@ const load = () => import('./scripts-contract.mjs');
 
 const EXPECTED_REQUIRED = [
   'install:web', 'lint:web', 'format:check:web', 'typecheck:web', 'test:web', 'build:web', 'audit:web',
-  'lint:api', 'format:check:api', 'typecheck:api', 'test:api', 'build:api', 'audit:api',
-  'format:web', 'format:api', 'test:hooks', 'test:scripts', 'check:repo',
+  'format:web', 'test:hooks', 'test:scripts', 'check:repo',
   'lint', 'format:check', 'typecheck', 'test', 'build', 'audit', 'verify',
 ];
 
@@ -57,12 +56,12 @@ test('REQ-REPO-002 every required script is reported when missing', async () => 
   }
 });
 
-test('REQ-REPO-002 root package.json missing typecheck:api is rejected', async () => {
+test('REQ-REPO-002 root package.json missing typecheck:web is rejected', async () => {
   const m = goodManifest();
-  delete m.scripts['typecheck:api'];
+  delete m.scripts['typecheck:web'];
   const errs = await errorsFor(m);
   assert.ok(errs.length >= 1);
-  assert.match(joined(errs), /typecheck:api/);
+  assert.match(joined(errs), /typecheck:web/);
 });
 
 test('REQ-REPO-002 root package.json with no scripts object reports required scripts', async () => {

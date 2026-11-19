@@ -1,12 +1,11 @@
 // REQ-REPO-002: the root package.json is a dependency-free script contract.
-// Spec 001 design: "Root script contract". install:renovate and check:renovate arrive with T-16.
+// Spec 001 design: "Root script contract", web only since ADR-0004 (the Java API moved to settlement-lab).
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const REQUIRED_SCRIPTS = [
   'install:web', 'lint:web', 'format:check:web', 'typecheck:web', 'test:web', 'build:web', 'audit:web',
-  'lint:api', 'format:check:api', 'typecheck:api', 'test:api', 'build:api', 'audit:api',
-  'format:web', 'format:api',
+  'format:web',
   'test:hooks', 'test:scripts', 'check:repo',
   'lint', 'format:check', 'typecheck', 'test', 'build', 'audit', 'verify',
 ];

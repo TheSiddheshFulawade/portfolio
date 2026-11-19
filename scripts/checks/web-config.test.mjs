@@ -350,16 +350,15 @@ test("REQ-WEB-003 e2e stub exits 0", () => {
   assert.match(result.stdout, /^e2e: no tests until spec 004\r?\n$/);
 });
 
-test("REQ-WEB-004 angular.json test target sets lines threshold 80", async () => {
+test("REQ-WEB-004 angular.json test target reports coverage; no line threshold in v1 (ADR-0004)", async () => {
   const test = (p) => p.angular.projects.web.architect.test;
   // untested files must count, otherwise the gate is hollow
   assert.ok(has(await errorsFor((p) => delete test(p).options.coverageInclude), "coverageInclude"));
   assert.ok(has(await errorsFor((p) => delete p.angular.projects.web.architect.test), "test target"));
   assert.ok(has(await errorsFor((p) => (test(p).builder = "@angular/build:karma")), "@angular/build:unit-test"));
   assert.ok(has(await errorsFor((p) => (test(p).options.runner = "karma")), "runner"));
-  assert.ok(has(await errorsFor((p) => (test(p).options.coverageThresholds.lines = 79)), "lines"));
-  assert.ok(has(await errorsFor((p) => delete test(p).options.coverageThresholds), "lines"));
-  assert.deepEqual(await errorsFor((p) => (test(p).options.coverageThresholds.lines = 90)), []); // raising the bar is allowed
+  assert.deepEqual(await errorsFor((p) => delete test(p).options.coverageThresholds), []); // ADR-0004: no web coverage gate in v1
+  assert.deepEqual(await errorsFor((p) => (test(p).options.coverageThresholds.lines = 90)), []); // a threshold is still allowed
   assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["html"])), "coverageReporters"));
   assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["text-summary"])), "lcov"));
 });
