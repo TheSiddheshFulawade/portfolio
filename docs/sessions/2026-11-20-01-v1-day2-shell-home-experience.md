@@ -8,7 +8,7 @@
 
 **State**
 
-- The push and the PR were blocked: GitHub returned 403 (Claude GitHub App not linked for this repo). The three commits exist only in this cloud session's container.
+- `feature/v1-day-2` pushed and a PR opened to `develop` (first push got 403 until the user installed the Claude GitHub App). Not merged: waiting for the user's yes.
 - Links to `/projects`, `/projects/settlement-lab`, `/contact` and `/resume.pdf` show the 404 page until V1-07 and V1-08.
 
 **Next**
