@@ -1,10 +1,12 @@
 // Static server for the smoke test (REQ-PAGE-001). Serves dist/web/browser the way Cloudflare Pages does:
-// /path, then /path/index.html, else 404.html with status 404. Test-only; never deployed.
+// /path, then /path/index.html, else 404.html with status 404, with the headers from the built `_headers` file
+// (so the smoke test runs with the CSP enforced, spec 003 V11-02). Test-only; never deployed.
 // Usage: node e2e/serve.mjs [port]   (default 4310)
 import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve } from 'node:path';
+import { parseHeaders } from '../scripts/emit-headers.mjs';
 
 const root = resolve(import.meta.dirname, '..', 'dist', 'web', 'browser');
 const port = Number(process.argv[2] ?? 4310);
@@ -25,6 +27,12 @@ if (!existsSync(join(root, '404.html'))) {
   process.exit(1);
 }
 
+// Only the catch-all rule is written by emit-headers.mjs; apply it to every response.
+const headersFile = join(root, '_headers');
+const securityHeaders = existsSync(headersFile)
+  ? (parseHeaders(await readFile(headersFile, 'utf8'))['/*'] ?? {})
+  : {};
+
 async function file(path) {
   try {
     return (await stat(path)).isFile() ? path : undefined;
@@ -41,6 +49,7 @@ createServer(async (req, res) => {
     : undefined;
   const path = found ?? join(root, '404.html');
   res.writeHead(found ? 200 : 404, {
+    ...securityHeaders,
     'content-type': TYPES[extname(path)] ?? 'application/octet-stream',
   });
   res.end(await readFile(path));

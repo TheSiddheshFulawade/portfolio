@@ -102,9 +102,9 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 
 ### Day 1: CI and headers
 
-- [ ] V11-01 [infra] CI workflow (REQ-CI-001, 002). Tests first: none (the workflow is the test). Checks: a PR with a
+- [x] V11-01 [infra] CI workflow (REQ-CI-001, 002). Tests first: none (the workflow is the test). Checks: a PR with a
       failing unit test is red; a clean PR is green; every `uses:` is pinned by a 40-character SHA.
-- [ ] V11-02 [web] Security headers and CSP (REQ-SEC-001). Tests first: a script test that parses `_headers` for every
+- [x] V11-02 [web] Security headers and CSP (REQ-SEC-001). Tests first: a script test that parses `_headers` for every
       required header; the post-build inline-script hash check. Checks: smoke test green with the CSP enforced by the
       local server; no CSP violations in the console.
 
@@ -148,7 +148,7 @@ and no task that depends on an answer is started.
 3. Should v1.1 also split project write-ups out of the main bundle (initial JS is 87 KB of 120 and grows with notes)? [No split in v1.1 unless initial JS passes 100 KB.]
 
 Start: 2026-11-19, the user asked from mobile to start the tasks and to decide routine questions.
-Started on that basis: V11-01, V11-02 (no product choices). Waiting for the user: V11-03, V11-04, V11-05 (visitor
+Started on that basis: V11-01, V11-02 (no product choices); both done on 2026-11-19. Waiting for the user: V11-03, V11-04, V11-05 (visitor
 counter, to be worked on together tonight) and V11-07 (note topics). Full approval of this spec is still to come.
 
 Status: DRAFT (partly started at the user's request, 2026-11-19)

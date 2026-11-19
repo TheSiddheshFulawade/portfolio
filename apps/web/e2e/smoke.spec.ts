@@ -115,3 +115,51 @@ test('REQ-SEO-002 the sitemap lists exactly the smoke-tested routes, and robots.
   expect(robots).toContain(`Sitemap: ${content.site.url}/sitemap.xml`);
   expect((await request.get('/og.png')).headers()['content-type']).toBe('image/png');
 });
+
+test('REQ-SEC-001 every response carries the security headers and a CSP without unsafe-inline', async ({
+  request,
+}) => {
+  const headers = (await request.get('/')).headers();
+  const csp = headers['content-security-policy'] ?? '';
+
+  expect(csp).toContain("default-src 'self'");
+  expect(csp).toContain("frame-ancestors 'none'");
+  expect(csp).not.toMatch(/unsafe-inline|unsafe-eval/);
+  expect(headers['strict-transport-security']).toContain('max-age=63072000');
+  expect(headers['x-content-type-options']).toBe('nosniff');
+  expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+});
+
+test('REQ-SEC-001 no CSP violations on any route or during client-side navigation', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as { cspViolations: string[] };
+    w.cspViolations = [];
+    document.addEventListener('securitypolicyviolation', (e) =>
+      w.cspViolations.push(`${e.violatedDirective} ${e.blockedURI || 'inline'} ${e.sample}`),
+    );
+  });
+  const violations = () =>
+    page.evaluate(() => (window as unknown as { cspViolations: string[] }).cspViolations);
+
+  for (const route of [...routes, '/no-such-page']) {
+    await page.goto(route, { waitUntil: 'networkidle' });
+    expect(await violations(), route).toEqual([]);
+  }
+
+  // Client-side navigation loads lazy components, which add their styles at runtime.
+  await page.goto('/', { waitUntil: 'networkidle' });
+  for (const item of content.site.nav) {
+    await page.locator(`header a[href="${item.path}"]`).first().dispatchEvent('click');
+    await expect(page).toHaveURL(new RegExp(`${item.path === '/' ? '/$' : item.path}$`));
+    await page.waitForLoadState('networkidle');
+  }
+  await page.locator('header a[href="/projects"]').first().dispatchEvent('click');
+  await expect(page).toHaveURL(/\/projects$/);
+  await page.locator(`main a[href="/projects/${content.projects[0].id}"]`).first().click();
+  await expect(page).toHaveURL(new RegExp(`/projects/${content.projects[0].id}$`));
+  await page.waitForLoadState('networkidle');
+  await page.getByRole('button', { name: content.site.ui['themeToggle'] }).click();
+  expect(await violations()).toEqual([]);
+});
