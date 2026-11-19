@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from './app.routes';
 import { HomePageComponent } from './features/home/home-page.component';
+import { ExperiencePageComponent } from './features/experience/experience-page.component';
 import { NotFoundPageComponent } from './features/not-found/not-found-page.component';
 
 describe('routes', () => {
@@ -15,6 +16,12 @@ describe('routes', () => {
     const component = await (await harness()).navigateByUrl('/', HomePageComponent);
 
     expect(component).toBeInstanceOf(HomePageComponent);
+  });
+
+  it('REQ-PAGE-001 /experience resolves to ExperiencePageComponent', async () => {
+    const component = await (await harness()).navigateByUrl('/experience', ExperiencePageComponent);
+
+    expect(component).toBeInstanceOf(ExperiencePageComponent);
   });
 
   it('REQ-PAGE-001 unknown paths and /404 resolve to NotFoundPageComponent', async () => {

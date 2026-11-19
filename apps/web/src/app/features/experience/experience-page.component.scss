@@ -1,0 +1,101 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  padding-block: var(--space-7) var(--space-4);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lede {
+  color: var(--dim);
+  font-size: var(--step-1);
+}
+
+.roles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.role {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+}
+
+.role-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.company {
+  color: var(--text-strong);
+  font-weight: 500;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  color: var(--dim);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+
+.highlights,
+.recognition ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+  max-width: var(--prose);
+}
+
+.recognition {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  h3 {
+    color: var(--amber);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-control);
+    background: var(--raise);
+    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+}

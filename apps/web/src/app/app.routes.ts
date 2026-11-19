@@ -9,6 +9,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/home/home-page.component').then((m) => m.HomePageComponent),
   },
+  {
+    path: 'experience',
+    loadComponent: () =>
+      import('./features/experience/experience-page.component').then(
+        (m) => m.ExperiencePageComponent,
+      ),
+  },
   // Prerendered to /404/index.html; scripts/emit-404.mjs copies it to 404.html for the host.
   { path: '404', loadComponent: notFound },
   { path: '**', loadComponent: notFound },

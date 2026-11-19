@@ -363,7 +363,7 @@ test("REQ-WEB-004 angular.json test target reports coverage; no line threshold i
   assert.ok(has(await errorsFor((p) => (test(p).options.coverageReporters = ["text-summary"])), "lcov"));
 });
 
-test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.html and 404.html have the h1 and no server was emitted", () => {
+test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.html, experience and 404.html have the h1 and no server was emitted", () => {
   const script = path.join(repoRoot, "apps/web/scripts/verify-prerender.mjs");
   const run = (files) => {
     const dir = mkdtempSync(path.join(tmpdir(), "prerender-"));
@@ -380,6 +380,7 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.htm
   const page = (inner) => "<html><body><sf-root>" + inner + "</sf-root></body></html>";
   const good = {
     "browser/index.html": page("<main><h1>Hello</h1></main>"),
+    "browser/experience/index.html": page("<main><h1>Experience</h1></main>"),
     "browser/404.html": page("<main><h1>Page not found</h1></main>"),
   };
 
@@ -387,8 +388,10 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless index.htm
   assert.equal(run({ ...good, "browser/index.html": page("<main></main>") }).status, 1, "no h1");
   assert.equal(run({ ...good, "browser/index.html": "<html><h1>x</h1><sf-root></sf-root></html>" }).status, 1, "h1 outside sf-root");
   assert.equal(run({ ...good, "browser/index.html": page("<h1></h1>") }).status, 1, "empty h1");
-  assert.equal(run({ "browser/404.html": good["browser/404.html"] }).status, 1, "no index.html");
-  assert.equal(run({ "browser/index.html": good["browser/index.html"] }).status, 1, "no 404.html");
+  const without = (rel) => Object.fromEntries(Object.entries(good).filter(([k]) => k !== rel));
+  assert.equal(run(without("browser/index.html")).status, 1, "no index.html");
+  assert.equal(run(without("browser/experience/index.html")).status, 1, "no experience page");
+  assert.equal(run(without("browser/404.html")).status, 1, "no 404.html");
   assert.equal(run({ ...good, "server/server.mjs": "" }).status, 1, "server.mjs emitted");
 });
 

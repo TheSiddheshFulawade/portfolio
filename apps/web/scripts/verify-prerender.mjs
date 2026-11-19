@@ -1,5 +1,5 @@
 // REQ-WEB-002 / REQ-WEB-001 / REQ-PAGE-001: runs as `postbuild`. Fails the build unless the static output has prerendered
-// pages (index.html, 404.html) with a non-empty <h1> inside <sf-root>, and no server bundle (server.mjs) was emitted.
+// pages (index.html, experience/index.html, 404.html) with a non-empty <h1> inside <sf-root>, and no server bundle (server.mjs) was emitted.
 // Usage: node scripts/verify-prerender.mjs [distDir]   (default: dist/web)
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -19,7 +19,7 @@ function find(dir, name) {
 
 const errors = [];
 // Every prerendered page that must exist, relative to dist/web/browser (REQ-PAGE-001).
-const PAGES = ['index.html', '404.html'];
+const PAGES = ['index.html', 'experience/index.html', '404.html'];
 for (const page of PAGES) {
   const file = join(dist, 'browser', page);
   if (!existsSync(file)) {
