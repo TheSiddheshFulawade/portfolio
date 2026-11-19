@@ -49,4 +49,13 @@ describe('VisitorCounterComponent', () => {
 
     expect(container.textContent?.trim()).toBe('');
   });
+
+  it('REQ-COUNT-005 shows nothing while the counter is not configured (204 No Content)', async () => {
+    stubFetch(async () => new Response(null, { status: 204 }));
+
+    const { container, fixture } = await render(VisitorCounterComponent);
+    await fixture.whenStable();
+
+    expect(container.textContent?.trim()).toBe('');
+  });
 });

@@ -44,6 +44,11 @@ export async function handleVisits(
   if (request.method !== 'GET' && request.method !== 'POST') {
     return problem(405, 'Use GET to read or POST to count.', { allow: 'GET, POST' });
   }
+  // Not set up yet (no D1 binding or no salt secret, e.g. before V11-05): answer quietly, so the footer shows
+  // nothing and the browser logs no error. Never count with an unsalted hash.
+  if (!env.VISITS_DB || !env.VISIT_SALT) {
+    return new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } });
+  }
   const day = utcDay(now());
   try {
     if (request.method === 'GET') return json(await readTotals(env.VISITS_DB, day));
@@ -52,7 +57,6 @@ export async function handleVisits(
     if (request.headers.get('origin') !== new URL(request.url).origin) {
       return problem(403, 'Visits are counted only from this site.');
     }
-    if (!env.VISIT_SALT) return problem(503, 'The counter is not configured.');
     const hash = await visitorHash(
       env.VISIT_SALT,
       day,

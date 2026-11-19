@@ -78,10 +78,16 @@ test('REQ-COUNT-005 a database failure returns a generic 503 with no internals',
   assert.ok(!text.includes('secret internal detail'));
 });
 
-test('REQ-COUNT-006 a missing salt secret is a 503, never an unsalted hash', async () => {
-  const e = { ...env(), VISIT_SALT: '' };
+test('REQ-COUNT-005 until the database and salt are configured, the endpoint answers 204 and stores nothing', async () => {
+  const noSalt = { ...env(), VISIT_SALT: '' };
+  const noDb = { VISIT_SALT: 'test-secret-not-a-real-one' } as unknown as VisitsEnv;
 
-  const res = await handleVisits(request('POST', { origin: ORIGIN }), e, NOW);
+  for (const e of [noSalt, noDb]) {
+    for (const method of ['GET', 'POST']) {
+      const res = await handleVisits(request(method, { origin: ORIGIN }), e, NOW);
 
-  assert.equal(res.status, 503);
+      assert.equal(res.status, 204, method);
+      assert.equal(await res.text(), '');
+    }
+  }
 });

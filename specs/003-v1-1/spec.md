@@ -126,10 +126,10 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
       reading time); unit tests for both pages. Checks: smoke test covers the new routes.
 - [ ] V11-07 [content] Two or three notes drafted for the user's approval (REQ-NOTE-003). Checks: the content build's
       disclosure rules pass; the user approves each note before `published: true`.
+      Status: two drafts committed with `published: false` (topics a and b from §6); waiting for the user's review and approval.
 
 ### Day 4: release
 
-      Status: two drafts committed with `published: false` (topics a and b from §6); waiting for the user's review and approval.
 - [ ] V11-08 [web] Trailing-slash fix if the v1 preview showed redirects (REQ-SEO-003), observatory and
       securityheaders checks (REQ-SEC-002), Lighthouse re-run, `/release` v1.1.0.
 
@@ -145,11 +145,15 @@ and no task that depends on an answer is started.
 
 1. [Footer only] Counter placement: footer only (as designed), or also on Home?
 2. Notes topics: suggested (a) exactly-once processing without distributed transactions, (b) ordered locking vs
-   CAS in the Settlement Lab ledger, (c) what a JSON Schema content pipeline buys a static site. Which two or three? [No default: V11-07 waits for the answer.]
+   CAS in the Settlement Lab ledger, (c) what a JSON Schema content pipeline buys a static site. Which two or three? [Drafted (a) and (b) as unpublished notes for review; (c) not written.]
 3. Should v1.1 also split project write-ups out of the main bundle (initial JS is 87 KB of 120 and grows with notes)? [No split in v1.1 unless initial JS passes 100 KB.]
 
-Start: 2026-11-19, the user asked from mobile to start the tasks and to decide routine questions.
-Started on that basis: V11-01, V11-02 (no product choices); both done on 2026-11-19. V11-06 (notes pages, no content) done the same day; Notes stays hidden until a note is published. Waiting for the user: V11-03, V11-04, V11-05 (visitor
-counter, to be worked on together tonight) and V11-07 (note topics). Full approval of this spec is still to come.
+Progress (2026-11-19, cloud session; the user asked from mobile to keep going and decide routine questions):
+
+- Done: V11-01 CI, V11-02 headers, V11-06 notes pages, V11-03 counter endpoint, V11-04 footer counter (code and
+  tests; it shows nothing until the D1 database exists).
+- Drafted, waiting for the user: V11-07 (two notes, unpublished).
+- User actions: V11-05 (D1 database, secret, migration, WAF rule, Web Analytics). Then V11-08 on the live site.
+- Full approval of this spec is still to come.
 
 Status: DRAFT (partly started at the user's request, 2026-11-19)
