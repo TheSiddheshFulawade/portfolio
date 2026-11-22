@@ -107,7 +107,8 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 - [ ] V1-09 [web] Playwright smoke test (replaces and deletes `scripts/e2e-stub.mjs`); first Cloudflare Pages
       preview deploy from `develop` (**the user connects the repo in the Cloudflare dashboard**).
       Checks: smoke test green locally; the preview URL serves every route.
-      Status: smoke test done (day 3, 12 tests green); open until the user connects Cloudflare Pages and the preview serves every route.
+      Status: smoke test done (day 3, 12 tests green). Cloudflare Pages project `siddheshfulawade` connected 2026-11-22
+      (root `apps/web`, output `dist/web/browser`, previews from `develop` only); open until the preview serves every route.
 
 ### Sun 22 Nov (day 4): write-up, SEO, polish, launch
 
