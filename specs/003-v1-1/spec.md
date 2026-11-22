@@ -154,6 +154,6 @@ Progress (2026-11-19, cloud session; the user asked from mobile to keep going an
   tests; it shows nothing until the D1 database exists).
 - Drafted, waiting for the user: V11-07 (two notes, unpublished).
 - User actions: V11-05 (D1 database, secret, migration, WAF rule, Web Analytics). Then V11-08 on the live site.
-- Full approval of this spec is still to come.
+- Approved by the user on 2026-11-22 with the §6 defaults (footer only, two drafted topics, no bundle split).
 
-Status: DRAFT (partly started at the user's request, 2026-11-19)
+Status: APPROVED (2026-11-22, user approved with the §6 defaults)
