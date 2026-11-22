@@ -14,6 +14,9 @@ const routes = [
   '/contact',
 ];
 
+// REQ-SEO-003: Cloudflare Pages answers /about with a 308 to /about/, so public URLs end in a slash.
+const publicUrl = (route: string) => content.site.url + (route.endsWith('/') ? route : `${route}/`);
+
 function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('console', (m) => {
@@ -94,7 +97,7 @@ test('REQ-SEO-001 every route ships its title, description, canonical URL and Op
       /<title>[^<]+ · Siddhesh Fulawade<\/title>|<title>Siddhesh Fulawade · /,
     );
     expect(html, route).toMatch(/<meta name="description" content="[^"]{20,}"/);
-    expect(html, route).toContain(`<link rel="canonical" href="${content.site.url}${route}"`);
+    expect(html, route).toContain(`<link rel="canonical" href="${publicUrl(route)}"`);
     expect(html, route).toContain(`<meta property="og:image" content="${content.site.url}/og.png"`);
   }
 });
@@ -113,7 +116,7 @@ test('REQ-SEO-002 the sitemap lists exactly the smoke-tested routes, and robots.
   const robots = await (await request.get('/robots.txt')).text();
 
   const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  expect(locs).toEqual(routes.map((r) => content.site.url + r));
+  expect(locs).toEqual(routes.map(publicUrl));
   expect(robots).toContain(`Sitemap: ${content.site.url}/sitemap.xml`);
   expect((await request.get('/og.png')).headers()['content-type']).toBe('image/png');
 });

@@ -15,9 +15,9 @@ describe('SeoService', () => {
 
     expect(TestBed.inject(Title).getTitle()).toBe('Experience · Siddhesh Fulawade');
     expect(meta('name="description"')).toContain('Roles, responsibilities and impact');
-    expect(canonical()?.getAttribute('href')).toBe('https://siddheshfulawade.com/experience');
+    expect(canonical()?.getAttribute('href')).toBe('https://siddheshfulawade.com/experience/');
     expect(meta('property="og:title"')).toBe('Experience · Siddhesh Fulawade');
-    expect(meta('property="og:url"')).toBe('https://siddheshfulawade.com/experience');
+    expect(meta('property="og:url"')).toBe('https://siddheshfulawade.com/experience/');
     expect(meta('property="og:type"')).toBe('website');
     expect(meta('property="og:site_name"')).toBe('Siddhesh Fulawade');
     expect(meta('property="og:image"')).toBe('https://siddheshfulawade.com/og.png');
@@ -34,7 +34,7 @@ describe('SeoService', () => {
 
     expect(TestBed.inject(Title).getTitle()).toBe('Settlement Lab · Siddhesh Fulawade');
     expect(canonical()?.getAttribute('href')).toBe(
-      'https://siddheshfulawade.com/projects/settlement-lab',
+      'https://siddheshfulawade.com/projects/settlement-lab/',
     );
     expect(meta('property="og:type"')).toBe('article');
   });

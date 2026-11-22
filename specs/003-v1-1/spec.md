@@ -132,6 +132,8 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 
 - [ ] V11-08 [web] Trailing-slash fix if the v1 preview showed redirects (REQ-SEO-003), observatory and
       securityheaders checks (REQ-SEC-002), Lighthouse re-run, `/release` v1.1.0.
+      Status: trailing-slash part done 2026-11-22 (preview answers `/about` with 308 to `/about/`; canonical, `og:url` and
+      sitemap now end in a slash). Observatory, securityheaders and Lighthouse wait for the live domain.
 
 ## 5. Out of scope
 
