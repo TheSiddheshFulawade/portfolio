@@ -184,11 +184,11 @@ test('REQ-SEO-002 the sitemap lists every published route with the site origin, 
   assert.match(xml, /^<\?xml version="1.0" encoding="UTF-8"\?>/);
   assert.deepEqual(locs, [
     'https://siddheshfulawade.com/',
-    'https://siddheshfulawade.com/experience',
-    'https://siddheshfulawade.com/projects',
-    ...content.projects.map((p) => `https://siddheshfulawade.com/projects/${p.id}`),
-    'https://siddheshfulawade.com/about',
-    'https://siddheshfulawade.com/contact',
+    'https://siddheshfulawade.com/experience/',
+    'https://siddheshfulawade.com/projects/',
+    ...content.projects.map((p) => `https://siddheshfulawade.com/projects/${p.id}/`),
+    'https://siddheshfulawade.com/about/',
+    'https://siddheshfulawade.com/contact/',
   ]);
   assert.ok(!xml.includes('/404'));
 });
@@ -294,5 +294,5 @@ test('REQ-NOTE-002 published notes appear in the navigation and the sitemap', as
   c.done();
 
   assert.ok(content.site.nav.some((n) => n.path === '/notes'));
-  assert.match(sitemapXml(content), /\/notes<\/loc>[\s\S]*\/notes\/exactly-once<\/loc>/);
+  assert.match(sitemapXml(content), /\/notes\/<\/loc>[\s\S]*\/notes\/exactly-once\/<\/loc>/);
 });

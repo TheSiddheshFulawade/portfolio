@@ -37,7 +37,7 @@ describe('NotePageComponent', () => {
     expect(TestBed.inject(Title).getTitle()).toBe('Ordered locking versus CAS · Siddhesh Fulawade');
     expect(
       TestBed.inject(DOCUMENT).head.querySelector('link[rel="canonical"]')?.getAttribute('href'),
-    ).toBe('https://siddheshfulawade.com/notes/ordered-locking');
+    ).toBe('https://siddheshfulawade.com/notes/ordered-locking/');
   });
 
   it('REQ-NOTE-001 an unknown note shows the not-found page', async () => {

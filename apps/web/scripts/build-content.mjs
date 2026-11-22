@@ -242,10 +242,16 @@ export function siteRoutes(content) {
   ];
 }
 
-/** REQ-SEO-002: sitemap.xml of the published routes on the production origin. */
+/**
+ * REQ-SEO-002: sitemap.xml of the published routes on the production origin. Each URL ends in a slash,
+ * the form Cloudflare Pages serves without a redirect (REQ-SEO-003).
+ */
 export function sitemapXml(content) {
   const urls = siteRoutes(content)
-    .map((route) => `  <url><loc>${content.site.url}${route}</loc></url>`)
+    .map(
+      (route) =>
+        `  <url><loc>${content.site.url}${route.endsWith('/') ? route : `${route}/`}</loc></url>`,
+    )
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }

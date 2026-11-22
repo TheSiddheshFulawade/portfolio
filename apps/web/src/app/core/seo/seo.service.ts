@@ -14,6 +14,14 @@ export interface SeoItem {
  * Per-route <title>, meta description, canonical URL and Open Graph / Twitter tags, all from content/
  * (REQ-SEO-001). Pages call it on creation, so the prerendered HTML carries the tags.
  */
+/**
+ * Cloudflare Pages serves each prerendered route as a folder and answers `/about` with a 308 to `/about/`,
+ * so canonical and Open Graph URLs use the final form (REQ-SEO-003).
+ */
+export function withTrailingSlash(path: string): string {
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SeoService {
   private readonly content = inject(ContentService);
@@ -42,7 +50,7 @@ export class SeoService {
   }
 
   private apply(item: SeoItem, type: 'website' | 'article'): void {
-    const url = this.content.site.url + item.path;
+    const url = this.content.site.url + withTrailingSlash(item.path);
     this.setCommon(item.title, item.description);
     this.meta.removeTag('name="robots"');
     this.meta.updateTag({ property: 'og:type', content: type });
