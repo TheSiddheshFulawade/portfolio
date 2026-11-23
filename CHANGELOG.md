@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v1.0.1 (2026-11-23)
+
+- Contact page meta description no longer mentions a resume PDF (002 REQ-PAGE-008, v1 ships without one).
+- Visitor counter hardening from the v1.0.0 security review (003 REQ-COUNT-003 amended, REQ-COUNT-007): a visitor is a daily salted hash of the IP only (IPv6 cut to /64), so rotating the user agent no longer inflates the count; a visitor already counted today costs one read and no write; only the production hosts record visits; every Function response carries `nosniff` and CORP. `.dev.vars*` and `.wrangler/` are ignored and blocked by the secrets hook, which now has tests.
+
+- Mobile menu: Escape anywhere in the page closes it and returns focus to the Menu button (focus elsewhere is left alone); "All projects" links have a 24 px target (002 REQ-UI-001, v1.0.0 UI review).
+
 ## v1.0.0 (2026-11-23)
 
 - Project scaffold: constitution, brief, Claude Code agents, skills, hooks and MCP configuration.

@@ -18,14 +18,14 @@ Things that need you. Delete this file once each item is done or moved into a sp
 
 - **Built** (V11-03, V11-04): `apps/web/functions/api/visits.ts`, logic and 16 tests in `apps/web/server/visits/`,
   migration `apps/web/migrations/0001_visits.sql`, footer component. A visitor is only
-  `SHA-256(HMAC(secret, UTC day) | IP | user agent)`; the IP is never stored or logged; hashes are deleted
+  `SHA-256(HMAC(secret, UTC day) | IP)` (IPv6 cut to /64; only production hosts record); the IP is never stored or logged; hashes are deleted
   after two days; daily counts are kept. POST is accepted only from the site's own origin.
 - **Your actions** (Cloudflare dashboard, free plan):
   1. Workers and Pages → D1 → create a database (e.g. `portfolio-visits`).
   2. In the Pages project → Settings → Bindings: add a D1 binding named **`VISITS_DB`** to that database
-     (production and preview).
+     (**production only**: previews run unreviewed branch code).
   3. Settings → Variables and secrets: add a **secret** named **`VISIT_SALT`** with a long random value
-     (production and preview). Never put it in the repo.
+     (**production only**: previews run unreviewed branch code). Never put it in the repo.
   4. D1 → the database → Console: paste and run `apps/web/migrations/0001_visits.sql`.
   5. Security → WAF → rate limiting rule for `/api/*` (for example 30 requests per minute per IP).
   6. Web Analytics: enable it for the Pages project (REQ-ANA-001). The CSP already allows its hosts.

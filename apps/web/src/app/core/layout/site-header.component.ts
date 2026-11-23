@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
@@ -12,8 +20,8 @@ import { ThemeService } from '../theme/theme.service';
   templateUrl: './site-header.component.html',
   styleUrl: './site-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // Escape anywhere in the header (menu button or an open nav link) closes the mobile menu.
-  host: { '(keydown.escape)': 'closeMenu()' },
+  // Escape anywhere in the document closes the open mobile menu (WCAG 2.2 AA); inert while closed.
+  host: { '(document:keydown.escape)': 'onEscape()' },
 })
 export class SiteHeaderComponent {
   private readonly content = inject(ContentService);
@@ -23,6 +31,8 @@ export class SiteHeaderComponent {
   protected readonly nav = this.content.site.nav;
   protected readonly ui = this.content.site.ui;
   protected readonly open = signal(false);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly menuButton = viewChild.required<ElementRef<HTMLButtonElement>>('menuButton');
 
   constructor() {
     inject(Router)
@@ -39,6 +49,16 @@ export class SiteHeaderComponent {
 
   protected closeMenu(): void {
     this.open.set(false);
+  }
+
+  /** Close on Escape; return focus to the Menu button only if focus was in the header or on body. */
+  protected onEscape(): void {
+    if (!this.open()) return;
+    const active = document.activeElement;
+    const focusInHeaderOrBody =
+      !active || active === document.body || this.host.nativeElement.contains(active);
+    this.open.set(false);
+    if (focusInHeaderOrBody) this.menuButton().nativeElement.focus();
   }
 
   protected toggleTheme(): void {
