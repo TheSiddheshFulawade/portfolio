@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Spec 004 (`/lab` page) drafted against the approved Lab runs API contract; not approved yet.
+
 ## v1.0.1 (2026-11-23)
 
 - Contact page meta description no longer mentions a resume PDF (002 REQ-PAGE-008, v1 ships without one).
