@@ -188,3 +188,76 @@ test('REQ-COUNT-001 REQ-COUNT-005 the footer shows the visitor counter without s
     await page.evaluate(() => (window as unknown as { shift: number }).shift),
   ).toBeLessThanOrEqual(0.05);
 });
+
+// REQ-UI-001: the desktop nav starts at 896 px so seven items still share one row with brand and theme button.
+async function padNavToSeven(page: Page) {
+  await page.evaluate(() => {
+    const ul = document.querySelector('header nav ul')!;
+    while (ul.children.length < 7) ul.appendChild(ul.lastElementChild!.cloneNode(true));
+    const last = ul.lastElementChild!.querySelector('a')!;
+    last.textContent = 'Lab';
+    last.removeAttribute('href');
+  });
+}
+
+async function headerRow(page: Page) {
+  return page.evaluate(() => {
+    const centre = (sel: string) => {
+      const r = document.querySelector(sel)!.getBoundingClientRect();
+      return r.top + r.height / 2;
+    };
+    return {
+      barHeight: document.querySelector('header .bar')!.getBoundingClientRect().height,
+      brand: centre('header .brand'),
+      nav: centre('header nav'),
+      theme: centre('header .theme-button'),
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+}
+
+for (const scrollbar of [0, 15]) {
+  test(`REQ-UI-001 at 896 px the desktop nav shows and seven items stay on one header row (${scrollbar} px scrollbar)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 800 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await padNavToSeven(page);
+    const wide = await headerRow(page);
+
+    // Media queries see the full viewport; a classic scrollbar only narrows the layout width.
+    await page.setViewportSize({ width: 896 + scrollbar, height: 800 });
+    // Worst case: the media query sees 896 px while the layout is 881 px.
+    if (scrollbar) await page.addStyleTag({ content: `html { width: 881px; }` });
+    const layout = await page.evaluate(() => ({
+      client: document.documentElement.clientWidth,
+      width: document.documentElement.getBoundingClientRect().width,
+    }));
+    expect(layout.client).toBe(scrollbar ? 881 : 896);
+    expect(layout.width).toBe(scrollbar ? 881 : 896);
+
+    await expect(page.locator('header nav')).toBeVisible();
+    await expect(page.locator('header .menu-button')).toBeHidden();
+    expect(await page.locator('header nav li').count()).toBeGreaterThanOrEqual(7);
+    const row = await headerRow(page);
+
+    expect(row.barHeight).toBeCloseTo(wide.barHeight, 0);
+    expect(Math.abs(row.nav - row.brand)).toBeLessThanOrEqual(2);
+    expect(Math.abs(row.theme - row.brand)).toBeLessThanOrEqual(2);
+    expect(row.overflow).toBe(0);
+  });
+}
+
+test('REQ-UI-001 at 895 px the Menu button shows and the nav is collapsed', async ({ page }) => {
+  await page.setViewportSize({ width: 895, height: 800 });
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await padNavToSeven(page);
+
+  await expect(page.getByRole('button', { name: content.site.ui['menu'] })).toBeVisible();
+  await expect(page.locator('header nav')).toBeHidden();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBe(0);
+});
