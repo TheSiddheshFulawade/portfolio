@@ -17,14 +17,20 @@ workflow so every pull request is checked before it reaches `develop`.
   visitors, numbers in monospace and international format (for example `visitors.total 4,218 · today 37`).
 - REQ-COUNT-002 WHEN a page loads in a browser, THE counter endpoint `/api/visits` SHALL record at most one visit
   per visitor per UTC day and return the current totals.
-- REQ-COUNT-003 THE endpoint SHALL identify a visitor only by a hash of (daily salt, IP address, user agent); the
-  raw IP and user agent SHALL never be stored or logged, and the salt SHALL change every UTC day.
+- REQ-COUNT-003 THE endpoint SHALL identify a visitor only by a hash of (daily salt, IP address), with IPv6
+  addresses cut to their /64 prefix; the raw IP SHALL never be stored or logged, and the salt SHALL change every
+  UTC day. (Amended 2026-11-23 after the v1.0.0 security review: hashing the user agent let one IP inflate the
+  counter by rotating it.)
 - REQ-COUNT-004 THE increment SHALL be atomic: concurrent first visits of different visitors are all counted,
   and concurrent repeat visits of one visitor are counted once.
 - REQ-COUNT-005 IF the endpoint fails or is slow, THEN THE footer SHALL keep the page usable and show no number
   (no error text, no layout shift).
 - REQ-COUNT-006 THE endpoint SHALL accept only `GET` and `POST` from the site's origin, reject other methods with
   RFC 9457 problem details, and be rate-limited.
+- REQ-COUNT-007 THE endpoint SHALL record visits only for requests whose host is a configured site host
+  (`siddheshfulawade.com`, `www.siddheshfulawade.com`, `portfolio-7qt.pages.dev`); other hosts (preview
+  aliases) get the totals without a write. A visitor already counted today SHALL cost one read and no write.
+  Function responses SHALL carry `x-content-type-options: nosniff` and `cross-origin-resource-policy: same-site`.
 
 ### Analytics
 
@@ -64,7 +70,7 @@ the domain only (Cloudflare free plan: Pages Functions, D1, Web Analytics).
 
 - **Counter Function** (`apps/web/functions/api/visits.ts`, Cloudflare Pages Function): `POST` records a visit and
   returns `{ total, today }`; `GET` returns the totals. Pure modules with unit tests (Vitest, no network):
-  `visitor-hash.ts` (SHA-256 over salt, IP and user agent with Web Crypto; salt derived per UTC day from a secret,
+  `visitor-hash.ts` (SHA-256 over salt and IP, IPv6 cut to /64, with Web Crypto; salt derived per UTC day from a secret,
   `VISIT_SALT`, so yesterday's hashes cannot be linked to today's) and `visit-store.ts` (D1 queries).
 - **Data (D1, binding `VISITS_DB`)**: `daily_visitors(day TEXT, visitor_hash TEXT, PRIMARY KEY(day, visitor_hash))`
   and `totals(day TEXT PRIMARY KEY, unique_visitors INTEGER)`. One visit is

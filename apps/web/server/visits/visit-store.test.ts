@@ -61,3 +61,75 @@ test('REQ-COUNT-003 visitor hashes older than two days are deleted', async () =>
   assert.deepEqual(await readTotals(d, '2026-11-25'), { total: 3, today: 1 });
   d.close();
 });
+
+// --- Spec 003 amendment 2026-11-23 (REQ-COUNT-007): a counted visitor costs one read, no write ---
+import type { D1Database } from './visit-store.ts';
+
+function spyDb(inner: D1Database) {
+  const calls = { batch: 0, run: 0 };
+  const wrap = (st: ReturnType<D1Database['prepare']>): ReturnType<D1Database['prepare']> =>
+    Object.assign(Object.create(st), {
+      bind: (...v: (string | number | null)[]) => wrap(st.bind(...v)),
+      first: <T>() => st.first<T>(),
+      run: () => {
+        calls.run++;
+        return st.run();
+      },
+    });
+  const spy: D1Database = {
+    prepare: (sql) => wrap(inner.prepare(sql)),
+    batch: (s) => {
+      calls.batch++;
+      return inner.batch(s);
+    },
+  };
+  return { spy, calls };
+}
+
+test('REQ-COUNT-007 a repeat visit by a counted visitor performs no write and returns the same totals', async () => {
+  const d = db();
+  await recordVisit(d, '2026-11-25', 'hash-a');
+  await recordVisit(d, '2026-11-25', 'hash-b');
+  const { spy, calls } = spyDb(d);
+
+  const totals = await recordVisit(spy, '2026-11-25', 'hash-a');
+
+  assert.deepEqual(totals, { total: 2, today: 2 });
+  assert.equal(calls.batch, 0, 'no batch');
+  assert.equal(calls.run, 0, 'no run');
+  d.close();
+});
+
+test('REQ-COUNT-007 a first visit still writes exactly once', async () => {
+  const d = db();
+  const { spy, calls } = spyDb(d);
+
+  const totals = await recordVisit(spy, '2026-11-25', 'hash-a');
+
+  assert.deepEqual(totals, { total: 1, today: 1 });
+  assert.equal(calls.batch, 1);
+  d.close();
+});
+
+test('REQ-COUNT-007 a visitor counted yesterday is new today and writes once', async () => {
+  const d = db();
+  await recordVisit(d, '2026-11-24', 'hash-a');
+  const { spy, calls } = spyDb(d);
+
+  const totals = await recordVisit(spy, '2026-11-25', 'hash-a');
+
+  assert.deepEqual(totals, { total: 2, today: 1 });
+  assert.equal(calls.batch, 1);
+  d.close();
+});
+
+test('REQ-COUNT-004 concurrent repeats through the read guard are still counted once', async () => {
+  const d = db();
+  const visits = Array.from({ length: 200 }, (_, i) => `hash-${i % 20}`);
+
+  await Promise.all(visits.map((x) => recordVisit(d, '2026-11-25', x)));
+  await Promise.all(visits.map((x) => recordVisit(d, '2026-11-25', x)));
+
+  assert.deepEqual(await readTotals(d, '2026-11-25'), { total: 20, today: 20 });
+  d.close();
+});

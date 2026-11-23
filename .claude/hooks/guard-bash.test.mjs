@@ -182,6 +182,21 @@ test("block rules leave everyday commands alone", () => {
   }
 });
 
+test("Wrangler local secrets and state cannot be read from the shell", () => {
+  for (const command of [
+    "cat apps/web/.dev.vars",
+    "type apps\\web\\.dev.vars.preview",
+    "cp .dev.vars /tmp/x",
+    "sqlite3 apps/web/.wrangler/state/v3/d1/db.sqlite .dump",
+  ]) {
+    assert.ok(run(command).blocked, command);
+  }
+  assert.ok(
+    !run("grep -n wrangler apps/web/package.json").blocked,
+    "mentioning wrangler is fine",
+  );
+});
+
 test("other global or system git config changes ask first", () => {
   for (const command of [
     "git config --global user.name Someone",

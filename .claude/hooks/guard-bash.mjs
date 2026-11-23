@@ -72,6 +72,10 @@ const repoRules = [
     "reading .env files is not allowed",
   ],
   [
+    /(^|[\s;&|])(cat|type|Get-Content|gc|less|more|head|tail|grep|findstr|Select-String|cp|copy|Copy-Item|sqlite3)\s+[^|;&]*(\.dev\.vars|\.wrangler[\\/])/i,
+    "reading Wrangler local secrets or state (.dev.vars, .wrangler/) is not allowed",
+  ],
+  [
     /\bgit\s+add\b[^;&|\n]*docs[\\/]private/,
     "docs/private holds personal documents and must never be committed",
   ],

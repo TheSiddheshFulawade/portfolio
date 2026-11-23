@@ -44,3 +44,8 @@ desktop.ini
 
 # Playwright MCP screenshots and snapshots (local review output)
 .playwright-mcp/
+
+# Wrangler local secrets and state (never commit; VISIT_SALT may live here)
+.dev.vars
+.dev.vars.*
+.wrangler/
