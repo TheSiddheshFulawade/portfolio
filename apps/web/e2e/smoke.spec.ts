@@ -225,16 +225,27 @@ for (const scrollbar of [0, 15]) {
     await padNavToSeven(page);
     const wide = await headerRow(page);
 
-    // Media queries see the full viewport; a classic scrollbar only narrows the layout width.
-    await page.setViewportSize({ width: 896 + scrollbar, height: 800 });
-    // Worst case: the media query sees 896 px while the layout is 881 px.
-    if (scrollbar) await page.addStyleTag({ content: `html { width: 881px; }` });
-    const layout = await page.evaluate(() => ({
-      client: document.documentElement.clientWidth,
-      width: document.documentElement.getBoundingClientRect().width,
-    }));
-    expect(layout.client).toBe(scrollbar ? 881 : 896);
-    expect(layout.width).toBe(scrollbar ? 881 : 896);
+    // Worst case: the media query sees 896 px while a classic scrollbar narrows the layout to 881 px.
+    // Set through the CSSOM: the site's CSP blocks an injected style element.
+    const width = 896 - scrollbar;
+    await page.setViewportSize({ width: 896, height: 800 });
+    await page.evaluate((px) => {
+      document.documentElement.style.width = `${px}px`;
+    }, width);
+    const layout = await page.evaluate(() => {
+      const bar = document.querySelector('header .bar')!;
+      const inner = [...bar.querySelectorAll('a, button')].filter((e) => e.getClientRects().length);
+      return {
+        viewport: window.innerWidth,
+        root: document.documentElement.getBoundingClientRect().width,
+        bar: bar.getBoundingClientRect().width,
+        right: Math.max(...inner.map((e) => e.getBoundingClientRect().right)),
+      };
+    });
+    expect(layout.viewport).toBe(896);
+    expect(layout.root).toBe(width);
+    expect(layout.bar).toBeLessThanOrEqual(width);
+    expect(layout.right).toBeLessThanOrEqual(width);
 
     await expect(page.locator('header nav')).toBeVisible();
     await expect(page.locator('header .menu-button')).toBeHidden();
