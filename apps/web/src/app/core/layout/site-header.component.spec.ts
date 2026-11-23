@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { fireEvent, render, screen, within } from '@testing-library/angular';
+import { ContentService } from '../content/content.service';
 import { ThemeService } from '../theme/theme.service';
 import { SiteHeaderComponent } from './site-header.component';
 
@@ -28,7 +29,9 @@ describe('SiteHeaderComponent', () => {
       .map((a) => a.textContent?.trim());
 
     expect(nav.getAttribute('aria-label')).toBe('Main');
-    expect(labels).toEqual(['Home', 'Experience', 'Projects', 'About', 'Contact']);
+    // Notes is in the navigation only while at least one note is published (REQ-NOTE-002).
+    const notes = TestBed.inject(ContentService).notes.length > 0 ? ['Notes'] : [];
+    expect(labels).toEqual(['Home', 'Experience', 'Projects', ...notes, 'About', 'Contact']);
     expect(screen.getByRole('link', { name: 'Siddhesh Fulawade' }).getAttribute('href')).toBe('/');
   });
 

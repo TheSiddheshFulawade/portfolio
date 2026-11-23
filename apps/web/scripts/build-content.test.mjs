@@ -1,7 +1,17 @@
 // Spec 002 V1-02: content build. Each test copies the real content/ to a temp dir and changes one thing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmdirSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,9 +19,16 @@ import { buildContent, robotsTxt, sitemapXml } from './build-content.mjs';
 
 const REAL = resolve(dirname(fileURLToPath(import.meta.url)), '../../../content');
 
+// Real notes get published over time, so every temp copy starts with no notes; tests add the notes they need.
+function dropNotes(dir) {
+  const notes = join(dir, 'notes');
+  for (const f of readdirSync(notes)) unlinkSync(join(notes, f));
+  rmdirSync(notes);
+}
 function withContent(mutate) {
   const dir = mkdtempSync(join(tmpdir(), 'content-'));
   cpSync(REAL, dir, { recursive: true });
+  dropNotes(dir);
   mutate?.(dir);
   return { dir, done: () => rmSync(dir, { recursive: true, force: true }) };
 }
@@ -176,7 +193,21 @@ test('REQ-CONTENT-005 employer names outside the Experience page are rejected', 
 });
 
 test('REQ-SEO-002 the sitemap lists every published route with the site origin, and not /404', async () => {
-  const { content } = await buildContent({ contentDir: REAL });
+  const c = withContent((d) => {
+    addNote(d, 'exactly-once.md', NOTE);
+    addNote(
+      d,
+      'older.md',
+      NOTE.replace('id: exactly-once', 'id: older').replaceAll('2026-11-25', '2026-11-20'),
+    );
+    addNote(
+      d,
+      'draft.md',
+      NOTE.replace('id: exactly-once', 'id: draft').replace('published: true', 'published: false'),
+    );
+  });
+  const { content } = await buildContent({ contentDir: c.dir });
+  c.done();
 
   const xml = sitemapXml(content);
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
@@ -187,9 +218,13 @@ test('REQ-SEO-002 the sitemap lists every published route with the site origin, 
     'https://siddheshfulawade.com/experience/',
     'https://siddheshfulawade.com/projects/',
     ...content.projects.map((p) => `https://siddheshfulawade.com/projects/${p.id}/`),
+    'https://siddheshfulawade.com/notes/',
+    'https://siddheshfulawade.com/notes/exactly-once/',
+    'https://siddheshfulawade.com/notes/older/',
     'https://siddheshfulawade.com/about/',
     'https://siddheshfulawade.com/contact/',
   ]);
+  assert.ok(!xml.includes('/notes/draft'));
   assert.ok(!xml.includes('/404'));
 });
 
@@ -280,7 +315,9 @@ test('REQ-NOTE-003 a note that names the employer is rejected (employer work sta
 });
 
 test('REQ-NOTE-002 with no published notes, Notes is left out of the navigation and the sitemap', async () => {
-  const { content } = await buildContent({ contentDir: REAL });
+  const c = withContent();
+  const { content } = await buildContent({ contentDir: c.dir });
+  c.done();
 
   assert.deepEqual(content.notes, []);
   assert.ok(!content.site.nav.some((n) => n.path === '/notes'));
