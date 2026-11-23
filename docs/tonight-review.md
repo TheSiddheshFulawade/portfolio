@@ -23,9 +23,9 @@ Things that need you. Delete this file once each item is done or moved into a sp
 - **Your actions** (Cloudflare dashboard, free plan):
   1. Workers and Pages → D1 → create a database (e.g. `portfolio-visits`).
   2. In the Pages project → Settings → Bindings: add a D1 binding named **`VISITS_DB`** to that database
-     (production and preview).
+     (**production only**: previews run unreviewed branch code).
   3. Settings → Variables and secrets: add a **secret** named **`VISIT_SALT`** with a long random value
-     (production and preview). Never put it in the repo.
+     (**production only**: previews run unreviewed branch code). Never put it in the repo.
   4. D1 → the database → Console: paste and run `apps/web/migrations/0001_visits.sql`.
   5. Security → WAF → rate limiting rule for `/api/*` (for example 30 requests per minute per IP).
   6. Web Analytics: enable it for the Pages project (REQ-ANA-001). The CSP already allows its hosts.

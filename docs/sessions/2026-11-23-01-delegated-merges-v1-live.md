@@ -15,6 +15,6 @@ Prod `portfolio-7qt.pages.dev`: all routes 200, 404 ok, full headers, `/api/visi
 4. Ghost check: GitHub → Settings → Applications → Cloudflare Workers and Pages → Configure → Repository access → tick
    `portfolio` → Save. Cloudflare → Worker `portfolio` (if listed) → Settings → Builds → Disconnect. Else support, build `befa2414`.
 5. D1: Storage & Databases → D1 → Create `portfolio-visits`. Pages project → Settings → Bindings → Add D1 `VISITS_DB`
-   (Production + Preview). Variables and secrets → Secret `VISIT_SALT` (64 random chars). D1 → Console → run
+   (**Production only**). Variables and secrets → Secret `VISIT_SALT` (64 random chars, **Production only**). D1 → Console → run
    `apps/web/migrations/0001_visits.sql`. WAF rate rule `/api/*` 30/min/IP on the zone. Redeploy latest production.
 6. Lighthouse mobile once on production (MCP audit has no Performance score).
