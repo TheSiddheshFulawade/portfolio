@@ -1,5 +1,6 @@
 // Spec 003 V11-03 (REQ-COUNT-002, REQ-COUNT-004): D1 storage for the visitor counter.
-// Schema: migrations/0001_visits.sql. One visit is a single D1 batch, which D1 runs as one transaction:
+// Schema: migrations/0001_visits.sql. A visitor already counted today costs one read and no write (REQ-COUNT-007).
+// Otherwise one visit is a single D1 batch, which D1 runs as one transaction:
 //   1. record (day, hash), ignoring a repeat;
 //   2. set today's count to the number of distinct hashes today (exact, whatever the interleaving);
 //   3. delete hashes older than two days (REQ-COUNT-003).
@@ -31,6 +32,12 @@ function daysBefore(day: string, days: number): string {
 }
 
 export async function recordVisit(db: D1Database, day: string, hash: string): Promise<Totals> {
+  const seen = await db
+    .prepare('SELECT 1 FROM daily_visitors WHERE day = ?1 AND visitor_hash = ?2')
+    .bind(day, hash)
+    .first();
+  if (seen) return readTotals(db, day);
+  // INSERT OR IGNORE stays the source of truth: concurrent first visits can both pass the read above.
   await db.batch([
     db
       .prepare('INSERT OR IGNORE INTO daily_visitors (day, visitor_hash) VALUES (?1, ?2)')

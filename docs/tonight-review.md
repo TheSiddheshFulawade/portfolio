@@ -18,7 +18,7 @@ Things that need you. Delete this file once each item is done or moved into a sp
 
 - **Built** (V11-03, V11-04): `apps/web/functions/api/visits.ts`, logic and 16 tests in `apps/web/server/visits/`,
   migration `apps/web/migrations/0001_visits.sql`, footer component. A visitor is only
-  `SHA-256(HMAC(secret, UTC day) | IP | user agent)`; the IP is never stored or logged; hashes are deleted
+  `SHA-256(HMAC(secret, UTC day) | IP)` (IPv6 cut to /64; only production hosts record); the IP is never stored or logged; hashes are deleted
   after two days; daily counts are kept. POST is accepted only from the site's own origin.
 - **Your actions** (Cloudflare dashboard, free plan):
   1. Workers and Pages → D1 → create a database (e.g. `portfolio-visits`).
