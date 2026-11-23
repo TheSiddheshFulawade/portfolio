@@ -16,6 +16,8 @@
 }
 
 .back {
+  display: inline-block;
+  min-block-size: var(--space-5);
   font-family: var(--font-mono);
   font-size: var(--step--1);
 }

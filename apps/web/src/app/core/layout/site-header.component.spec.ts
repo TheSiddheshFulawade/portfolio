@@ -53,6 +53,68 @@ describe('SiteHeaderComponent', () => {
     expect(button.getAttribute('aria-expanded')).toBe('false');
   });
 
+  describe('REQ-UI-003 Escape while the menu is open (WCAG 2.2 AA)', () => {
+    afterEach(() => document.getElementById('outside-input')?.remove());
+
+    function addOutsideInput(): HTMLInputElement {
+      const input = document.createElement('input');
+      input.id = 'outside-input';
+      document.body.appendChild(input);
+      return input;
+    }
+
+    it('closes the menu and focuses the Menu button when Escape is pressed on the body', async () => {
+      await setup();
+      const button = screen.getByRole('button', { name: 'Menu' });
+      fireEvent.click(button);
+      (document.activeElement as HTMLElement | null)?.blur();
+
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+
+      expect(button.getAttribute('aria-expanded')).toBe('false');
+      expect(document.activeElement).toBe(button);
+    });
+
+    it('closes the menu and returns focus to the button when Escape is pressed on a nav link', async () => {
+      await setup();
+      const button = screen.getByRole('button', { name: 'Menu' });
+      fireEvent.click(button);
+      const link = within(screen.getByRole('navigation', { hidden: true })).getByText('Projects');
+      link.focus();
+
+      fireEvent.keyDown(link, { key: 'Escape' });
+
+      expect(button.getAttribute('aria-expanded')).toBe('false');
+      expect(document.activeElement).toBe(button);
+    });
+
+    it('closes the menu on Escape outside the header without stealing focus', async () => {
+      await setup();
+      const button = screen.getByRole('button', { name: 'Menu' });
+      fireEvent.click(button);
+      const input = addOutsideInput();
+      input.focus();
+
+      fireEvent.keyDown(input, { key: 'Escape' });
+
+      expect(button.getAttribute('aria-expanded')).toBe('false');
+      expect(document.activeElement).toBe(input);
+    });
+
+    it('does nothing when the menu is closed (no focus move, no state change)', async () => {
+      await setup();
+      const button = screen.getByRole('button', { name: 'Menu' });
+      const input = addOutsideInput();
+      input.focus();
+
+      fireEvent.keyDown(input, { key: 'Escape' });
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+
+      expect(button.getAttribute('aria-expanded')).toBe('false');
+      expect(document.activeElement).toBe(input);
+    });
+  });
+
   it('REQ-UI-003 following a nav link closes the menu', async () => {
     const view = await setup();
     const button = screen.getByRole('button', { name: 'Menu' });
