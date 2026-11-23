@@ -1,6 +1,6 @@
 # 000 · Constitution
 
-The rules every spec, agent and session must follow. Changing this file requires an ADR. Last amended by ADR-0004 (2026-11-19).
+The rules every spec, agent and session must follow. Changing this file requires an ADR. Last amended by ADR-0005 (2026-11-23).
 
 ## 1. Process
 1.1 Every change traces to a spec in `specs/NNN-name/`. Bug fixes may use a short spec.
@@ -8,13 +8,14 @@ The rules every spec, agent and session must follow. Changing this file requires
     tasks. The user approves it once (ADR-0004).
 1.3 Tasks are feature-sized (a page, a component, an engine module). Each task lists its acceptance checks
     and, where the spec asks for tests, the test written first.
-1.4 One work branch and one PR per day (`feature/<release>-day-N`), squash-merged to `develop` after the
-    user's yes. Each session ends with a short `/handoff` (ADR-0004; supersedes ADR-0003).
+1.4 One work branch and one PR per task (`feature/<spec>-<task>-<slug>`), squash-merged to `develop` by the
+    `git-ops` agent once the required CI check is green. Each session ends with a short `/handoff` (ADR-0005).
 1.5 All work lands through pull requests: work branches → `develop` (squash merge) →
     `main` (release PR, merge commit, version tag). `main` is always deployable; `develop` always builds.
     Cloudflare Pages deploys production from `main` and previews from `develop`.
 1.6 `/review` runs once per release, before the release PR to `main`; no high or critical finding is open
-    when the release merges. The user approves every merge.
+    when the release merges. Merges run on required green CI with no per-merge approval; the user keeps the
+    hard gates listed in CLAUDE.md (ADR-0005).
 
 ## 2. Quality
 2.1 Tests first for every behaviour the spec names a test for. Settlement Lab code is always test-first.

@@ -5,8 +5,8 @@ description: The spec-driven development process for this repo - one spec.md per
 
 # Spec-driven development (ADR-0004)
 
-Flow: `/spec` writes `specs/NNN-release/spec.md` → the user approves once → tasks run day by day on
-`feature/<release>-day-N`. Template: `templates/spec.md` next to this file.
+Flow: `/spec` writes `specs/NNN-release/spec.md` → the user approves once → tasks run one by one, each on
+`feature/<spec>-<task>-<slug>` and merged by git-ops on green CI (ADR-0005). Template: `templates/spec.md` next to this file.
 Older specs (001) used requirements.md, design.md and tasks.md; leave them as they are.
 
 ## Status line

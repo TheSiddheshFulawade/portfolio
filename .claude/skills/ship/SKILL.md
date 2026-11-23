@@ -1,33 +1,24 @@
 ---
 name: ship
-description: Push the current work branch, open a PR to develop, post the review on it, and squash-merge after the user approves.
+description: Ship the current work branch to develop through the git-ops agent - verify, push, PR, wait for the required check, squash-merge on green (ADR-0005).
 disable-model-invocation: true
 argument-hint: "[optional PR title]"
 ---
+
 Ship the current branch to `develop`. Title override: $ARGUMENTS
 
-Requires the GitHub CLI (`gh auth status`). If it is missing or not logged in, stop and tell the user.
+1. **Check the branch.** It must be `feature/*`, `fix/*`, `chore/*` or `docs/*`, never `main` or `develop`.
+   Commit any task work first (local commits need no prompt). Never ship `feature/v1-resume`.
+2. **Gate.** Run `npm run verify` at the root (repo checks, hook tests, lint, typecheck, tests, functions, build,
+   prod audit). Fix failures before continuing. Record the SHA it passed on (`git rev-parse HEAD`).
+3. **Delegate to `git-ops`** with: the task id (for example `002 V1-08`), a two-line summary (what and why,
+   REQ ids, tests added, risks) and the verified SHA. git-ops does the leak check, push, PR to `develop`,
+   waits for the required check "verify and smoke test", squash-merges on green and cleans up.
+   No user yes is needed (ADR-0005): GitHub branch protection refuses a merge on red.
+4. **Red CI.** git-ops reports the failing log and does not edit code. Fix the cause on the same branch,
+   re-run `npm run verify`, then hand back to git-ops with the new SHA.
+5. **After merge.** Tick the task in `spec.md` if not done, add the CHANGELOG line, and update the day's
+   handoff (`/handoff`, at most 20 lines) with the PR link and merge SHA.
 
-1. **Check the branch.** It must be `feature/*` (for example `feature/v1-day-2`), `fix/*` or `chore/*`,
-   never `main` or `develop`.
-   The working tree must be clean; if not, list the changes and ask whether to commit them.
-2. **Sync.** `git fetch origin` and `git rebase origin/develop`. On conflicts, stop and explain them.
-3. **Gate.** Run the full checks: `npm run verify` at the root (lint, typecheck, tests, build, prod audit).
-   Fix failures before continuing.
-4. **Push** the branch: `git push -u origin <branch>`.
-5. **Open the PR** to `develop` with `gh pr create --base develop`:
-   - Title: Conventional Commit style, e.g. `feat(lab): ordered locking ledger (010 T-01)`
-   - Body: what changed and why, spec and REQ ids covered, tests added, screenshots if UI,
-     a checklist from the constitution's Definition of done, and the attribution line
-     `🤖 Generated with [Claude Code](https://claude.com/claude-code)` at the end.
-   If a PR for this branch already exists, update it instead.
-6. **No per-PR review** (ADR-0004): `/review` runs once per release, inside `/release`. If the user
-   asks for a review on this PR, run `/review` and post the findings as one PR comment.
-7. **Wait for CI** once (`gh pr checks --watch`, if workflows exist). Report the result.
-8. **Ask the user** in one line: PR link, review result, CI result, "merge to develop?".
-   Merge only on an explicit yes in this session. Right before merging, re-read
-   `gh pr view <n> --json baseRefName,headRefOid` and refuse if the base is not `develop` or the head
-   commit is not the one you pushed and reported.
-   `gh pr merge <n> --squash --delete-branch`. Never use `--admin`.
-9. **Clean up.** `git switch develop`, `git pull --ff-only`, delete the local branch.
-   Delete the branch on origin too (`--delete-branch` does it). Suggest `/handoff`.
+No per-PR review (ADR-0004): `/review` runs once per release, inside `/release`.
+Hard gates (CLAUDE.md "When to ask the user") still stop the task; record them under "Waiting on user".

@@ -1,7 +1,7 @@
 # Portfolio: Siddhesh Fulawade
 
 Personal portfolio for a full stack Java engineer (payments, distributed systems) targeting
-engineering roles at global banks. Current plan: **ADR-0004 fast track** (v1 live Sun 22 Nov 2026).
+engineering roles at global banks. Current plan: **ADR-0004 fast track**, delegated merges per **ADR-0005**.
 
 Repo (website and content only):
 
@@ -47,10 +47,12 @@ Enforced by `.claude/settings.json` (permission rules) and `.claude/hooks/guard-
 - Before a risky command, state what it does and why. If a guard blocks something genuinely needed,
   ask the user; never work around a guard.
 
-## When to ask the user
+## When to ask the user (hard gates, ADR-0005)
 
-Only for: merges and pushes; anything outward-facing (deploys, DNS, creating repos or cloud
-resources); money; real product choices. Decide everything else, note it in the handoff, keep going.
+Stop only for: money or cloud resources · the Cloudflare dashboard, DNS and secrets · GitHub repo settings ·
+publishing any resume PDF (none goes public before Dec 1) · approving note content · a product choice no approved
+spec covers. When a gate blocks a task, write it under "Waiting on user" in the handoff, move to the next unblocked
+task, and never work around the gate. Decide everything else, note it in the handoff, keep going.
 
 ## Commands and skills
 
@@ -58,21 +60,24 @@ Web (from `apps/web`): `npm run dev | test | e2e | lint | typecheck | build`. Ro
 Load the matching skill first: design-system · angular-standards · content-model · security-baseline ·
 testing-playbook · spec-driven. Windows 11; hooks are Node scripts run from `$CLAUDE_PROJECT_DIR`.
 
-## Workflow (ADR-0004)
+## Workflow (ADR-0005)
 
-`/spec` (one `spec.md` per release) → user approves once → each day: `feature/<release>-day-N` from
-`develop`, `/implement` tasks (local commits, no prompts) → `/ship` (one PR, merged after the user's yes)
-→ `/handoff`. Per release: `/release` runs `/review`, then the release PR to `main` deploys production.
+The master session is the PM and delegates. `/spec` → user approves once → per task: `test-engineer` (failing
+tests) → `angular-engineer` / `content-editor` → `npm run verify` → `security-auditor` / `ui-reviewer` /
+`perf-auditor` where the change needs it → `/ship` (`git-ops` opens the PR and merges on required green CI)
+→ one handoff line. Per release: `/release` (`/review`, Lighthouse, axe) → git-ops merges to `main` and tags.
 
 ## Branches
 
 - `main`: production (Cloudflare Pages). Changes only through a release PR from `develop`, merge commit, tag `vX.Y.Z`.
 - `develop`: integration and Cloudflare preview. Changes only through squash-merged PRs.
-- Work branches from `develop`: `feature/v1-day-N`, `fix/<topic>`, `chore/<topic>`. Delete after merge.
-- Merging and pushing always need the user's explicit go-ahead in the current session.
+- Both require the "verify and smoke test" check. Only `git-ops` pushes, opens PRs and merges, on green only.
+- Work branches from `develop`: `feature/<spec>-<task>-<slug>`, `fix/<topic>`, `chore/<topic>`, `docs/<topic>`.
+  Delete after merge. Never push `feature/v1-resume`.
 
 ## Definition of done
 
-Per task: acceptance checks met · named tests green · ticked in `spec.md` · local commit.
-Per day: one PR, lint, typecheck, tests and build green, CHANGELOG line per task, `/handoff` (≤ 20 lines).
-Per release: `/review` with no high findings · manual Lighthouse and axe check · tagged release.
+Per task: acceptance checks met · named tests green · `npm run verify` green · ticked in `spec.md` ·
+CHANGELOG line · merged by git-ops on green CI · handoff line.
+Per session: `/handoff` (≤ 20 lines) with "Waiting on user".
+Per release: `/review` with no high findings · Lighthouse and axe gates · tagged release · production verified.
