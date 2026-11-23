@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Contact page meta description no longer mentions a resume PDF (002 REQ-PAGE-008, v1 ships without one).
+
 ## v1.0.0 (2026-11-23)
 
 - Project scaffold: constitution, brief, Claude Code agents, skills, hooks and MCP configuration.
