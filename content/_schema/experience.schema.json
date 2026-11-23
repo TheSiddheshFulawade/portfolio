@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "experience.schema.json",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": [
+    "order",
+    "company",
+    "title",
+    "location",
+    "mode",
+    "start",
+    "end",
+    "summary",
+    "highlights",
+    "stack"
+  ],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "company": { "$ref": "common.schema.json#/definitions/text" },
+    "title": { "$ref": "common.schema.json#/definitions/text" },
+    "location": { "$ref": "common.schema.json#/definitions/text" },
+    "mode": { "enum": ["On-site", "Remote", "Hybrid"] },
+    "start": { "$ref": "common.schema.json#/definitions/month" },
+    "end": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/definitions/month" },
+        { "type": "null" }
+      ]
+    },
+    "summary": { "$ref": "common.schema.json#/definitions/text" },
+    "highlights": {
+      "$ref": "common.schema.json#/definitions/stringList",
+      "minItems": 1
+    },
+    "recognition": { "$ref": "common.schema.json#/definitions/stringList" },
+    "stack": { "$ref": "common.schema.json#/definitions/stringList" }
+  },
+  "additionalProperties": false
+}

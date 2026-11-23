@@ -1,0 +1,88 @@
+/* Design tokens (design-system skill). Dark first; light via the system preference or [data-theme].
+   Components use these variables only; literal colours are not allowed in src/app (tokens.test.mjs). */
+
+:root {
+  color-scheme: dark light;
+
+  --font-display: 'IBM Plex Sans Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --step--2: 0.75rem;
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --step-3: 1.75rem;
+  --step-4: 2.25rem;
+  --step-5: 3rem;
+  --step-6: 3.75rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-pill: 999px;
+
+  --prose: 72ch;
+  --layout-max: 1200px;
+  --gutter: max(16px, 4vw);
+
+  --dur-hover: 120ms;
+  --dur-enter: 240ms;
+  --dur-view: 400ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0a0e13;
+  --panel: #10161d;
+  --raise: #16202a;
+  --line: #1f2b36;
+  --text: #d9e1e8;
+  --text-strong: #eef3f6;
+  --dim: #7e8c99;
+  --accent: #4fd1c5;
+  --amber: #f2b84b;
+  --red: #f07a6e;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --bg: #f4f6f5;
+    --panel: #ffffff;
+    --raise: #eef2f1;
+    --line: #dce2e0;
+    --text: #14191d;
+    --text-strong: #0b0f12;
+    --dim: #5a6670;
+    --accent: #0a6964;
+    --amber: #8e5406;
+    --red: #b3261e;
+  }
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f6f5;
+  --panel: #ffffff;
+  --raise: #eef2f1;
+  --line: #dce2e0;
+  --text: #14191d;
+  --text-strong: #0b0f12;
+  --dim: #5a6670;
+  --accent: #0a6964;
+  --amber: #8e5406;
+  --red: #b3261e;
+}

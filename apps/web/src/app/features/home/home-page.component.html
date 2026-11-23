@@ -1,0 +1,46 @@
+<section class="hero" aria-labelledby="home-title">
+  <p class="eyebrow">{{ profile.location }}</p>
+  <h1 id="home-title">{{ profile.name }}</h1>
+  <p class="headline">{{ profile.headline }}</p>
+  <p class="summary">{{ profile.summary }}</p>
+  <div class="actions">
+    @if (profile.resume; as resume) {
+      <a class="button primary" [href]="resume.url">{{ resume.label }}</a>
+    }
+    <a class="button" routerLink="/contact">{{ ui['contactCta'] }}</a>
+  </div>
+</section>
+
+<section class="metrics" aria-labelledby="metrics-title">
+  <h2 id="metrics-title">{{ ui['metricsHeading'] }}</h2>
+  <ul class="metric-grid" aria-labelledby="metrics-title">
+    @for (metric of metrics; track metric.id) {
+      <li><sf-metric-tile [metric]="metric" [sourceLabel]="ui['metricSource']" /></li>
+    }
+  </ul>
+</section>
+
+<section class="featured" aria-labelledby="featured-title">
+  <h2 id="featured-title">{{ ui['featuredHeading'] }}</h2>
+  <ul class="project-list">
+    @for (project of featured; track project.id) {
+      <li class="project">
+        <div class="project-top">
+          <h3>
+            <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
+          </h3>
+          <sf-status-pill [label]="project.status" />
+        </div>
+        <p>{{ project.tagline }}</p>
+        <ul class="stack" [attr.aria-label]="ui['stack']">
+          @for (tech of project.stack; track tech) {
+            <li>{{ tech }}</li>
+          }
+        </ul>
+      </li>
+    }
+  </ul>
+  <p>
+    <a routerLink="/projects">{{ ui['allProjects'] }}</a>
+  </p>
+</section>

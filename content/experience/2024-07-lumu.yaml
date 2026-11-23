@@ -1,0 +1,28 @@
+id: 2024-07-lumu
+published: true
+featured: false
+order: 20
+updated: 2026-11-19
+company: Lumu Oy
+title: Freelance Software Engineer
+location: Espoo, Finland
+mode: Remote
+start: 2024-07
+end: 2024-10
+summary: Built the backend and content pipeline for a multilingual news startup.
+highlights:
+  - Architected and deployed a multilingual news backend on Azure Functions, Azure SQL and Azure Databricks.
+  - Implemented vector-based news search with Azure Elastic Search for fast, semantically relevant retrieval.
+  - Integrated GPT models through Azure AI Foundry for news summaries and podcast generation.
+  - Added push notifications with Azure Notification Hub and FCM.
+  - Built the cross-platform app in FlutterFlow, published on Google Play and the Apple App Store.
+recognition: []
+stack:
+  [
+    Azure Functions,
+    Azure SQL,
+    Azure Databricks,
+    Elastic Search,
+    Azure AI Foundry,
+    FlutterFlow,
+  ]

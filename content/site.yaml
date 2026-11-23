@@ -1,0 +1,85 @@
+# Site-wide copy: navigation, page titles and descriptions, footer. Read by the shell and SeoService.
+id: site
+published: true
+updated: 2026-11-19
+title: Siddhesh Fulawade
+url: https://siddheshfulawade.com
+locale: en
+# Open Graph image for link previews (1200 x 630, public/og.png) and its alt text.
+ogImage: /og.png
+ogImageAlt: Siddhesh Fulawade, full stack Java engineer, payments and distributed systems
+nav:
+  - { label: Home, path: / }
+  - { label: Experience, path: /experience }
+  - { label: Projects, path: /projects }
+  # Shown only while at least one note is published (the content build drops it otherwise).
+  - { label: Notes, path: /notes }
+  - { label: About, path: /about }
+  - { label: Contact, path: /contact }
+pages:
+  home:
+    title: Siddhesh Fulawade · Full stack Java engineer, payments
+    description: >-
+      Full stack Java engineer building payment systems that stay correct under load: Spring Boot,
+      ISO 20022, Kafka, IBM MQ and exactly-once processing.
+  experience:
+    title: Experience · Siddhesh Fulawade
+    heading: Experience
+    description: Roles, responsibilities and impact, from central banking payments to startup backends.
+  projects:
+    title: Projects · Siddhesh Fulawade
+    heading: Projects
+    description: Original work, led by Settlement Lab, a concurrency-safe settlement engine with property and stress tests.
+  notes:
+    title: Notes · Siddhesh Fulawade
+    description: Short technical notes on payments, concurrency and the engineering behind this site.
+    heading: Notes
+    body: No notes yet.
+  about:
+    title: About · Siddhesh Fulawade
+    heading: About
+    description: How I work, the skills I use and the evidence behind them, and my education.
+  contact:
+    title: Contact · Siddhesh Fulawade
+    heading: Contact
+    body: Email is the quickest way to reach me.
+    description: Email, LinkedIn and GitHub. Resume available as a PDF.
+  notFound:
+    title: Page not found · Siddhesh Fulawade
+    description: This page does not exist.
+    heading: Page not found
+    body: The page you asked for does not exist or has moved.
+    action: Go to the home page
+footer:
+  note: Built with Angular, prerendered, hosted on Cloudflare Pages.
+  sourceLabel: Source on GitHub
+  sourceUrl: https://github.com/TheSiddheshFulawade/portfolio
+ui:
+  skipLink: Skip to main content
+  menu: Menu
+  navLabel: Main
+  themeToggle: Switch colour theme
+  themeLight: Light theme
+  themeDark: Dark theme
+  earlierWork: Earlier work
+  contactCta: Get in touch
+  metricsHeading: Track record
+  metricSource: Source
+  featuredHeading: Featured work
+  allProjects: All projects
+  repoLink: Source code on GitHub
+  present: Present
+  recognition: Recognition
+  stack: Stack
+  skillsHeading: Skills
+  evidence: Evidence
+  educationHeading: Education
+  certificationsHeading: Certifications
+  achievementsHeading: Achievements
+  email: Email
+  readingTime: min read
+  tags: Tags
+  allNotes: All notes
+  counterLabel: Unique visitors
+  counterTotal: visitors.total
+  counterToday: today

@@ -1,0 +1,40 @@
+# Employer work is experience only (constitution 6.2): resume-level facts, no internal service names,
+# diagrams, volumes, throughput figures or logos. ReBIT and e-Kuber 3.0 may be named here only.
+id: 2024-11-rebit
+published: true
+featured: true
+order: 10
+updated: 2026-11-19
+company: Reserve Bank Information Technology (ReBIT)
+title: Full Stack Java Developer
+location: Navi Mumbai, India
+mode: On-site
+start: 2024-11
+end: null
+summary: >-
+  Contributor to RBI's e-Kuber 3.0, a next-generation central banking system, on the RTGS,
+  RTGS settlement, NEFT and bond depository payment modules.
+highlights:
+  - Designed and built Spring Boot microservices that process ISO 20022 payment messages and reconcile with the general ledger.
+  - Implemented thread-safe, exactly-once transaction processing under concurrent load using Java concurrency primitives.
+  - Built Kafka and IBM MQ pipelines between services for high availability across distributed instances.
+  - Developed a resilience layer with fallback and recovery for failures in Kafka, the data grid cache, SFTP and external APIs.
+  - Cut database calls by 30% with batch processing and OpenShift Data Grid caching.
+  - Raised unit test coverage on critical payment flows to 85% with JUnit 5 and Mockito.
+  - Led end-to-end deployments on OpenShift with Docker and Jenkins, cutting deployment time by 40%.
+recognition:
+  - Rising Star Award at ReBIT for contributions to the RTGS module of e-Kuber 3.0.
+stack:
+  [
+    Java,
+    Spring Boot,
+    ISO 20022,
+    Kafka,
+    IBM MQ,
+    Oracle Database,
+    OpenShift,
+    Docker,
+    Jenkins,
+    JUnit 5,
+    Mockito,
+  ]

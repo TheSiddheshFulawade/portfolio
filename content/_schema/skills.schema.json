@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skills.schema.json",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": ["groups"],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "order", "label", "skills"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/definitions/id" },
+          "order": { "type": "integer" },
+          "label": { "$ref": "common.schema.json#/definitions/text" },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "evidence"],
+              "additionalProperties": false,
+              "properties": {
+                "name": { "$ref": "common.schema.json#/definitions/text" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "$ref": "common.schema.json#/definitions/id" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

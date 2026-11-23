@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "site.schema.json",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": [
+    "title",
+    "url",
+    "locale",
+    "ogImage",
+    "ogImageAlt",
+    "nav",
+    "pages",
+    "footer",
+    "ui"
+  ],
+  "definitions": {
+    "page": {
+      "type": "object",
+      "required": ["title", "description"],
+      "properties": {
+        "title": { "$ref": "common.schema.json#/definitions/text" },
+        "description": { "type": "string", "minLength": 20, "maxLength": 170 },
+        "heading": { "$ref": "common.schema.json#/definitions/text" },
+        "body": { "$ref": "common.schema.json#/definitions/text" },
+        "action": { "$ref": "common.schema.json#/definitions/text" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "title": { "$ref": "common.schema.json#/definitions/text" },
+    "url": { "type": "string", "pattern": "^https://[^/]+$" },
+    "locale": { "type": "string" },
+    "ogImage": { "type": "string", "pattern": "^/[^/].*\\.(png|jpg)$" },
+    "ogImageAlt": { "$ref": "common.schema.json#/definitions/text" },
+    "nav": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["label", "path"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "$ref": "common.schema.json#/definitions/text" },
+          "path": { "type": "string", "pattern": "^/" }
+        }
+      }
+    },
+    "pages": {
+      "type": "object",
+      "required": [
+        "home",
+        "experience",
+        "projects",
+        "about",
+        "contact",
+        "notFound"
+      ],
+      "additionalProperties": { "$ref": "#/definitions/page" }
+    },
+    "footer": {
+      "type": "object",
+      "required": ["note", "sourceLabel", "sourceUrl"],
+      "additionalProperties": false,
+      "properties": {
+        "note": { "$ref": "common.schema.json#/definitions/text" },
+        "sourceLabel": { "$ref": "common.schema.json#/definitions/text" },
+        "sourceUrl": { "$ref": "common.schema.json#/definitions/url" }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": { "$ref": "common.schema.json#/definitions/text" }
+    }
+  },
+  "additionalProperties": false
+}

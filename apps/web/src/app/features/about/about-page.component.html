@@ -1,0 +1,76 @@
+<header class="intro">
+  <h1>{{ page.heading }}</h1>
+  @for (paragraph of profile.bio; track $index) {
+    <p>{{ paragraph }}</p>
+  }
+  @if (profile.resume; as resume) {
+    <p>
+      <a class="resume" [href]="resume.url">{{ resume.label }}</a>
+    </p>
+  }
+</header>
+
+<section class="skills" aria-labelledby="skills-title">
+  <h2 id="skills-title">{{ ui['skillsHeading'] }}</h2>
+  <div class="groups">
+    @for (group of groups; track group.id) {
+      <div class="group">
+        <h3>{{ group.label }}</h3>
+        <ul>
+          @for (skill of group.skills; track skill.name) {
+            <li>
+              <span class="skill">{{ skill.name }}</span>
+              @if (skill.evidence.length) {
+                <span class="visually-hidden">{{ ui['evidence'] }}:</span>
+                <span class="evidence">
+                  @for (item of skill.evidence; track item.id) {
+                    <a [routerLink]="item.link" [fragment]="item.fragment">{{ item.label }}</a>
+                  }
+                </span>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="education" aria-labelledby="education-title">
+  <h2 id="education-title">{{ ui['educationHeading'] }}</h2>
+  <ul class="plain">
+    @for (degree of education.degrees; track degree.id) {
+      <li>
+        <p class="strong">{{ degree.degree }}</p>
+        <p class="dim">
+          {{ degree.institution }} · <span class="mono">{{ degree.start }}–{{ degree.end }}</span>
+          @if (degree.grade) {
+            · <span class="mono">{{ degree.grade }}</span>
+          }
+        </p>
+      </li>
+    }
+  </ul>
+
+  @if (education.certifications.length) {
+    <h3>{{ ui['certificationsHeading'] }}</h3>
+    <ul class="plain">
+      @for (cert of education.certifications; track cert.id) {
+        <li>
+          <p>
+            {{ cert.name }} <span class="dim">· {{ cert.issuer }}</span>
+          </p>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (education.achievements.length) {
+    <h3>{{ ui['achievementsHeading'] }}</h3>
+    <ul class="bullets">
+      @for (item of education.achievements; track item.id) {
+        <li>{{ item.text }}</li>
+      }
+    </ul>
+  }
+</section>

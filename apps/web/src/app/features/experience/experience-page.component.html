@@ -1,0 +1,45 @@
+<header class="intro">
+  <h1>{{ page.heading }}</h1>
+  <p class="lede">{{ page.description }}</p>
+</header>
+
+<ol class="roles">
+  @for (role of roles; track role.id) {
+    <li>
+      <article class="role" [id]="role.id" [attr.aria-labelledby]="'role-' + role.id">
+        <header class="role-head">
+          <h2 [id]="'role-' + role.id">{{ role.title }}</h2>
+          <p class="company">{{ role.company }}</p>
+          <p class="meta">
+            <time [attr.datetime]="role.start">{{ role.dates }}</time>
+            <span aria-hidden="true">·</span>
+            <span>{{ role.location }}</span>
+            <span aria-hidden="true">·</span>
+            <span>{{ role.mode }}</span>
+          </p>
+        </header>
+        <p>{{ role.summary }}</p>
+        <ul class="highlights">
+          @for (highlight of role.highlights; track highlight) {
+            <li>{{ highlight }}</li>
+          }
+        </ul>
+        @if (role.recognition?.length) {
+          <div class="recognition">
+            <h3>{{ ui['recognition'] }}</h3>
+            <ul>
+              @for (item of role.recognition; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+        }
+        <ul class="stack" [attr.aria-label]="ui['stack']">
+          @for (tech of role.stack; track tech) {
+            <li>{{ tech }}</li>
+          }
+        </ul>
+      </article>
+    </li>
+  }
+</ol>

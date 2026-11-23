@@ -1,0 +1,23 @@
+<footer class="footer">
+  <div class="inner">
+    <ul class="links">
+      @for (link of profile.links; track link.id) {
+        <li>
+          <a [href]="link.url" rel="me noopener">{{ link.label }}</a>
+        </li>
+      }
+      <li>
+        <a [href]="'mailto:' + profile.email">{{ profile.email }}</a>
+      </li>
+    </ul>
+    <!-- Fixed-height slot so the counter never shifts the layout (REQ-COUNT-005). -->
+    <p class="counter">
+      <sf-visitor-counter />
+    </p>
+    <p class="meta">
+      <span class="mono">© {{ year }} {{ profile.name }}</span>
+      <span>{{ footer.note }}</span>
+      <a [href]="footer.sourceUrl" rel="noopener">{{ footer.sourceLabel }}</a>
+    </p>
+  </div>
+</footer>

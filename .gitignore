@@ -13,6 +13,10 @@ secrets/
 .claude/settings.local.json
 
 # Node / Angular
+apps/web/src/generated/
+# Written by apps/web/scripts/build-content.mjs (REQ-SEO-002)
+apps/web/public/sitemap.xml
+apps/web/public/robots.txt
 node_modules/
 dist/
 .angular/
@@ -34,3 +38,9 @@ hs_err_pid*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Downloaded tool binaries
+.cache/
+
+# Playwright MCP screenshots and snapshots (local review output)
+.playwright-mcp/

@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "profile.schema.json",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": [
+    "name",
+    "headline",
+    "location",
+    "summary",
+    "bio",
+    "email",
+    "links"
+  ],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "name": { "$ref": "common.schema.json#/definitions/text" },
+    "headline": { "$ref": "common.schema.json#/definitions/text" },
+    "location": { "$ref": "common.schema.json#/definitions/text" },
+    "summary": { "$ref": "common.schema.json#/definitions/text" },
+    "bio": {
+      "$ref": "common.schema.json#/definitions/stringList",
+      "minItems": 1
+    },
+    "email": { "const": "hello@siddheshfulawade.com" },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "url"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/definitions/id" },
+          "label": { "$ref": "common.schema.json#/definitions/text" },
+          "url": { "$ref": "common.schema.json#/definitions/url" }
+        }
+      }
+    },
+    "resume": {
+      "type": "object",
+      "required": ["label", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "$ref": "common.schema.json#/definitions/text" },
+        "url": { "$ref": "common.schema.json#/definitions/url" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

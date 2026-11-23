@@ -16,7 +16,7 @@ interviewer concrete things to ask about.
 ## Audience and what each needs
 | Who | Time spent | Must find |
 |---|---|---|
-| Recruiter | 30 seconds | Role, domain, years, location, availability, resume PDF, LinkedIn |
+| Recruiter | 30 seconds | Role, domain, years, location, resume PDF, LinkedIn |
 | Hiring manager | 5 minutes | Settlement Lab write-up, decisions and trade-offs, experience |
 | Interviewer | 30 minutes | Settlement Lab running live, public code, specs, ADRs, tests |
 
@@ -49,11 +49,16 @@ About ₹1,000–1,300 per year (domain only). Everything else on free tiers.
 
 ## Timeline
 About 4 weeks at 15+ hours per week. Blueprint: docs/blueprint.html
+Superseded on 2026-11-19 by ADR-0004 (fast track): v1 live Sun 22 Nov 2026, then v1.1, v2 and v2.1.
 
-## Open questions for Siddhesh
-1. Domain name preference (e.g. siddheshfulawade.dev / .com)?
-2. Notice period and availability line to show on the home page?
-3. Which contact details may be public (email only? LinkedIn only?)
-4. Is it OK to name ReBIT and e-Kuber 3.0 on the site? (Check your employment terms.)
+## Decisions (answered 2026-11-16)
+1. Domain: siddheshfulawade.com
+2. No notice period or availability line anywhere on the site (the current employer may visit).
+   The notice period is shared directly with recruiters (details in docs/private/), not published.
+3. Contact: the site shows email (hello@siddheshfulawade.com), LinkedIn and GitHub (the contact form
+   follows in v2). The public resume PDF has no phone number; the full resume is shared with
+   recruiters directly. Values live in content/profile, not in this brief. (Updated 2026-11-19.)
+4. ReBIT and e-Kuber 3.0 may be named, on the Experience page and in the resume only.
+   Never listed under Projects; Projects holds original work such as Settlement Lab.
 
-Status: DRAFT (change to APPROVED when you are happy with it)
+Status: APPROVED (2026-11-16)
