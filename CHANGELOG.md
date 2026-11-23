@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Header: the desktop navigation starts at 56rem, so six or seven items stay on one row; smoke tests at 895 and 896 px (002 REQ-UI-001).
 - Spec 004 (`/lab` page) drafted against the approved Lab runs API contract; not approved yet.
 
 ## v1.0.1 (2026-11-23)
