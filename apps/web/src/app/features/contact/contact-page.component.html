@@ -20,6 +20,8 @@
   }
 </dl>
 
-<p>
-  <a class="button" [href]="profile.resume.url">{{ profile.resume.label }}</a>
-</p>
+@if (profile.resume; as resume) {
+  <p>
+    <a class="button" [href]="resume.url">{{ resume.label }}</a>
+  </p>
+}

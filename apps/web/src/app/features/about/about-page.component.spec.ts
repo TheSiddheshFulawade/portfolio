@@ -4,6 +4,19 @@ import { render, screen, within } from '@testing-library/angular';
 import { ContentService } from '../../core/content/content.service';
 import { AboutPageComponent } from './about-page.component';
 
+/** Real content with the profile resume replaced (REQ-PAGE-008: it is optional). */
+function contentWith(resume: { label: string; url: string } | undefined) {
+  return {
+    provide: ContentService,
+    useFactory: () => {
+      const real = new ContentService();
+      return Object.assign(real, {
+        profile: { ...real.profile, resume },
+      }) as unknown as ContentService;
+    },
+  };
+}
+
 async function setup() {
   await render(AboutPageComponent, { providers: [provideRouter([])] });
   return TestBed.inject(ContentService);
@@ -64,11 +77,22 @@ describe('AboutPageComponent', () => {
     expect(section.textContent).toContain(content.education.achievements[0].text);
   });
 
-  it('REQ-PAGE-008 links to the resume', async () => {
-    await setup();
+  it('REQ-PAGE-008 links to the resume when the profile has one', async () => {
+    await render(AboutPageComponent, {
+      providers: [provideRouter([]), contentWith({ label: 'Resume (PDF)', url: '/resume.pdf' })],
+    });
 
     expect(screen.getByRole('link', { name: 'Resume (PDF)' }).getAttribute('href')).toBe(
       '/resume.pdf',
     );
+  });
+
+  it('REQ-PAGE-008 shows no resume link when the profile has none', async () => {
+    const { container } = await render(AboutPageComponent, {
+      providers: [provideRouter([]), contentWith(undefined)],
+    });
+
+    expect(screen.queryByRole('link', { name: /resume/i })).toBeNull();
+    expect(container.querySelector('a[href*="resume.pdf"]')).toBeNull();
   });
 });

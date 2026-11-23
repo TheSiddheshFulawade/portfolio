@@ -3,9 +3,11 @@
   @for (paragraph of profile.bio; track $index) {
     <p>{{ paragraph }}</p>
   }
-  <p>
-    <a class="resume" [href]="profile.resume.url">{{ profile.resume.label }}</a>
-  </p>
+  @if (profile.resume; as resume) {
+    <p>
+      <a class="resume" [href]="resume.url">{{ resume.label }}</a>
+    </p>
+  }
 </header>
 
 <section class="skills" aria-labelledby="skills-title">

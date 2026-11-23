@@ -51,7 +51,7 @@ export interface Profile {
   bio: string[];
   email: string;
   links: Link[];
-  resume: { label: string; url: string };
+  resume?: { label: string; url: string };
 }
 
 export interface Metric {
