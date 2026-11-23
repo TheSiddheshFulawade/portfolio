@@ -1,5 +1,19 @@
 import { render, screen } from '@testing-library/angular';
+import { ContentService } from '../../core/content/content.service';
 import { ContactPageComponent } from './contact-page.component';
+
+/** Real content with the profile resume replaced (REQ-PAGE-008: it is optional). */
+function contentWith(resume: { label: string; url: string } | undefined) {
+  return {
+    provide: ContentService,
+    useFactory: () => {
+      const real = new ContentService();
+      return Object.assign(real, {
+        profile: { ...real.profile, resume },
+      }) as unknown as ContentService;
+    },
+  };
+}
 
 describe('ContactPageComponent', () => {
   it('REQ-PAGE-007 shows the site email as a mailto link, LinkedIn and GitHub, and no form', async () => {
@@ -20,11 +34,22 @@ describe('ContactPageComponent', () => {
     expect(container.querySelector('form, input, textarea')).toBeNull();
   });
 
-  it('REQ-PAGE-008 links to the resume', async () => {
-    await render(ContactPageComponent);
+  it('REQ-PAGE-008 links to the resume when the profile has one', async () => {
+    await render(ContactPageComponent, {
+      providers: [contentWith({ label: 'Resume (PDF)', url: '/resume.pdf' })],
+    });
 
     expect(screen.getByRole('link', { name: 'Resume (PDF)' }).getAttribute('href')).toBe(
       '/resume.pdf',
     );
+  });
+
+  it('REQ-PAGE-008 shows no resume link when the profile has none', async () => {
+    const { container } = await render(ContactPageComponent, {
+      providers: [contentWith(undefined)],
+    });
+
+    expect(screen.queryByRole('link', { name: /resume/i })).toBeNull();
+    expect(container.querySelector('a[href*="resume.pdf"]')).toBeNull();
   });
 });

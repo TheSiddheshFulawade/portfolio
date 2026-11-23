@@ -4,6 +4,19 @@ import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { ContentService } from '../../core/content/content.service';
 import { HomePageComponent } from './home-page.component';
 
+/** Real content with the profile resume replaced (REQ-PAGE-008: it is optional). */
+function contentWith(resume: { label: string; url: string } | undefined) {
+  return {
+    provide: ContentService,
+    useFactory: () => {
+      const real = new ContentService();
+      return Object.assign(real, {
+        profile: { ...real.profile, resume },
+      }) as unknown as ContentService;
+    },
+  };
+}
+
 async function setup() {
   await render(HomePageComponent, { providers: [provideRouter([])] });
   return TestBed.inject(ContentService);
@@ -19,12 +32,29 @@ describe('HomePageComponent', () => {
     expect(screen.getByText(content.profile.summary.trim())).toBeTruthy();
   });
 
-  it('REQ-PAGE-002 links to the resume and the contact page', async () => {
-    await setup();
+  it('REQ-PAGE-008 links to the resume when the profile has one', async () => {
+    await render(HomePageComponent, {
+      providers: [provideRouter([]), contentWith({ label: 'Resume (PDF)', url: '/resume.pdf' })],
+    });
 
     expect(screen.getByRole('link', { name: 'Resume (PDF)' }).getAttribute('href')).toBe(
       '/resume.pdf',
     );
+  });
+
+  it('REQ-PAGE-008 shows no resume link when the profile has none, and still links to contact', async () => {
+    const { container } = await render(HomePageComponent, {
+      providers: [provideRouter([]), contentWith(undefined)],
+    });
+
+    expect(screen.queryByRole('link', { name: /resume/i })).toBeNull();
+    expect(container.querySelector('a[href*="resume.pdf"]')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Get in touch' })).toBeTruthy();
+  });
+
+  it('REQ-PAGE-002 links to the contact page', async () => {
+    await setup();
+
     expect(screen.getByRole('link', { name: 'Get in touch' }).getAttribute('href')).toBe(
       '/contact',
     );

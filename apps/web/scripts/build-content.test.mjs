@@ -296,3 +296,40 @@ test('REQ-NOTE-002 published notes appear in the navigation and the sitemap', as
   assert.ok(content.site.nav.some((n) => n.path === '/notes'));
   assert.match(sitemapXml(content), /\/notes\/<\/loc>[\s\S]*\/notes\/exactly-once\/<\/loc>/);
 });
+
+// The shipped profile has no resume (v1), so these tests add one.
+const withResume = (s) => `${s.trimEnd()}
+resume:
+  label: Resume (PDF)
+  url: /resume.pdf
+`;
+
+const dropResume = (s) => s.replace(/^resume:\r?\n(?:[ \t]+.*\r?\n?)+/m, '');
+
+test('REQ-PAGE-008 a profile without resume validates', async () => {
+  const c = withContent((d) => edit(d, 'profile.yaml', dropResume));
+
+  const { content, errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.deepEqual(errors, []);
+  assert.equal(content.profile.resume, undefined);
+});
+
+test('REQ-PAGE-008 a malformed resume still fails with the file and the field', async () => {
+  const noUrl = withContent((d) =>
+    edit(d, 'profile.yaml', (s) => withResume(s).replace(/^ {2}url: \/resume\.pdf\r?\n/m, '')),
+  );
+  const missing = await buildContent({ contentDir: noUrl.dir });
+  noUrl.done();
+  assert.match(joined(missing.errors), /profile\.yaml: \/resume must have required property 'url'/);
+
+  const extra = withContent((d) =>
+    edit(d, 'profile.yaml', (s) =>
+      withResume(s).replace('  url: /resume.pdf', '  url: /resume.pdf\n  size: big'),
+    ),
+  );
+  const extras = await buildContent({ contentDir: extra.dir });
+  extra.done();
+  assert.match(joined(extras.errors), /profile\.yaml: \/resume /);
+});

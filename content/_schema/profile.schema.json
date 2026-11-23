@@ -10,8 +10,7 @@
     "summary",
     "bio",
     "email",
-    "links",
-    "resume"
+    "links"
   ],
   "properties": {
     "id": true,

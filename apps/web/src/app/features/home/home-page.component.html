@@ -4,7 +4,9 @@
   <p class="headline">{{ profile.headline }}</p>
   <p class="summary">{{ profile.summary }}</p>
   <div class="actions">
-    <a class="button primary" [href]="profile.resume.url">{{ profile.resume.label }}</a>
+    @if (profile.resume; as resume) {
+      <a class="button primary" [href]="resume.url">{{ resume.label }}</a>
+    }
     <a class="button" routerLink="/contact">{{ ui['contactCta'] }}</a>
   </div>
 </section>

@@ -31,7 +31,9 @@ how to reach him, and download the resume. Everything is static, prerendered and
   a results section (real numbers from the settlement-lab repo, or "results coming") and a repo link.
 - REQ-PAGE-006 About SHALL show the longer bio, skills grouped with evidence links, and education.
 - REQ-PAGE-007 Contact SHALL show hello@siddheshfulawade.com (mailto), LinkedIn and GitHub links, and no form.
-- REQ-PAGE-008 `/resume.pdf` SHALL be served as a static file and linked from Home, About and Contact.
+- REQ-PAGE-008 The resume is optional (amended 2026-11-23, user decision: v1 launches without one). WHEN
+  `profile.yaml` has a `resume` entry, `/resume.pdf` SHALL be served as a static file and linked from Home, About
+  and Contact. WHEN it has none, those pages SHALL show no resume link and no broken link.
 
 ### Shell, themes, accessibility
 
@@ -101,9 +103,10 @@ Branch per day: `feature/v1-day-N` from `develop`, one PR per day.
 ### Sat 21 Nov (day 3): Projects, About, Contact, first deploy
 
 - [x] V1-07 [web] Projects list and detail template, prerendered per slug (REQ-PAGE-004).
-- [ ] V1-08 [web] About and Contact pages and resume links (REQ-PAGE-006, 007, 008). Needs the user's
-      `apps/web/public/resume.pdf`.
-      Status: pages and links done (day 3); open until the user adds `resume.pdf`.
+- [x] V1-08 [web] About and Contact pages and resume links (REQ-PAGE-006, 007, 008).
+      Status: pages and links done (day 3). 2026-11-23: `resume` optional in the schema and types; Home, About and
+      Contact hide the link when it is absent; `profile.yaml` has no `resume` for v1 (the final PDF lands Dec 1).
+      Tests: component tests for the absent case on all three pages; content test that a profile without `resume` validates.
 - [x] V1-09 [web] Playwright smoke test (replaces and deletes `scripts/e2e-stub.mjs`); first Cloudflare Pages
       preview deploy from `develop` (**the user connects the repo in the Cloudflare dashboard**).
       Checks: smoke test green locally; the preview URL serves every route.
