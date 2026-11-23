@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Two notes published: "Exactly-once without distributed transactions" and "Ordered locking versus CAS for moving money", with claims checked against the settlement-lab code (003 V11-07, REQ-NOTE-003).
+
 ## v1.0.1 (2026-11-23)
 
 - Contact page meta description no longer mentions a resume PDF (002 REQ-PAGE-008, v1 ships without one).

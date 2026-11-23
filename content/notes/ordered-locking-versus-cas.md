@@ -1,14 +1,12 @@
 ---
 id: ordered-locking-versus-cas
-published: false
-updated: 2026-11-19
+published: true
+updated: 2026-11-23
 title: Ordered locking versus CAS for moving money
 summary: Two ways to debit one account and credit another atomically, and what each costs under contention.
 date: 2026-11-19
 tags: [concurrency, java, settlement-lab]
 ---
-
-> Draft for review. Not published until approved. Numbers will come from the Settlement Lab runner.
 
 A transfer touches two balances. Debit A, credit B: either both happen or neither does, and no other
 transfer may see the money in between. With many threads moving money at once, there are two common

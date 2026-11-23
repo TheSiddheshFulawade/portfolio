@@ -1,14 +1,12 @@
 ---
 id: exactly-once-without-distributed-transactions
-published: false
-updated: 2026-11-19
+published: true
+updated: 2026-11-23
 title: Exactly-once without distributed transactions
 summary: Networks deliver messages at least once. An idempotency key and an outbox turn that into an exactly-once effect.
 date: 2026-11-19
 tags: [payments, idempotency, reliability]
 ---
-
-> Draft for review. Not published until approved.
 
 A payment instruction will sometimes arrive twice. A client times out and retries, a broker redelivers
 after a consumer restart, an operator replays a batch. None of these are bugs: at-least-once delivery
