@@ -1,14 +1,12 @@
 ---
 id: ordered-locking-versus-cas
-published: false
-updated: 2026-11-19
+published: true
+updated: 2026-11-23
 title: Ordered locking versus CAS for moving money
 summary: Two ways to debit one account and credit another atomically, and what each costs under contention.
 date: 2026-11-19
 tags: [concurrency, java, settlement-lab]
 ---
-
-> Draft for review. Not published until approved. Numbers will come from the Settlement Lab runner.
 
 A transfer touches two balances. Debit A, credit B: either both happen or neither does, and no other
 transfer may see the money in between. With many threads moving money at once, there are two common
@@ -48,14 +46,15 @@ snapshot only to lose the race and start again. Work is thrown away instead of w
 
 It depends on contention, which is why the lab measures rather than argues. The runner executes the
 same workload against both ledgers, on platform threads and on virtual threads with the same
-concurrency cap, and reports throughput, p50 and p99 latency, retries and the invariants for each
-combination. The expectation going in:
+concurrency cap, and reports throughput, p50 and p99 latency, general ledger retries and the
+invariants for each combination. The expectation going in:
 
 - with many accounts and little overlap, CAS avoids lock overhead and may do well;
 - with a few hot accounts, CAS retries pile up and ordered locking's simple queueing wins.
 
-If the measurements disagree with that, the measurements win. CAS losing at high contention is a
-valid result, and the README will say so.
+The first published run disagreed with the first point: ordered locking was faster in every pair, even
+with many accounts, because every CAS write copies the whole balance table. That run did not test a
+small table. The full results, and the machine they ran on, are in the Settlement Lab README.
 
 ## Invariants either way
 

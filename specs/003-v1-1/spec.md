@@ -133,6 +133,7 @@ Branch per day: `feature/v1.1-day-N` from `develop`, one PR per day.
 - [ ] V11-07 [content] Two or three notes drafted for the user's approval (REQ-NOTE-003). Checks: the content build's
       disclosure rules pass; the user approves each note before `published: true`.
       Status: two drafts committed with `published: false` (topics a and b from §6); waiting for the user's review and approval.
+      2026-11-23: disclosure check passed; publish PR open, not merged until the user approves the content.
 
 ### Day 4: release
 

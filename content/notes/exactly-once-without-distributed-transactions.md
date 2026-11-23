@@ -1,14 +1,12 @@
 ---
 id: exactly-once-without-distributed-transactions
-published: false
-updated: 2026-11-19
+published: true
+updated: 2026-11-23
 title: Exactly-once without distributed transactions
 summary: Networks deliver messages at least once. An idempotency key and an outbox turn that into an exactly-once effect.
 date: 2026-11-19
 tags: [payments, idempotency, reliability]
 ---
-
-> Draft for review. Not published until approved.
 
 A payment instruction will sometimes arrive twice. A client times out and retries, a broker redelivers
 after a consumer restart, an operator replays a batch. None of these are bugs: at-least-once delivery
@@ -34,7 +32,8 @@ work, and every concurrent duplicate gets the same future and waits for the same
 database, the same idea is a unique key on the id and an insert that either wins or reports a
 conflict.
 
-A property test makes this concrete: submit the same id from 50 threads at once, then assert that the
+A repeated concurrency test makes this concrete: submit the same id from 50 threads at once, then
+assert that the
 money moved once and that all 50 callers saw the same outcome.
 
 ## 2. An outbox for everything downstream
@@ -61,6 +60,8 @@ because of point 1: the downstream system deduplicates by the same transfer id.
 - **Discipline at every boundary**: each consumer has to deduplicate. One consumer that does not
   breaks the guarantee for everything behind it.
 
-Settlement Lab implements both ideas in an in-memory engine, and its tests check the invariants
-under concurrency and injected faults: no transfer applied twice, total money conserved, and the
+Settlement Lab implements both ideas in two forms. Its in-memory engine publishes directly first and
+falls back to an outbox when that fails; its PostgreSQL ledger writes the posting and the outbox row
+in one transaction. The tests check the invariants under concurrency and injected faults: no transfer
+applied twice, total money conserved, and the
 general ledger eventually equal to the ledger.
