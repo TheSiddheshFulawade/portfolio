@@ -16,6 +16,6 @@ Implement: $ARGUMENTS
    - implement, then run typecheck, lint and the tests for what changed;
    - check the task's acceptance checks, tick it in spec.md, add a CHANGELOG line under "Unreleased";
    - commit locally with a Conventional Commit message, e.g. `feat(web): home page (002 V1-05)`.
-4. Decide routine questions yourself and note them for the handoff. Stop and ask only about merges, pushes,
-   outward-facing actions (deploys, DNS, repos, cloud resources), money or real product choices.
-5. At the end of the day's tasks, suggest `/ship`.
+4. Decide routine questions yourself and note them for the handoff. Stop only at the hard gates in CLAUDE.md
+   (money, cloud, Cloudflare/DNS/secrets, repo settings, resume PDF, note content, unspecced product choices).
+5. After each task, run `/ship` (git-ops merges on green CI, ADR-0005).

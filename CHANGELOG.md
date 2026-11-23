@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+
 - Project scaffold: constitution, brief, Claude Code agents, skills, hooks and MCP configuration.
 - Branch flow: work branches → develop (squash PRs) → main (release PRs); `/ship` command; hook blocks direct pushes to main and develop.
 - Project brief approved: domain, no public availability line, public contact channels, employer naming rules.
@@ -41,3 +42,4 @@
 - Two note drafts, unpublished until the user approves: "Exactly-once without distributed transactions" and "Ordered locking versus CAS for moving money" (003 V11-07, drafts).
 - Until the D1 binding and salt secret exist, `/api/visits` answers 204 No Content and the footer shows nothing, so `develop` can be released before the Cloudflare setup; `docs/tonight-review.md` updated with the setup steps and open points.
 - Canonical URLs, `og:url` and the sitemap end in a slash, matching Cloudflare Pages' 308 from `/about` to `/about/` (003 V11-08, REQ-SEO-003); first Cloudflare Pages preview checked (002 V1-09).
+- Delegated merges (ADR-0005, constitution 1.4 and 1.6): the `git-ops` agent owns push, PR and merge on the required "verify and smoke test" check; `/ship` and `/release` delegate to it; CLAUDE.md lists the hard gates. guard-bash reads the commit branch of the directory the command runs in (worktrees), matches secure-erase tools only in command position, blocks deleting main/develop on the remote, repository deletion, protection and ruleset writes, disabling workflows, global hook or credential config, script and executable downloads and privileged or host-root containers, and asks before other global git config. Unused Spring agent and skill removed.

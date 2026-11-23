@@ -8,8 +8,8 @@ Built end to end with Claude Code using spec-driven development: every feature s
 
 | Path | What |
 |---|---|
-| `apps/web` | Angular site, prerendered (coming in spec 001) |
-| `apps/api` | Spring Boot 4 / Java 25 API: Settlement Lab, contact (spec 001) |
+| `apps/web` | Angular site, prerendered, on Cloudflare Pages |
+| `settlement-lab` (separate repo) | Java engine and, from v2, the Spring Boot API (ADR-0004) |
 | `content/` | All site content as YAML/Markdown |
 | `specs/` | Feature specs: requirements, design, tasks |
 | `docs/adr/` | Architecture decision records |
