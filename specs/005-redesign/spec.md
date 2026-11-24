@@ -100,7 +100,7 @@ One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so c
 
 - [x] RD-01 [docs] Spec, agents, `accuracy-baseline`, review and release wiring (this branch). Both auditors review the blueprint and the claim
       register; their corrections go into the register and `.cache/accuracy/open.md`. Checks: `npm run verify`; register rows verified or removed.
-- [ ] RD-02 [design] `design-system` skill updated to the blueprint (rail layout, type sizes, motion rules; remove eyebrows, count-up, magnetic
+- [x] RD-02 [design] `design-system` skill updated to the blueprint (rail layout, type sizes, motion rules; remove eyebrows, count-up, magnetic
       buttons, dot grid, card glow); shared styles and the view-transition set-up (REQ-UI-103, REQ-MOT-101 to 103). Checks: contrast tests.
 - [ ] RD-03 [content] Content model above, with schemas and tests first (missing decision cost fails; skill without evidence hidden; any employer
       or institute from the work history outside Experience fails; results need every fact of REQ-ACC-004) (REQ-HOME-104, 105, REQ-EXP-101, REQ-PROJ-104). Finance and technical audit.

@@ -1,4 +1,5 @@
-/* Base element styles. Tokens come from tokens.css. */
+/* Global styles: elements, then shared layout and controls, then route transitions. Tokens come from tokens.css.
+   Shared patterns live here, not in component stylesheets, because each of those adds a hash to the CSP. */
 
 *,
 *::before,
@@ -18,8 +19,9 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--step-0);
-  line-height: 1.6;
+  line-height: 1.65;
   overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -29,12 +31,13 @@ h3 {
   color: var(--text-strong);
   font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
 h1 {
-  font-size: clamp(var(--step-4), 6vw, var(--step-6));
+  font-size: var(--size-page);
+  letter-spacing: -0.015em;
 }
 
 h2 {
@@ -48,11 +51,13 @@ h3 {
 p {
   margin: 0;
   max-width: var(--prose);
+  text-wrap: pretty;
 }
 
 a {
   color: var(--accent);
-  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
 }
 
 a:hover {
@@ -62,7 +67,7 @@ a:hover {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 code,
@@ -111,9 +116,22 @@ td {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* The universal selector above does not reach these pseudo-elements (REQ-MOT-102). */
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
-/* Eyebrow label (design system: mono, 0.72rem, uppercase, accent). */
+/* The hidden attribute wins over any display value below. */
+[hidden] {
+  display: none !important;
+}
+
+/* Legacy label, for pages not redesigned yet (spec 005). Do not use it in new markup. */
 .eyebrow {
   color: var(--accent);
   font-family: var(--font-mono);
@@ -127,11 +145,11 @@ td {
   position: absolute;
   top: var(--space-2);
   left: var(--space-2);
-  z-index: 10;
+  z-index: 20;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-control);
-  background: var(--panel);
-  color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
   transform: translateY(-200%);
 }
 
@@ -144,12 +162,350 @@ td {
   outline: none;
 }
 
-/* Page container: layout max width and side gutter (REQ-UI-003). */
-.container {
+/* Page width and gutters (REQ-UI-003).
+   .container  <main>: 1200px of content plus the side gutter
+   .wrap       the same box, inside a full-width page
+   .full       on a page's host element: the page runs edge to edge and places its own .wrap blocks */
+.container,
+.wrap {
   width: 100%;
   max-width: var(--layout-max);
-  margin: 0 auto;
+  margin-inline: auto;
   padding-inline: var(--gutter);
+}
+
+.container:has(> .full) {
+  max-width: none;
+  padding-inline: 0;
+}
+
+/* Page head: one h1 and a lead paragraph.
+   .page-head  block with the page's opening space (may share an element with .wrap)
+   .lead       larger opening text, also usable inside a section */
+.page-head {
+  padding-block: clamp(3.2rem, 7vw, 5.5rem) clamp(2.2rem, 4vw, 3.2rem);
+}
+
+.page-head > * {
+  max-width: 50rem;
+}
+
+.page-head > * + * {
+  margin-top: 1.2rem;
+}
+
+.page-head > * + .acts {
+  margin-top: 2.1rem;
+}
+
+.lead {
+  font-size: var(--size-lead);
+}
+
+/* Section with a label rail (REQ-UI-103).
+   .band    <section>: a thin rule above (.first drops it), then rail and detail columns from 60rem
+   .rail    <header>: h2 and a short line, sticky beside the detail
+   .detail  the content column
+   .solo    with .band: no columns; a large h2 and intro above full-width content
+   A wider rail: set --rail on the section from a stylesheet. */
+.band {
+  display: grid;
+  gap: 2rem var(--rail-gap);
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: var(--band);
+  border-top: 1px solid var(--line);
+}
+
+.band.first {
+  border-top: 0;
+}
+
+.detail {
+  min-width: 0;
+}
+
+.rail > h2 {
+  font-size: var(--size-rail);
+}
+
+.rail > p {
+  margin-top: 0.7rem;
+  color: var(--dim);
+  font-size: var(--size-note);
+  line-height: 1.5;
+}
+
+.solo > .rail {
+  max-width: 44rem;
+}
+
+.solo > .rail > h2 {
+  font-size: var(--size-section);
+  letter-spacing: -0.01em;
+}
+
+.solo > .rail > p {
+  margin-top: 1.1rem;
+  color: var(--text);
+  font-size: inherit;
+  line-height: inherit;
+}
+
+@media (min-width: 60rem) {
+  .band:not(.solo) {
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+  }
+
+  .band:not(.solo) > .rail {
+    position: sticky;
+    top: var(--sticky-top);
+    align-self: start;
+  }
+}
+
+/* Rows: a list of work or roles, ruled between items.
+   .rows  <ul>
+   .row   link or block in each <li>: h3, p.sub, p, and .side (date, status, .arrow) on the right */
+.rows,
+.facts,
+.chips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  gap: 0.4rem 2rem;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: 1.9rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.rows > li:first-child > .row {
+  padding-top: 0;
+}
+
+.row > h3 {
+  font-size: var(--size-row);
+}
+
+a.row:hover > h3 {
+  color: var(--accent);
+}
+
+.row > p {
+  max-width: 43rem;
+}
+
+.row > .sub {
+  color: var(--dim);
+  font-size: var(--size-note);
+}
+
+.row > .side {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--dim);
+  font-size: var(--size-note);
+}
+
+@media (min-width: 40.01rem) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .row > * {
+    grid-column: 1;
+  }
+
+  .row > .side {
+    flex-direction: column;
+    align-items: flex-end;
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
+/* Small text.
+   .facts      <ul>: plain inline facts (stack, place, terms)
+   .status     text with a dot; .dev for work in development (amber). The words carry the meaning, not the dot
+   .note-text  caption or caveat under a figure or simulation */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.5rem;
+  color: var(--dim);
+  font-size: var(--size-note);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--dim);
+  font-size: var(--size-note);
+}
+
+.status::before {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  content: '';
+}
+
+.status.dev::before {
+  background: var(--amber);
+}
+
+.note-text {
+  margin-top: 1rem;
+  max-width: var(--measure);
+  color: var(--dim);
+  font-size: var(--size-note);
+  line-height: 1.55;
+}
+
+/* Controls.
+   .btn    link or button, outlined; .solid for the one main action on a page
+   .acts   wrapping group of buttons
+   .more   text link with an arrow
+   .arrow  <svg viewBox="0 0 16 16" aria-hidden="true">: moves 4px while its link is hovered
+   .chips  group of toggle buttons (scenario, mode); .chip for each, aria-pressed marks the choice */
+.btn,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-strong);
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn {
+  padding: 0.78rem 1.2rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.chip {
+  min-height: 2.75rem;
+  padding: 0.45rem 0.8rem;
+  font-size: var(--size-note);
+  text-align: left;
+}
+
+.btn:hover,
+.chip:hover,
+.chip[aria-pressed='true'] {
+  border-color: var(--accent);
+}
+
+/* The bar marks the chosen chip without relying on colour. */
+.chip[aria-pressed='true'] {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.btn.solid {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn.solid:hover {
+  background: color-mix(in oklab, var(--accent) 86%, var(--text-strong));
+}
+
+.btn:disabled,
+.chip:disabled {
+  border-color: var(--line);
+  cursor: default;
+  opacity: 0.5;
+}
+
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.3rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.arrow {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  transition: transform var(--dur-enter) var(--ease);
+}
+
+.row .arrow {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--accent);
+}
+
+:is(.btn, .more, .row):hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Route changes: a short fade of the page (REQ-MOT-103). The header has its own name, so it stays put and
+   shows its new state at once. route-transition.ts skips the fade for reduced motion and same-page moves. */
+sf-site-header {
+  view-transition-name: site-header;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root) {
+  animation-duration: var(--dur-view-out);
+}
+
+::view-transition-group(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-view-in);
+}
+
+::view-transition-group(site-header),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
 }
 
 /* Markdown write-ups rendered with [innerHTML] (REQ-PAGE-004). Global because the injected HTML carries no
