@@ -32,6 +32,6 @@ IDs: `REQ-<AREA>-NNN` (AREA such as PAGE, CONTENT, UI, SEO, DEP). Every criterio
 ## Release specs
 
 000 constitution · 001 monorepo & tooling (done, scope cut) · 002 v1 site (22 Nov) ·
-003 v1.1 counter, analytics, notes, headers, CI (~29 Nov) · 004 v2 Lab dashboard and contact form (~13 Dec) ·
-005 v2.1 engineering page, generated resume, Lighthouse CI (~20 Dec).
+003 v1.1 counter, analytics, notes, headers, CI (~29 Nov) · 005 v1.2 redesign (29 Nov, before 004) ·
+004 v2 Lab dashboard (1 Dec) · 006 v2.1 engineering page, generated resume, Lighthouse CI (~20 Dec).
 Settlement Lab engine: `docs/settlement-lab-spec.md`, built in the `settlement-lab` repo.
