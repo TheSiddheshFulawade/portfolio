@@ -41,6 +41,17 @@ const PAIRS = [
   ['--amber', '--panel', 4.5],
   ['--red', '--panel', 4.5],
   ['--line', '--bg', 1.2],
+  // Spec 005 RD-02: second line colour, ink on solid buttons, text on the nested surface.
+  ['--line-2', '--bg', 1.5],
+  ['--accent-ink', '--accent', 4.5],
+  ['--text', '--raise', 4.5],
+  ['--text-strong', '--raise', 4.5],
+  ['--dim', '--raise', 4.5],
+  ['--accent', '--raise', 4.5],
+  ['--amber', '--raise', 4.5],
+  ['--red', '--raise', 4.5],
+  ['--amber', '--bg', 4.5],
+  ['--red', '--bg', 4.5],
 ];
 
 for (const name of ['dark', 'light']) {
@@ -84,4 +95,26 @@ test('REQ-UI-005 component styles use tokens, not literal colours', () => {
       : literal.test(text);
   });
   assert.deepEqual(offenders, []);
+});
+
+test('REQ-MOT-102 reduced motion stops view transitions; smooth scrolling needs no-preference', () => {
+  const base = readFileSync(join(WEB, 'src/styles/base.css'), 'utf8');
+  assert.match(
+    base,
+    /@media \(prefers-reduced-motion: reduce\)[\s\S]*::view-transition-group\(\*\)[\s\S]*animation:\s*none !important/,
+  );
+  const smooth = base.indexOf('scroll-behavior: smooth');
+  if (smooth === -1) return;
+  const media = base.lastIndexOf('@media (prefers-reduced-motion: no-preference)', smooth);
+  assert.ok(media !== -1, 'scroll-behavior: smooth must sit inside no-preference');
+  assert.doesNotMatch(
+    base.slice(media, smooth),
+    /\n\}/,
+    'smooth scrolling is outside no-preference',
+  );
+});
+
+test('REQ-MOT-101 no animation in the global styles loops forever', () => {
+  for (const file of ['tokens.css', 'base.css'])
+    assert.doesNotMatch(readFileSync(join(WEB, 'src/styles', file), 'utf8'), /\binfinite\b/);
 });

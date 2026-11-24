@@ -1,4 +1,5 @@
 /* Design tokens (design-system skill). Dark first; light via the system preference or [data-theme].
+   --line-2 is the stronger line (controls, table heads); --accent-ink is text on a solid accent button.
    Components use these variables only; literal colours are not allowed in src/app (tokens.test.mjs). */
 
 :root {
@@ -10,13 +11,25 @@
 
   --step--2: 0.75rem;
   --step--1: 0.875rem;
-  --step-0: 1rem;
+  --step-0: 1.0625rem;
   --step-1: 1.125rem;
   --step-2: 1.375rem;
   --step-3: 1.75rem;
   --step-4: 2.25rem;
   --step-5: 3rem;
   --step-6: 3.75rem;
+
+  /* Display sizes: one per role, so pages never set their own heading sizes. */
+  --size-hero: clamp(2.35rem, 5.3vw, 4.25rem);
+  --size-page: clamp(2.4rem, 5vw, 3.9rem);
+  --size-contact: clamp(2.1rem, 4.6vw, 3.6rem);
+  --size-project: clamp(2rem, 4vw, 3rem);
+  --size-section: clamp(1.9rem, 3.6vw, 2.9rem);
+  --size-role: clamp(1.75rem, 3vw, 2.4rem);
+  --size-row: 1.6rem;
+  --size-rail: 1.5rem;
+  --size-lead: 1.14rem;
+  --size-note: 0.95rem;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -33,13 +46,25 @@
   --radius-pill: 999px;
 
   --prose: 72ch;
-  --layout-max: 1200px;
-  --gutter: max(16px, 4vw);
+  --measure: 46rem;
+  --gutter: 1.5rem;
+  --layout-max: calc(1200px + 2 * var(--gutter));
+  --rail: 13rem;
+  --rail-gap: clamp(2rem, 5vw, 5rem);
+  --band: clamp(3.5rem, 7vw, 6rem);
+  --sticky-top: 6rem;
 
   --dur-hover: 120ms;
   --dur-enter: 240ms;
-  --dur-view: 400ms;
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-view-out: 160ms;
+  --dur-view-in: 240ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (max-width: 40rem) {
+  :root {
+    --gutter: 1rem;
+  }
 }
 
 :root,
@@ -49,10 +74,12 @@
   --panel: #10161d;
   --raise: #16202a;
   --line: #1f2b36;
+  --line-2: #2e3d4b;
   --text: #d9e1e8;
   --text-strong: #eef3f6;
-  --dim: #7e8c99;
+  --dim: #93a3b1;
   --accent: #4fd1c5;
+  --accent-ink: #06201d;
   --amber: #f2b84b;
   --red: #f07a6e;
 }
@@ -62,12 +89,14 @@
     color-scheme: light;
     --bg: #f4f6f5;
     --panel: #ffffff;
-    --raise: #eef2f1;
-    --line: #dce2e0;
-    --text: #14191d;
-    --text-strong: #0b0f12;
-    --dim: #5a6670;
+    --raise: #e9eeec;
+    --line: #d5dddb;
+    --line-2: #b7c3c0;
+    --text: #26313a;
+    --text-strong: #0d141a;
+    --dim: #55636f;
     --accent: #0a6964;
+    --accent-ink: #ffffff;
     --amber: #8e5406;
     --red: #b3261e;
   }
@@ -77,12 +106,14 @@
   color-scheme: light;
   --bg: #f4f6f5;
   --panel: #ffffff;
-  --raise: #eef2f1;
-  --line: #dce2e0;
-  --text: #14191d;
-  --text-strong: #0b0f12;
-  --dim: #5a6670;
+  --raise: #e9eeec;
+  --line: #d5dddb;
+  --line-2: #b7c3c0;
+  --text: #26313a;
+  --text-strong: #0d141a;
+  --dim: #55636f;
   --accent: #0a6964;
+  --accent-ink: #ffffff;
   --amber: #8e5406;
   --red: #b3261e;
 }
