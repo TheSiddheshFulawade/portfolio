@@ -10,8 +10,9 @@ Prepare release: $ARGUMENTS
 1. **develop is green.** `git fetch origin`, `gh run list --branch develop --limit 3` (latest run green),
    `npm run verify` locally on `origin/develop`.
 2. Create `release/v<version>` from `origin/develop`.
-3. **Gate (all three must pass; any high or critical finding stops the release until fixed on develop):**
+3. **Gate (all must pass; any high or critical finding stops the release until fixed on develop):**
    - `/review` against `main`: no high or critical findings open.
+   - `technical-auditor` and `finance-auditor`: PASS on every page and simulation (`accuracy-baseline`).
    - `perf-auditor`: Lighthouse mobile on Home and one detail page meets constitution §3
      (Performance ≥95, LCP ≤1.8 s, CLS ≤0.05, initial JS ≤120 KB gzipped).
    - `ui-reviewer`: axe on every route with zero serious violations, keyboard pass, 320 px layout, both themes.

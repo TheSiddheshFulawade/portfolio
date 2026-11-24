@@ -27,7 +27,10 @@ Always diff against the remote ref `origin/BASE`, so a stale local branch in a w
 2. In parallel, delegate to (pass BASE on):
    - `security-auditor` always;
    - `ui-reviewer` when files under apps/web or content changed (start the dev server first if needed);
-   - `perf-auditor` when files under apps/web changed.
+   - `perf-auditor` when files under apps/web changed;
+   - `technical-auditor` when a simulation, animation, diagram, number or technical copy changed;
+   - `finance-auditor` when anything that mentions money, payments, ledgers or banking changed.
+     For a release, both always run on every page. A FAIL from either is must-fix.
 3. Check traceability yourself: each changed behaviour maps to a REQ id; where the spec names a test, it exists.
 4. Merge the findings into one list ordered by severity, removing duplicates. Mark each as
    must-fix (blocks the PR) or follow-up.

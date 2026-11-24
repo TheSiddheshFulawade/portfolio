@@ -27,6 +27,8 @@ Settlement Lab lives in its own public repo `settlement-lab` (engine now, Spring
 - Never read or write secrets (`.env*`, `*.pem`, `secrets/`). Never push to `main` or `develop` directly.
 - `docs/private/` holds personal documents. Never copy anything from it into a tracked file
   without the user's approval (no phone number, no personal email).
+- Accuracy: every technical or financial claim has a source (`accuracy-baseline`). No merge while `technical-auditor` or
+  `finance-auditor` has an open wrong, misleading or unsupported finding.
 
 ## Agent safety
 
@@ -58,13 +60,14 @@ task, and never work around the gate. Decide everything else, note it in the han
 
 Web (from `apps/web`): `npm run dev | test | e2e | lint | typecheck | build`. Root: `npm run verify`.
 Load the matching skill first: design-system · angular-standards · content-model · security-baseline ·
-testing-playbook · spec-driven. Windows 11; hooks are Node scripts run from `$CLAUDE_PROJECT_DIR`.
+testing-playbook · spec-driven · accuracy-baseline. Windows 11; hooks are Node scripts run from `$CLAUDE_PROJECT_DIR`.
 
 ## Workflow (ADR-0005)
 
 The master session is the PM and delegates. `/spec` → user approves once → per task: `test-engineer` (failing
-tests) → `angular-engineer` / `content-editor` → `npm run verify` → `security-auditor` / `ui-reviewer` /
-`perf-auditor` where the change needs it → `/ship` (`git-ops` opens the PR and merges on required green CI)
+tests) → `angular-engineer` / `motion-designer` / `content-editor` → `npm run verify` → `security-auditor` /
+`ui-reviewer` / `perf-auditor` where the change needs it, `technical-auditor` for any simulation, diagram, number or
+technical copy, `finance-auditor` for any money or payments wording → `/ship` (`git-ops` opens the PR and merges on required green CI)
 → one handoff line. Per release: `/release` (`/review`, Lighthouse, axe) → git-ops merges to `main` and tags.
 
 ## Branches
