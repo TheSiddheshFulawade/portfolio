@@ -17,8 +17,8 @@ systems they can break and watch recover. A specialist who looks closely finds n
 - REQ-ACC-002 IF `technical-auditor` or `finance-auditor` has an open wrong, misleading or unsupported finding on a change, THEN
   the change SHALL NOT merge.
 - REQ-ACC-003 EACH simulation SHALL be a pure, seeded TypeScript model with no DOM or timers, and a view that only draws it.
-- REQ-ACC-004 EACH simulation SHALL be labelled as a simplified model; measured results SHALL stand apart, with machine, JDK,
-  run count and source.
+- REQ-ACC-004 EACH simulation SHALL be labelled as a simplified model; measured results SHALL stand apart, and state what
+  was measured, machine, JDK, run count, run date, workload and source.
 - REQ-ACC-005 WHILE a project is in development, its copy SHALL separate what is designed from what merged tests prove.
 
 ### Shell and pages
@@ -36,9 +36,11 @@ systems they can break and watch recover. A specialist who looks closely finds n
 - REQ-HOME-101 THE headline SHALL be complete in the prerendered HTML; its last phrase MAY cycle once through `hero.phrases`,
   ending within 5 s on the prerendered phrase. Screen readers get one fixed sentence.
 - REQ-HOME-102 THE technology strip SHALL move only with the scroll and wrap into rows with reduced motion or no support.
-- REQ-HOME-103 THE invariant field SHALL draw Σ = 0 with one dot per posting and offer: drop a node, partition, deliver twice. Legs
-  move in pairs; a committed posting is never shown as uncommitted; counters come from the model (committed, reachable,
-  recovering, duplicates rejected, debits − credits).
+- REQ-HOME-103 THE invariant field SHALL draw Σ = 0 with one dot per entry (a debit or a credit; two dots are one transaction) and
+  offer: drop a node, partition, deliver twice. The two entries of a transaction move together, and whole transactions are
+  delivered twice. A committed entry is never shown as uncommitted. Counters come from the model, never from pixels:
+  committed, reachable, unreachable, recovering (only while a node's log is replayed), duplicate transactions not applied,
+  debits − credits. committed = reachable + unreachable + recovering. Pointer movement changes no counter.
 - REQ-HOME-104 Home SHALL then show selected systems, an experience summary without employer names, engineering decisions,
   capabilities with evidence, and contact.
 - REQ-HOME-105 EACH engineering decision SHALL state the choice, the rejected option, the reason, the cost and its evidence.
@@ -52,13 +54,21 @@ systems they can break and watch recover. A specialist who looks closely finds n
 ### Projects and simulations
 
 - REQ-PROJ-101 `/projects` SHALL show PayFlow and Settlement Lab in full with their simulations, then earlier work. Detail pages stay.
-- REQ-PROJ-102 THE PayFlow model SHALL follow payflow `SPEC.md` §4 and its merged code, with six scenarios: completes, wallet crash,
+- REQ-PROJ-102 THE PayFlow model SHALL follow payflow `SPEC.md` §4, and the merged code where a step is merged at a recorded commit,
+  and label each scenario "merged, tested per service", "partly merged" or "specified, not built yet". Six scenarios: completes, wallet crash,
   duplicate delivery, risk rejection, broker outage, insufficient funds. It shows payment state, event log, outbox and
-  inbox counts, balances and Σ(available + held). `REFUNDED` is explained as an authorisation reversal.
+  inbox counts, balances and Σ(available + held). Inbox row, effect and
+  outgoing message change in one step. `REFUNDED` is explained as an authorisation reversal: any hold was released, nothing
+  was captured.
 - REQ-PROJ-103 THE Settlement Lab model SHALL run 600 transfers through a bounded queue, 8 workers, a ledger (ordered locking, CAS, and two
-  modes marked unsafe), a publisher with retry inside a circuit breaker, and an outbox, then evaluate six invariants. A deadlocked
-  run shows "not evaluated".
-- REQ-PROJ-104 Measured results SHALL come from `content/`, generated from settlement-lab `results/results.json` at a recorded commit.
+  modes marked unsafe and browser-only), then publish each posting directly, with retry inside a circuit breaker, to a simulated
+  general ledger keyed by transfer id; only a failed publish enters the outbox. Duplicate ids are answered before the queue. Retry and
+  circuit-breaker limits and the six invariants are those of the repo; transfers, accounts, queue size and wait times are scaled
+  down, and the page says so. A deadlocked run shows "not evaluated"; an unordered
+  run that finishes says "No deadlock this time; the risk remains."
+- REQ-PROJ-104 Measured results SHALL come from `content/`, generated from settlement-lab `results/results.json` at a recorded commit,
+  with the facts of REQ-ACC-004. Rates are named for what they measure: submissions answered by the engine (duplicates and
+  rejections included), not delivery to the general ledger.
 - REQ-PROJ-105 EACH simulation SHALL start only on a click, end by itself, offer Run and (PayFlow) Pause, and log its steps as text.
 
 ### Motion, accessibility, security, performance
@@ -88,20 +98,27 @@ systems they can break and watch recover. A specialist who looks closely finds n
 
 One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so can RD-05, RD-06 and the models of RD-07 and RD-08.
 
-- [ ] RD-01 [docs] Spec, agents, `accuracy-baseline`, review and release wiring (this branch). Both auditors review the blueprint and the claim
+- [x] RD-01 [docs] Spec, agents, `accuracy-baseline`, review and release wiring (this branch). Both auditors review the blueprint and the claim
       register; their corrections go into the register and `.cache/accuracy/open.md`. Checks: `npm run verify`; register rows verified or removed.
 - [ ] RD-02 [design] `design-system` skill updated to the blueprint (rail layout, type sizes, motion rules; remove eyebrows, count-up, magnetic
       buttons, dot grid, card glow); shared styles and the view-transition set-up (REQ-UI-103, REQ-MOT-101 to 103). Checks: contrast tests.
-- [ ] RD-03 [content] Content model above, with schemas and tests first (missing decision cost fails; skill without evidence hidden; employer name
-      outside Experience fails; results need machine, JDK and commit) (REQ-HOME-104, 105, REQ-EXP-101, REQ-PROJ-104). Finance and technical audit.
+- [ ] RD-03 [content] Content model above, with schemas and tests first (missing decision cost fails; skill without evidence hidden; any employer
+      or institute from the work history outside Experience fails; results need every fact of REQ-ACC-004) (REQ-HOME-104, 105, REQ-EXP-101, REQ-PROJ-104). Finance and technical audit.
 - [ ] RD-04 [web] Header, footer, contact section, 404 (REQ-UI-101, 102, 104). Smoke test extended.
-- [ ] RD-05 [web] Home (REQ-HOME-101 to 105, REQ-UI-105). Tests first: field model (pairs move together, net zero for all and for reachable
-      postings in every state, duplicates never counted, returns to rest); headline ends within 5 s; reduced motion.
+- [ ] RD-05 [web] Home (REQ-HOME-101 to 105, REQ-UI-105). Tests first: field model (pairs move together; net zero for all and for
+      reachable entries in every state; counters sum to committed; the near side of a partition stays reachable; redelivered ids are
+      whole pairs and change no balance; displacement and pointer change no counter; returns to rest); headline ends within 5 s; reduced motion.
 - [ ] RD-06 [web] Experience and About (REQ-EXP-101, REQ-ABOUT-101). Tests: every highlight in content is rendered once.
 - [ ] RD-07 [web] Settlement Lab model, view and results table (REQ-PROJ-101, 103 to 105). Tests first, 30 seeds per combination: safe modes pass all
-      six invariants; unordered locking deadlocks; no synchronisation breaks TOTAL_CONSERVED; breaker states are legal; outbox drains.
+      six invariants; unordered locking deadlocks on these seeds and a finishing run says so; without synchronisation the exact failing
+      set is asserted per seed (POSTINGS_EXPLAIN_BALANCES always, TOTAL_CONSERVED on these seeds); the six checks equal
+      `InvariantChecker` and take accepted ids from callers' outcomes; 3 attempts; never open → closed directly; duplicates use no queue
+      slot; every seed rejects some transfers; one playback rate for all modes; outbox drains.
 - [ ] RD-08 [web] PayFlow model and view (REQ-PROJ-102, 105). Tests first: each scenario's terminal state, one terminal state only, Σ constant after every
-      step, no effect before its commit, re-send has a new id, redelivery has the same id, late attempt ignored.
+      step, no effect before its commit, re-send has a new id, redelivery has the same id, late attempt ignored; inbox,
+      effect and outgoing message in one step; RECEIVED never alone; outbox falls only after the ack; a redelivered command
+      adds an outbox row with the stored reply's message id and no inbox row; a redelivered reply adds neither; each COMPLETED has exactly
+      one capture (one payer debit, one payee credit); REFUNDED and REJECTED move no money between wallets; no negative balance, held = 0 at a terminal state. Repin payflow first.
 - [ ] RD-09 [review] Both auditors on every page and simulation (PASS), `ui-reviewer`, `security-auditor`, `perf-auditor`; claim register complete.
 - [ ] RD-10 [release] `/release` v1.2.0. Needs the production domain live and the photo, or the user's yes to launch without it.
 
@@ -113,6 +130,8 @@ Single-page layout, `/lab` and the API (spec 004), contact form, resume PDF, ani
 
 1. The photo file (about 1200 × 1500 px). [Until then the layout closes up.]
 2. Product names and one ranking in the work history (`.cache/accuracy/open.md`, O-01 to O-04, O-07). [Use neutral wording or drop the item.]
+   Decided 2026-11-24: ReBIT wording follows the resume ("thread-safe", 85% without scope) and RBI's public terms for e-Kuber 3.0.
 3. Should PayFlow appear before its v1.0.0? [Yes, marked "In development".]
 
-Status: DRAFT
+Status: APPROVED (user, 2026-11-24, with the default answers in section 6; REQ-ACC-004, HOME-103, PROJ-102 to 104 and the test lists
+corrected after the RD-01 audit, approved by the user the same day)
