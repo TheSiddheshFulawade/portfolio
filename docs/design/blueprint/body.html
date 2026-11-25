@@ -1,0 +1,180 @@
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#" data-go="home">Siddhesh Fulawade</a>
+  <nav class="nav" aria-label="Main">
+    <a href="#" data-go="projects">Projects</a><a href="#" data-go="experience">Experience</a><a href="#" data-go="about">About</a><a href="#" data-go="contact">Contact</a>
+  </nav>
+  <button class="theme" id="theme" aria-label="Switch colour theme"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor"/></svg></button>
+</div></header>
+
+<main id="main" tabindex="-1" style="outline:0">
+
+<!-- ================= HOME ================= -->
+<div data-view="home">
+  <section class="wrap hero">
+    <div>
+      <p class="role">Full stack Java engineer · payments and distributed systems</p>
+      <h1><span class="vh">I build payment systems designed to stay correct under partial failure.</span>
+        <span aria-hidden="true">I build payment systems designed to stay correct under <span class="swap" id="swap"><i>partial failure.</i></span></span></h1>
+      <p class="lead">I design the failure path first, then test the guarantee. PayFlow and Settlement Lab are two systems built in public.</p>
+      <div class="acts">
+        <a class="btn solid" href="#" data-go="projects">See the systems <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a class="btn" href="#" data-go="experience">Read the experience</a>
+      </div>
+      <p class="where"><span>Navi Mumbai, India</span><a href="https://github.com/TheSiddheshFulawade">GitHub</a><a href="https://www.linkedin.com/in/siddhesh-fulawade">LinkedIn</a><a href="mailto:hello@siddheshfulawade.com">hello@siddheshfulawade.com</a></p>
+    </div>
+    <figure class="photo"><div class="frame"><svg viewBox="0 0 320 400" role="img" aria-label="Portrait placeholder"><rect width="320" height="400" fill="var(--raise)"/><circle cx="160" cy="158" r="62" fill="var(--line-2)"/><path d="M28 400c8-94 62-142 132-142s124 48 132 142z" fill="var(--line-2)"/></svg></div>
+      <figcaption><span>Siddhesh Fulawade</span><span>photo, 4:5</span></figcaption></figure>
+  </section>
+
+  <div class="strip" aria-label="Technologies"><ul>
+    <li>Java</li><li>Spring Boot</li><li>SQL</li><li>PostgreSQL</li><li>Apache Kafka</li><li>Hazelcast</li><li>Testcontainers</li><li>Python</li><li>Django REST Framework</li><li>Redis</li><li>Celery</li><li>TypeScript</li><li>Angular</li>
+  </ul></div>
+
+  <div class="wrap">
+    <section class="band first full" aria-labelledby="inv-h">
+      <header><h2 id="inv-h">The sum has to hold, whatever fails.</h2>
+        <p>Double entry gives every debit an equal credit, so the postings of a ledger always net to zero. Each dot is one committed posting. Take a node down, partition the network or deliver the batch twice: postings can become unreachable, they are recovered from the durable log, and the net never moves.</p></header>
+      <div>
+        <div class="inv rise">
+          <div class="stage"><canvas id="field" role="img" aria-label="A field of postings that forms the equation sigma equals zero"></canvas></div>
+          <aside>
+            <div class="ctl" role="group" aria-label="Inject a failure">
+              <button data-f="node">Drop a node</button><button data-f="part">Partition the network</button><button data-f="dup">Deliver the batch twice</button>
+            </div>
+            <p class="say" id="say" aria-live="polite">Inject a failure, or drag across the field.</p>
+            <dl class="tally"><div><dt>Committed</dt><dd id="t-n">0</dd></div><div><dt>Reachable</dt><dd id="t-s">0</dd></div><div><dt>Recovering</dt><dd id="t-f">0</dd></div><div><dt>Duplicates rejected</dt><dd id="t-d">0</dd></div><div class="ok"><dt>Debits − credits</dt><dd id="t-z">0</dd></div></dl>
+          </aside>
+        </div>
+        <p class="note">A browser illustration of the property. Settlement Lab asserts the real invariants after every run.</p>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="work-h">
+      <header><h2 id="work-h">Selected systems</h2><p>Original work, built in public.</p></header>
+      <ul class="rows">
+        <li class="rise"><a class="row" href="#" data-go="projects" data-at="payflow"><h3>PayFlow</h3><p class="sub">A payment saga across three services. Reserve funds, check risk, capture.</p><p>An orchestrated reserve, risk-check and capture flow over Kafka, designed so that a crash in any service or the broker still ends in exactly one terminal state.</p><p class="facts"><span>Transactional outbox</span><span>Idempotent inbox</span><span>Compensation</span><span>Chaos scenarios specified</span></p><div class="side"><span class="status dev">In development</span><span class="go"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></div></a></li>
+        <li class="rise"><a class="row" href="#" data-go="projects" data-at="lab"><h3>Settlement Lab</h3><p class="sub">A transfer engine tested to conserve money under concurrency, duplicates and downstream faults.</p><p>Two ledger strategies, two thread models and three fault profiles, measured over 100,000 submissions per row with six invariants asserted in every row.</p><p class="facts"><span>Ordered locking against CAS</span><span>Platform and virtual threads</span><span>Circuit breaker and outbox</span></p><div class="side"><span class="status">Engine measured, API built but not deployed</span><span class="go"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></div></a></li>
+      </ul>
+    </section>
+
+    <section class="band" aria-labelledby="exp-h">
+      <header><h2 id="exp-h">Experience</h2><p>One line on the work so far.</p></header>
+      <div><ul class="rows">
+        <li class="rise"><a class="row" href="#" data-go="experience"><h3>Role title</h3><p class="sub">Domain · place</p><p>Two or three lines of resume-level impact, without an employer name.</p><div class="side"><span>Dates</span></div></a></li>
+        <li class="rise"><a class="row" href="#" data-go="experience"><h3>Role title</h3><p class="sub">Domain · place</p><p>Two or three lines of resume-level impact, without an employer name.</p><div class="side"><span>Dates</span></div></a></li>
+        <li class="rise"><a class="row" href="#" data-go="experience"><h3>Role title</h3><p class="sub">Domain · place</p><p>Two or three lines of resume-level impact, without an employer name.</p><div class="side"><span>Dates</span></div></a></li>
+      </ul><p style="margin-top:1rem"><a class="more" href="#" data-go="experience">Full experience <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p></div>
+    </section>
+
+    <section class="band" aria-labelledby="dec-h">
+      <header><h2 id="dec-h">Engineering decisions</h2><p>What I chose, what I turned down, and what the choice costs.</p></header>
+      <div id="decs"></div>
+    </section>
+
+    <section class="band" aria-labelledby="cap-h">
+      <header><h2 id="cap-h">Capabilities</h2><p>Each one points to where it was used.</p></header>
+      <div class="caps" data-caps></div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= PROJECTS ================= -->
+<div data-view="projects" hidden><div class="wrap">
+  <div class="head"><h1>Systems, and how they fail</h1><p>Two systems built around one question: what is still true after something fails? Run a simulation, inject a failure, and read the evidence.</p></div>
+
+  <article class="proj" id="payflow">
+    <div class="ph"><h2>PayFlow</h2><span class="status dev">In development</span><p>A payment moves through three services that each own their database. No distributed transaction joins them, so the design has to make every step safe to repeat, every step before capture compensable, and every payment end in one terminal state. Reserve, risk check and capture are merged and tested per service. Compensation and the recovery sweeper are specified and not built yet; chaos tests follow.</p></div>
+    <ul class="gua">
+      <li><h4>No message without its state change, no second effect</h4><p>State and outgoing message commit in one transaction (outbox). Consumers record the message id with the effect (inbox), so a redelivery has no second effect.</p></li>
+      <li><h4>Money is held before it moves</h4><p>Funds are reserved, risk is checked, then the hold is captured. Compensation is always a release of the hold (specified, not built yet), so REVERSED is an authorisation reversal: any hold was released and nothing was captured.</p></li>
+      <li><h4>Every payment ends in one state</h4><p>Specified, not built yet: a sweeper re-sends overdue commands up to 3 times, then compensates. A release is retried until the wallet confirms it; if the money was already captured, the wallet says so and the payment ends COMPLETED.</p></li>
+    </ul>
+    <div class="simtitle"><h3>Follow one payment</h3><p>A simplified model of the saga in PayFlow SPEC.md section 4.</p></div>
+    <div class="sim" id="pf">
+      <div class="bar"><div class="chips" role="group" aria-label="Scenario" id="pf-sc"></div><div class="run chips"><button id="pf-run">Run</button><button id="pf-pause" disabled>Pause</button></div></div>
+      <div class="pf">
+        <div class="track" id="pf-track" aria-label="Payment state"></div>
+        <div class="net" id="pf-net"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+        <ol class="log" id="pf-log" tabindex="0" aria-label="Event log"></ol>
+        <div class="money"><div class="mbar" aria-hidden="true"><i class="a" id="m-a"></i><i class="h" id="m-h"></i><i class="p" id="m-p"></i></div>
+          <div class="mkey"><span><i style="background:var(--accent)"></i>Payer available <b id="k-a"></b></span><span><i style="background:var(--amber)"></i>Payer held <b id="k-h"></b></span><span><i style="background:color-mix(in oklab,var(--accent) 45%,var(--panel))"></i>Payee available <b id="k-p"></b></span></div>
+          <p class="msum" id="m-s"></p></div>
+      </div>
+    </div>
+    <p class="facts" style="margin-top:1.6rem"><span>Java</span><span>Spring Boot</span><span>Apache Kafka</span><span>PostgreSQL</span><span>Hazelcast</span><span>Testcontainers</span></p>
+    <p style="margin-top:.8rem"><a class="more" href="https://github.com/TheSiddheshFulawade/payflow">Source on GitHub <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+  </article>
+
+  <article class="proj" id="lab">
+    <div class="ph"><h2>Settlement Lab</h2><span class="status">Engine measured, API built but not deployed</span><p>Transfers pass a bounded queue, workers post them to an in-memory ledger, and each posting is published to a simulated general ledger through a retry inside a circuit breaker; what cannot be delivered waits in an in-memory outbox. Settlement here means posting transfers in the project's own in-memory ledger. No real money moves and no settlement finality is claimed. Six invariants are asserted after every run.</p></div>
+    <div class="simtitle"><h3>Run 600 transfers</h3><p>A scaled-down model, executed in your browser. Unsafe modes are for contrast only. They exist only in this browser model, not in the repository.</p></div>
+    <div class="sim" id="lb">
+      <div class="bar"><span class="lbl">Ledger</span><div class="chips" role="group" aria-label="Ledger strategy" id="lb-m"></div><span class="lbl">Faults</span><div class="chips" role="group" aria-label="Fault profile" id="lb-f"></div><div class="run chips"><button id="lb-run">Run</button></div></div>
+      <div class="lab">
+        <div class="flow">
+          <div class="two"><div><h4>Bounded queue <span id="lb-q">0 / 64</span></h4><div class="meter"><i id="lb-qm"></i></div></div><div><h4>General ledger <span id="lb-p">0 / 600</span></h4><div class="meter"><i id="lb-pm"></i></div></div></div>
+          <div class="two"><div><h4>Workers</h4><ul class="workers" id="lb-w"></ul></div><div><h4>Accounts <span id="lb-c">&nbsp;</span></h4><ul class="accts" id="lb-a" aria-hidden="true"></ul></div></div>
+          <div><h4>Outbox depth over time <span id="lb-b">breaker closed</span></h4><canvas class="ts" id="lb-ts" role="img" aria-label="Outbox depth and breaker state over the run"></canvas></div>
+        </div>
+        <div class="verify"><div><h4>Invariants</h4><ul class="chk" id="lb-chk"></ul></div><p class="verdict" id="lb-v" aria-live="polite">Choose a ledger and a fault profile, then run. Start with ordered locking under an outage, then compare with no synchronisation.</p>
+          <dl class="tally"><div><dt>Ticks to finish</dt><dd id="lb-t">0</dd></div><div><dt>Conflicts and waits</dt><dd id="lb-k">0</dd></div><div><dt>Publish retries</dt><dd id="lb-r">0</dd></div><div><dt>Duplicates rejected</dt><dd id="lb-d">0</dd></div></dl></div>
+      </div>
+    </div>
+    <div class="simtitle"><h3>Measured results</h3><p>From the repository, not from the simulation above.</p></div>
+    <div class="tw"><table id="res"><thead><tr><th>Ledger</th><th>Threads</th><th>Faults</th><th>Throughput</th><th class="n">Submissions/s</th><th class="n">p99 µs to outcome</th><th class="n">Outbox peak</th><th>Invariants</th></tr></thead><tbody></tbody></table></div>
+    <p class="note">One run, results committed 19 Nov 2026 (3eb119a): cloud container, Intel Xeon at 2.10 GHz, 4 cores, Linux, JDK 21.0.13. 100,000 submissions per row from 64 closed-loop clients through 8 workers; 10,000 accounts; 20% of transfers within 20 hot accounts; 2,006 duplicates and 802 to 853 rejections per row. Rates are submissions answered by the engine; delivery to the simulated general ledger is not in the rate and finishes afterwards. Ordered locking answered 2.9× to 4.6× as many submissions per second as CAS; virtual threads had the lower p99 and the higher p50 in all six pairs.</p>
+    <p style="margin-top:1rem"><a class="more" href="https://github.com/TheSiddheshFulawade/settlement-lab">Source and full results on GitHub <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+  </article>
+
+  <section class="proj"><h2 style="font-size:1.8rem;margin-bottom:1.6rem">Earlier work</h2><ul class="small">
+    <li><h3>Real-time anomaly detection</h3><p>A video model that spots 7 kinds of anomalies in a live feed and raises an alarm.</p><p class="tags"><span>Python</span><span>LRCN</span><span>Twilio</span></p></li>
+    <li><h3>PennyWise</h3><p>An expense app for personal and group spending, with automated reminders.</p><p class="tags"><span>Django REST Framework</span><span>Celery</span><span>Redis</span></p></li>
+    <li><h3>Helmet detection</h3><p>Finds motorcyclists without helmets in a live camera feed and reads their number plates.</p><p class="tags"><span>YOLOv5</span><span>OpenCV</span><span>EasyOCR</span></p></li>
+  </ul></section>
+</div></div>
+
+<!-- ================= EXPERIENCE ================= -->
+<div data-view="experience" hidden><div class="wrap">
+  <div class="head"><h1>Experience</h1><p>One line on the work so far.</p></div>
+  <div id="jobs"></div>
+  <section class="band" aria-labelledby="edu-h"><header><h2 id="edu-h">Education and recognition</h2></header>
+    <ul class="list3">
+      <li><strong>Entry title</strong><span>Dates or issuer</span><span>One line</span></li>
+      <li><strong>Entry title</strong><span>Dates or issuer</span><span>One line</span></li>
+      <li><strong>Entry title</strong><span>Dates or issuer</span><span>One line</span></li>
+      <li><strong>Entry title</strong><span>Dates or issuer</span><span>One line</span></li>
+    </ul></section>
+</div></div>
+
+<!-- ================= ABOUT ================= -->
+<div data-view="about" hidden><div class="wrap">
+  <div class="head"><h1>About</h1></div>
+  <div class="about-top">
+    <figure class="photo"><div class="frame"><svg viewBox="0 0 320 400" role="img" aria-label="Portrait placeholder"><rect width="320" height="400" fill="var(--raise)"/><circle cx="160" cy="158" r="62" fill="var(--line-2)"/><path d="M28 400c8-94 62-142 132-142s124 48 132 142z" fill="var(--line-2)"/></svg></div></figure>
+    <div class="txt"><p>First bio paragraph. The site reads it from content/profile.yaml.</p>
+      <p>Second bio paragraph.</p>
+      <p>Third bio paragraph.</p></div>
+  </div>
+  <section class="band" aria-labelledby="cap2-h"><header><h2 id="cap2-h">Capabilities</h2><p>Each one points to where it was used.</p></header><div class="caps" data-caps></div></section>
+</div></div>
+
+<!-- ================= 404 ================= -->
+<div data-view="lost" hidden><div class="wrap lost">
+  <canvas id="field404" role="img" aria-label="404"></canvas>
+  <h1 class="big">No record at this address</h1><p style="margin-top:.8rem">The page moved or never existed. Drag across the field; it recovers, this URL won't.</p>
+  <div class="acts"><a class="btn solid" href="#" data-go="home">Return home</a></div>
+</div></div>
+
+<section class="wrap contact" id="contact" data-contact><div><h2>Building something that has to be right?</h2><p>I'm glad to talk about payments, distributed systems and backend engineering roles.</p></div><p><a class="mail" href="mailto:hello@siddheshfulawade.com">hello@siddheshfulawade.com</a></p></section>
+</main>
+
+<footer class="foot"><div class="wrap">
+  <div class="cols">
+    <div class="id"><strong>Siddhesh Fulawade</strong><p>Full stack Java engineer. Payments, concurrency and failure recovery.</p></div>
+    <nav aria-label="Footer"><h2>Site</h2><ul><li><a href="#" data-go="home">Home</a></li><li><a href="#" data-go="projects">Projects</a></li><li><a href="#" data-go="experience">Experience</a></li><li><a href="#" data-go="about">About</a></li></ul></nav>
+    <div><h2>Systems</h2><ul><li><a href="https://github.com/TheSiddheshFulawade/payflow">PayFlow</a></li><li><a href="https://github.com/TheSiddheshFulawade/settlement-lab">Settlement Lab</a></li><li><a href="https://github.com/TheSiddheshFulawade/portfolio">This site's source</a></li><li><a href="#" data-go="lost">404 page (preview)</a></li></ul></div>
+    <div><h2>Elsewhere</h2><ul><li><a href="https://github.com/TheSiddheshFulawade">GitHub</a></li><li><a href="https://www.linkedin.com/in/siddhesh-fulawade">LinkedIn</a></li><li><a href="mailto:hello@siddheshfulawade.com">Email</a></li></ul></div>
+  </div>
+  <div class="base"><span>© 2026 Siddhesh Fulawade</span><span>Navi Mumbai, India</span><span class="mono">visitors.total —</span><span>Built with Angular, prerendered, hosted on Cloudflare Pages.</span></div>
+</div></footer>

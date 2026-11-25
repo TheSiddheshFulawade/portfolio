@@ -1,7 +1,7 @@
 # 005 · Redesign · Spec
 
 Release v1.2.0, target Sun 29 Nov 2026, before spec 004. Design approved by the user on 2026-11-24: blueprint
-`.cache/design/portfolio-concept-v2.html` (local, git-ignored; source `.cache/design/v2/`). Port its structure, wording
+`docs/design/blueprint/` (copy placeholders where personal; mechanism errors in its `KNOWN-ERRORS.md`). Port its structure, wording
 direction, spacing and behaviour. Where it and this spec differ, this spec wins.
 
 ## 1. Goal
