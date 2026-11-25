@@ -32,8 +32,8 @@ ogImage: /og.png
 ogImageAlt: Siddhesh Fulawade, full stack Java engineer, payments and distributed systems
 nav:
   - { label: Home, path: / }
-  - { label: Experience, path: /experience }
   - { label: Projects, path: /projects }
+  - { label: Experience, path: /experience }
   # Shown only while at least one note is published (the content build drops it otherwise).
   - { label: Notes, path: /notes }
   - { label: About, path: /about }
