@@ -1,10 +1,32 @@
 # Site-wide copy: navigation, page titles and descriptions, footer. Read by the shell and SeoService.
 id: site
 published: true
-updated: 2026-11-19
+updated: 2026-11-24
 title: Siddhesh Fulawade
 url: https://siddheshfulawade.com
 locale: en
+# Home headline (REQ-HOME-101): `lead` + the last phrase is the complete sentence in the prerendered HTML.
+# The headline may cycle once through `phrases` and must end on the last one within 5 s; screen readers
+# get `srSentence`. "Designed to": PayFlow's chaos tests are not built yet, so no absolute claim.
+hero:
+  lead: I build payment systems designed to stay correct under
+  phrases:
+    - concurrent load.
+    - duplicate delivery.
+    - broker outages.
+    - partial failure.
+  srSentence: I build payment systems designed to stay correct under partial failure.
+# Home section labels (REQ-HOME-104) and their one-line introductions.
+sections:
+  selected: Selected systems
+  selectedIntro: Original work, built in public.
+  experience: Experience
+  experienceIntro: Central banking payments now; cloud and applied-AI backends before that.
+  decisions: Engineering decisions
+  decisionsIntro: What I chose, what I turned down, and what the choice costs.
+  capabilities: Capabilities
+  capabilitiesIntro: Each one points to where it was used.
+  contact: Contact
 # Open Graph image for link previews (1200 x 630, public/og.png) and its alt text.
 ogImage: /og.png
 ogImageAlt: Siddhesh Fulawade, full stack Java engineer, payments and distributed systems
@@ -20,8 +42,8 @@ pages:
   home:
     title: Siddhesh Fulawade · Full stack Java engineer, payments
     description: >-
-      Full stack Java engineer building payment systems that stay correct under load: Spring Boot,
-      ISO 20022, Kafka, IBM MQ and exactly-once processing.
+      Full stack Java engineer building payment software: Spring Boot, ISO 20022, Kafka and IBM MQ,
+      plus two systems built in public: PayFlow and Settlement Lab.
   experience:
     title: Experience · Siddhesh Fulawade
     heading: Experience
@@ -29,7 +51,7 @@ pages:
   projects:
     title: Projects · Siddhesh Fulawade
     heading: Projects
-    description: Original work, led by Settlement Lab, a concurrency-safe settlement engine with property and stress tests.
+    description: PayFlow, a payment saga in development, and Settlement Lab, a transfer engine with measured results, plus earlier work.
   notes:
     title: Notes · Siddhesh Fulawade
     description: Short technical notes on payments, concurrency and the engineering behind this site.
@@ -38,7 +60,7 @@ pages:
   about:
     title: About · Siddhesh Fulawade
     heading: About
-    description: How I work, the skills I use and the evidence behind them, and my education.
+    description: How I work, the capabilities I use with the evidence behind them, and my education.
   contact:
     title: Contact · Siddhesh Fulawade
     heading: Contact

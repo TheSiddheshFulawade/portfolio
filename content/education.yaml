@@ -1,6 +1,6 @@
 id: education
 published: true
-updated: 2026-11-19
+updated: 2026-11-24
 degrees:
   - id: pce-btech
     order: 10
@@ -18,6 +18,6 @@ achievements:
   - id: anomaly-copyright
     order: 10
     text: Copyright registered with the Government of India for the real-time anomaly detection project.
-  - id: iitb-teams
+  - id: research-teams
     order: 20
-    text: Led four teams of 5 to 6 members on med-tech projects during the IIT Bombay internship.
+    text: Led four teams of 5 to 6 members on med-tech projects during a research internship.

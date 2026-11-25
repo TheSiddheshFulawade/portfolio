@@ -19,11 +19,14 @@
           </p>
         </header>
         <p>{{ role.summary }}</p>
-        <ul class="highlights">
-          @for (highlight of role.highlights; track highlight) {
-            <li>{{ highlight }}</li>
-          }
-        </ul>
+        @for (group of role.highlights; track group.theme) {
+          <h3 class="theme">{{ group.theme }}</h3>
+          <ul class="highlights">
+            @for (item of group.items; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        }
         @if (role.recognition?.length) {
           <div class="recognition">
             <h3>{{ ui['recognition'] }}</h3>

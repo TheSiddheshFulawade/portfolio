@@ -1,7 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "experience.schema.json",
-  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/definitions/shared"
+    }
+  ],
   "type": "object",
   "required": [
     "order",
@@ -21,24 +25,61 @@
     "featured": true,
     "order": true,
     "updated": true,
-    "company": { "$ref": "common.schema.json#/definitions/text" },
-    "title": { "$ref": "common.schema.json#/definitions/text" },
-    "location": { "$ref": "common.schema.json#/definitions/text" },
-    "mode": { "enum": ["On-site", "Remote", "Hybrid"] },
-    "start": { "$ref": "common.schema.json#/definitions/month" },
+    "company": {
+      "$ref": "common.schema.json#/definitions/text"
+    },
+    "title": {
+      "$ref": "common.schema.json#/definitions/text"
+    },
+    "location": {
+      "$ref": "common.schema.json#/definitions/text"
+    },
+    "mode": {
+      "enum": ["On-site", "Remote", "Hybrid"]
+    },
+    "start": {
+      "$ref": "common.schema.json#/definitions/month"
+    },
     "end": {
       "oneOf": [
-        { "$ref": "common.schema.json#/definitions/month" },
-        { "type": "null" }
+        {
+          "$ref": "common.schema.json#/definitions/month"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
-    "summary": { "$ref": "common.schema.json#/definitions/text" },
-    "highlights": {
-      "$ref": "common.schema.json#/definitions/stringList",
-      "minItems": 1
+    "summary": {
+      "$ref": "common.schema.json#/definitions/text"
     },
-    "recognition": { "$ref": "common.schema.json#/definitions/stringList" },
-    "stack": { "$ref": "common.schema.json#/definitions/stringList" }
+    "highlights": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["theme", "items"],
+        "additionalProperties": false,
+        "properties": {
+          "theme": {
+            "$ref": "common.schema.json#/definitions/text"
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "common.schema.json#/definitions/text"
+            }
+          }
+        }
+      }
+    },
+    "recognition": {
+      "$ref": "common.schema.json#/definitions/stringList"
+    },
+    "stack": {
+      "$ref": "common.schema.json#/definitions/stringList"
+    }
   },
   "additionalProperties": false
 }

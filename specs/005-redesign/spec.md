@@ -58,7 +58,7 @@ systems they can break and watch recover. A specialist who looks closely finds n
   and label each scenario "merged, tested per service", "partly merged" or "specified, not built yet". Six scenarios: completes, wallet crash,
   duplicate delivery, risk rejection, broker outage, insufficient funds. It shows payment state, event log, outbox and
   inbox counts, balances and Σ(available + held). Inbox row, effect and
-  outgoing message change in one step. `REFUNDED` is explained as an authorisation reversal: any hold was released, nothing
+  outgoing message change in one step. `REVERSED` is explained as an authorisation reversal: any hold was released, nothing
   was captured.
 - REQ-PROJ-103 THE Settlement Lab model SHALL run 600 transfers through a bounded queue, 8 workers, a ledger (ordered locking, CAS, and two
   modes marked unsafe and browser-only), then publish each posting directly, with retry inside a circuit breaker, to a simulated
@@ -118,7 +118,7 @@ One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so c
       step, no effect before its commit, re-send has a new id, redelivery has the same id, late attempt ignored; inbox,
       effect and outgoing message in one step; RECEIVED never alone; outbox falls only after the ack; a redelivered command
       adds an outbox row with the stored reply's message id and no inbox row; a redelivered reply adds neither; each COMPLETED has exactly
-      one capture (one payer debit, one payee credit); REFUNDED and REJECTED move no money between wallets; no negative balance, held = 0 at a terminal state. Repin payflow first.
+      one capture (one payer debit, one payee credit); REVERSED and REJECTED move no money between wallets; no negative balance, held = 0 at a terminal state. Repin payflow first.
 - [ ] RD-09 [review] Both auditors on every page and simulation (PASS), `ui-reviewer`, `security-auditor`, `perf-auditor`; claim register complete.
 - [ ] RD-10 [release] `/release` v1.2.0. Needs the production domain live and the photo, or the user's yes to launch without it.
 

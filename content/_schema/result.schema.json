@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "result.schema.json",
+  "description": "content/results/<id>.yaml: measured results with every fact of REQ-ACC-004, generated from the repo's results.json at a recorded commit (REQ-PROJ-104). The file name must equal the id.",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": [
+    "measured",
+    "machine",
+    "os",
+    "cores",
+    "jdk",
+    "runs",
+    "runDate",
+    "workload",
+    "source",
+    "rows"
+  ],
+  "definitions": {
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "measured": { "$ref": "common.schema.json#/definitions/text" },
+    "machine": { "$ref": "common.schema.json#/definitions/text" },
+    "os": { "$ref": "common.schema.json#/definitions/text" },
+    "cores": { "type": "integer", "minimum": 1 },
+    "jdk": { "$ref": "common.schema.json#/definitions/text" },
+    "runs": { "type": "integer", "minimum": 1 },
+    "runDate": { "$ref": "common.schema.json#/definitions/date" },
+    "workload": { "$ref": "common.schema.json#/definitions/text" },
+    "source": {
+      "type": "object",
+      "required": ["repo", "commit", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string", "pattern": "^https://" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" },
+        "path": { "$ref": "common.schema.json#/definitions/text" }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "ledger",
+          "threads",
+          "fault",
+          "transfers",
+          "submissionsPerSecond",
+          "p50Us",
+          "p99Us",
+          "rejected",
+          "duplicates",
+          "retries",
+          "breakerOpens",
+          "outboxPeak",
+          "invariantsPassed"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "ledger": { "type": "string", "pattern": "^[A-Z][A-Z_]*$" },
+          "threads": { "type": "string", "pattern": "^[A-Z][A-Z_]*$" },
+          "fault": { "type": "string", "pattern": "^[A-Z][A-Z_]*$" },
+          "transfers": { "type": "integer", "minimum": 1 },
+          "submissionsPerSecond": { "$ref": "#/definitions/count" },
+          "p50Us": { "$ref": "#/definitions/count" },
+          "p99Us": { "$ref": "#/definitions/count" },
+          "rejected": { "$ref": "#/definitions/count" },
+          "duplicates": { "$ref": "#/definitions/count" },
+          "retries": { "$ref": "#/definitions/count" },
+          "breakerOpens": { "$ref": "#/definitions/count" },
+          "outboxPeak": { "$ref": "#/definitions/count" },
+          "invariantsPassed": { "type": "boolean" },
+          "firstFailure": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

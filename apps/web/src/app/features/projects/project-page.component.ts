@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
+import { projectBody } from '../../core/content/project-bodies';
 import { StatusPillComponent } from '../../shared/ui/status-pill.component';
 import { NotFoundPageComponent } from '../not-found/not-found-page.component';
 
@@ -22,6 +23,7 @@ export class ProjectPageComponent {
   /** Bound from the :slug route parameter (withComponentInputBinding). */
   readonly slug = input('');
   protected readonly project = computed(() => this.content.project(this.slug()));
+  protected readonly body = computed(() => projectBody(this.slug()));
   protected readonly ui = this.content.site.ui;
 
   constructor() {

@@ -1,57 +1,63 @@
-# Skill groups. Each skill links to evidence: an experience id or a project id. No percentage bars.
+# Four capability groups (REQ-ABOUT-101). Each skill points to evidence: an experience id, a project id,
+# or `site` (this website's source). A skill without evidence is hidden. No percentage bars.
 id: skills
 published: true
-updated: 2026-11-19
+updated: 2026-11-24
 groups:
-  - id: languages
+  - id: backend-engineering
     order: 10
-    label: Languages
+    label: Backend engineering
     skills:
-      - { name: Java, evidence: [2024-11-rebit, settlement-lab] }
-      - { name: TypeScript, evidence: [] }
+      - { name: Java, evidence: [2024-11-rebit, settlement-lab, payflow] }
+      - { name: Spring Boot, evidence: [2024-11-rebit, payflow] }
+      - { name: SQL, evidence: [2024-07-lumu, payflow, settlement-lab] }
+      - { name: PostgreSQL, evidence: [payflow, settlement-lab] }
       - {
           name: Python,
           evidence: [2023-12-iit-bombay, anomaly-detection, pennywise],
         }
-      - { name: SQL, evidence: [2024-11-rebit, 2024-07-lumu] }
-  - id: backend
-    order: 20
-    label: Backend and frameworks
-    skills:
-      - { name: Spring Boot, evidence: [2024-11-rebit] }
-      - { name: Angular, evidence: [] }
       - {
           name: Django REST Framework,
           evidence: [2023-12-iit-bombay, pennywise],
         }
-      - { name: Apache Camel, evidence: [] }
-  - id: payments
-    order: 30
-    label: Payments and distributed systems
+      - { name: TypeScript, evidence: [site] }
+      - { name: Angular, evidence: [site] }
+  - id: payments-messaging
+    order: 20
+    label: Payments and messaging
     skills:
       - { name: ISO 20022, evidence: [2024-11-rebit] }
+      - { name: Apache Kafka, evidence: [2024-11-rebit, payflow] }
+      - { name: IBM MQ, evidence: [2024-11-rebit] }
+      - { name: Event-driven microservices, evidence: [2024-11-rebit, payflow] }
+      - { name: "Saga, outbox and inbox patterns", evidence: [payflow] }
+  - id: correctness-resilience
+    order: 30
+    label: Correctness and resilience
+    skills:
       - {
-          name: Concurrency and exactly-once processing,
+          name: Concurrency and thread safety,
           evidence: [2024-11-rebit, settlement-lab],
         }
-      - name: "Resilience: retry, circuit breaker, fallback"
-        evidence: [2024-11-rebit, settlement-lab]
-      - { name: Event-driven microservices, evidence: [2024-11-rebit] }
-  - id: messaging
+      - { name: Idempotent processing, evidence: [settlement-lab, payflow] }
+      - { name: Fallback and recovery, evidence: [2024-11-rebit] }
+      - { name: Retry and circuit breaker, evidence: [settlement-lab] }
+      - { name: Red Hat Data Grid caching, evidence: [2024-11-rebit] }
+      - { name: Hazelcast, evidence: [payflow] }
+      - {
+          name: Property-based and stress tests,
+          evidence: [settlement-lab, payflow],
+        }
+      - { name: JUnit 5 and Mockito, evidence: [2024-11-rebit] }
+  - id: delivery-cloud
     order: 40
-    label: Messaging, caching and data
-    skills:
-      - { name: Apache Kafka, evidence: [2024-11-rebit] }
-      - { name: IBM MQ, evidence: [2024-11-rebit] }
-      - { name: Hazelcast and OpenShift Data Grid, evidence: [2024-11-rebit] }
-      - { name: Redis, evidence: [pennywise] }
-      - { name: Oracle Database, evidence: [2024-11-rebit] }
-      - { name: MySQL and MongoDB, evidence: [] }
-  - id: delivery
-    order: 50
     label: Delivery and cloud
     skills:
       - { name: OpenShift, evidence: [2024-11-rebit] }
       - { name: Docker and Jenkins, evidence: [2024-11-rebit] }
-      - { name: Azure, evidence: [2024-07-lumu] }
-      - { name: JUnit 5 and Mockito, evidence: [2024-11-rebit] }
+      - {
+          name: "Azure Functions, Azure SQL and Azure Databricks",
+          evidence: [2024-07-lumu],
+        }
+      - { name: Redis and Celery, evidence: [pennywise] }
+      - { name: Testcontainers, evidence: [payflow] }
