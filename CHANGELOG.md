@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Shell fixes from the RD-04 re-review: the open mobile menu scrolls in short viewports, scroll padding covers a wrapped header on small phones, header buttons use the control border, and the navigation follows the spec order (005 RD-04).
+- Design blueprint published in `docs/design/blueprint/` with the known errors of its simulations and their corrections (005).
 - `/progress` command: read-only status, effort-weighted percent and dates for the three projects from git, GitHub and the spec tasks; runs no tests (tooling).
 - Redesign content: `decisions.yaml` with six decisions and pinned evidence, four capability groups with evidence, themed experience highlights, PayFlow content that separates proven from planned, Settlement Lab rewritten for the Java 21 run, 12 measured rows from `results.json` at 3eb119a, hero and section labels, and the RD-01 content corrections (005 RD-03).
 - Sticky header, four-column footer (identity, site, systems, profiles, location, counter), closing contact section above the footer, and a 404 with a decorative dot field that is drawn once and settles (005 RD-04).
