@@ -21,6 +21,7 @@ export class AboutPageComponent {
   protected readonly page = this.content.page('about');
   protected readonly profile = this.content.profile;
   protected readonly ui = this.content.site.ui;
+  protected readonly sections = this.content.site.sections;
   protected readonly groups = resolveSkills(this.content.skills, this.content);
 
   constructor() {

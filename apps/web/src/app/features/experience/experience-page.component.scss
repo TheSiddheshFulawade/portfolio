@@ -10,6 +10,7 @@
 
 /* Global .rail and .facts styles cover the rest of the label rail. */
 .rail > .facts {
+  flex-direction: column;
   margin-top: var(--space-3);
 }
 

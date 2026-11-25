@@ -7,7 +7,7 @@
   @for (role of roles; track role.id) {
     <li>
       <article class="band role" [id]="role.id" [attr.aria-labelledby]="'role-' + role.id">
-        <aside class="rail">
+        <aside class="rail" [attr.aria-labelledby]="'role-' + role.id">
           <p class="when">
             <time [attr.datetime]="role.start">{{ role.dates }}</time>
           </p>

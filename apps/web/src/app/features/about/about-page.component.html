@@ -29,7 +29,8 @@
 
 <section class="band" aria-labelledby="skills-title">
   <header class="rail">
-    <h2 id="skills-title">{{ ui['skillsHeading'] }}</h2>
+    <h2 id="skills-title">{{ sections.capabilities }}</h2>
+    <p>{{ sections['capabilitiesIntro'] }}</p>
   </header>
   <div class="detail caps">
     @for (group of groups; track group.id) {
