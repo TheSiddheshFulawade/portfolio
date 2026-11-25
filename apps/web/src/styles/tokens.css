@@ -1,5 +1,6 @@
 /* Design tokens (design-system skill). Dark first; light via the system preference or [data-theme].
-   --line-2 is the stronger line (controls, table heads); --accent-ink is text on a solid accent button.
+   --line-2 is the stronger line (controls, table heads); --accent-ink is text on a solid accent button;
+   --control is the border of buttons and chips (3:1 on --bg and --panel).
    Components use these variables only; literal colours are not allowed in src/app (tokens.test.mjs). */
 
 :root {
@@ -75,6 +76,7 @@
   --raise: #16202a;
   --line: #1f2b36;
   --line-2: #2e3d4b;
+  --control: #5d6f80;
   --text: #d9e1e8;
   --text-strong: #eef3f6;
   --dim: #93a3b1;
@@ -92,6 +94,7 @@
     --raise: #e9eeec;
     --line: #d5dddb;
     --line-2: #b7c3c0;
+    --control: #7f8f8c;
     --text: #26313a;
     --text-strong: #0d141a;
     --dim: #55636f;
@@ -109,6 +112,7 @@
   --raise: #e9eeec;
   --line: #d5dddb;
   --line-2: #b7c3c0;
+  --control: #7f8f8c;
   --text: #26313a;
   --text-strong: #0d141a;
   --dim: #55636f;

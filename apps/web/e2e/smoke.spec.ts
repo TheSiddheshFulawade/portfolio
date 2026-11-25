@@ -56,17 +56,19 @@ test('REQ-PAGE-001 an unknown path returns 404 with the not-found page', async (
   expect(await seriousViolations(page)).toEqual([]);
 });
 
-test('REQ-UI-003 no route scrolls sideways at 320 px', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 800 });
+for (const width of [320, 960, 1024, 1100, 1280, 1440]) {
+  test(`REQ-UI-003 no route scrolls sideways at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
 
-  for (const route of routes) {
-    await page.goto(route, { waitUntil: 'networkidle' });
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow, route).toBe(0);
-  }
-});
+    for (const route of routes) {
+      await page.goto(route, { waitUntil: 'networkidle' });
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, route).toBe(0);
+    }
+  });
+}
 
 test('REQ-UI-005 keyboard: the mobile menu opens, navigates and moves focus to the new heading', async ({
   page,
@@ -79,7 +81,10 @@ test('REQ-UI-005 keyboard: the mobile menu opens, navigates and moves focus to t
   await menu.focus();
   await page.keyboard.press('Enter');
   await expect(menu).toHaveAttribute('aria-expanded', 'true');
-  await page.getByRole('link', { name: 'Experience', exact: true }).focus();
+  await page
+    .getByRole('navigation', { name: 'Main' })
+    .getByRole('link', { name: 'Experience', exact: true })
+    .focus();
   await page.keyboard.press('Enter');
 
   await expect(page).toHaveURL(/\/experience$/);
@@ -272,3 +277,175 @@ test('REQ-UI-001 at 895 px the Menu button shows and the nav is collapsed', asyn
     ),
   ).toBe(0);
 });
+
+// ---- Spec 005 RD-04: shell (REQ-UI-101, 102, 104, REQ-MOT-101 to 103) ----------------------------------
+
+const shellSite = content.site as unknown as {
+  footer: { navLabel: string; note: string; sourceLabel: string; sourceUrl: string };
+  contact: { heading: string };
+};
+const allPaths = [...routes, '/no-such-page'];
+
+for (const route of allPaths) {
+  test(`REQ-UI-102 ${route} has one footer landmark with site links, profiles, email, location, note, source and counter slot`, async ({
+    page,
+  }) => {
+    await page.goto(route, { waitUntil: 'networkidle' });
+    const footer = page.getByRole('contentinfo');
+
+    await expect(footer).toHaveCount(1);
+    await expect(footer.getByRole('navigation', { name: shellSite.footer.navLabel })).toBeVisible();
+    for (const item of content.site.nav) {
+      await expect(
+        footer
+          .getByRole('navigation', { name: shellSite.footer.navLabel })
+          .locator(`a[href="${item.path}"]`),
+      ).toHaveCount(1);
+    }
+    for (const link of content.profile.links) {
+      await expect(footer.locator(`a[href="${link.url}"]`)).not.toHaveCount(0);
+    }
+    await expect(footer.locator(`a[href="mailto:${content.profile.email}"]`)).toHaveCount(1);
+    await expect(footer).toContainText(content.profile.location);
+    await expect(footer).toContainText(shellSite.footer.note);
+    await expect(footer.locator(`a[href="${shellSite.footer.sourceUrl}"]`)).toHaveCount(1);
+    await expect(footer.locator('sf-visitor-counter')).toHaveCount(1);
+    // Last thing on the page: nothing after the footer.
+    expect(
+      await page.evaluate(() => {
+        const f = document.querySelector('footer')!;
+        return f.getBoundingClientRect().bottom >= document.documentElement.scrollHeight - 1;
+      }),
+    ).toBe(true);
+  });
+}
+
+for (const route of ['/', '/projects', '/about']) {
+  test(`REQ-UI-101 ${route} shows the contact section above the footer`, async ({ page }) => {
+    await page.goto(route, { waitUntil: 'networkidle' });
+
+    const section = page.getByRole('region', { name: shellSite.contact.heading });
+    await expect(section).toBeVisible();
+    await expect(section.locator(`a[href="mailto:${content.profile.email}"]`)).toHaveCount(1);
+    const [s, f] = await Promise.all([section.boundingBox(), page.locator('footer').boundingBox()]);
+    expect(s!.y + s!.height).toBeLessThanOrEqual(f!.y + 1);
+  });
+}
+
+for (const route of allPaths) {
+  test(`REQ-MOT-101 ${route} nothing is animating 5 s after load`, async ({ page }) => {
+    await page.goto(route, { waitUntil: 'networkidle' });
+
+    await page.waitForTimeout(5000);
+
+    expect(
+      await page.evaluate(() =>
+        document
+          .getAnimations()
+          .map((a) => `${a.constructor.name} ${(a as CSSAnimation).animationName ?? ''}`),
+      ),
+    ).toEqual([]);
+  });
+
+  test(`REQ-MOT-102 ${route} with reduced motion nothing is animating right after load`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(route, { waitUntil: 'networkidle' });
+
+    expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
+  });
+}
+
+test('REQ-UI-101 the header stays at the top of the viewport while the page scrolls', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 400 });
+  await page.goto('/projects', { waitUntil: 'networkidle' });
+  const header = page.locator('header').first();
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(1000);
+
+  await page.evaluate(() => window.scrollTo(0, 500));
+  await page.waitForFunction(() => window.scrollY > 400);
+
+  const box = await header.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(-1);
+  expect(box!.y).toBeLessThanOrEqual(1);
+  await expect(header).toBeInViewport();
+});
+
+test('REQ-A11Y-101 a focused link is not hidden behind the sticky header (WCAG 2.2 focus not obscured)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await page.goto('/projects', { waitUntil: 'networkidle' });
+
+  await page.locator('main a').last().focus();
+  const { link, headerBottom } = await page.evaluate(() => ({
+    link: document.activeElement!.getBoundingClientRect().top,
+    headerBottom: document.querySelector('header')!.getBoundingClientRect().bottom,
+  }));
+
+  expect(link).toBeGreaterThanOrEqual(headerBottom - 1);
+});
+
+test('REQ-UI-104 the 404 page has a plain message, a way home, and a decorative dot field that is drawn', async ({
+  page,
+}) => {
+  await page.goto('/no-such-page', { waitUntil: 'networkidle' });
+
+  const canvas = page.locator('main canvas');
+  await expect(canvas).toHaveCount(1);
+  await expect(canvas).toHaveAttribute('aria-hidden', 'true');
+  const home = page
+    .locator('main')
+    .getByRole('link', { name: content.site.pages.notFound.action! });
+  await expect(home).toBeVisible();
+  await expect(home).toHaveAttribute('href', '/');
+  const painted = await canvas.evaluate((el) => {
+    const c = el as HTMLCanvasElement;
+    const data = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data;
+    let n = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] > 0) n++;
+    return { n, w: c.width, h: c.height };
+  });
+  expect(painted.w).toBeGreaterThan(0);
+  expect(painted.n).toBeGreaterThan(50);
+
+  await home.click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('h1')).toBeVisible();
+});
+
+for (const reduce of [true, false]) {
+  test(`REQ-MOT-102 REQ-MOT-103 the 404 field is drawn at once and runs no frame loop while idle (reduced motion ${reduce})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: reduce ? 'reduce' : 'no-preference' });
+    await page.addInitScript(() => {
+      const w = window as unknown as { frames: number };
+      w.frames = 0;
+      const raf = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = (cb) => {
+        w.frames++;
+        return raf(cb);
+      };
+    });
+    await page.goto('/no-such-page', { waitUntil: 'networkidle' });
+    const drawn = await page.locator('main canvas').evaluate((el) => {
+      const c = el as HTMLCanvasElement;
+      const d = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data;
+      return d.some((v, i) => i % 4 === 3 && v > 0);
+    });
+    expect(drawn).toBe(true);
+
+    // A running loop asks for about 60 frames a second; a settled page asks for almost none.
+    await page.waitForTimeout(1500);
+    await page.evaluate(() => ((window as unknown as { frames: number }).frames = 0));
+    await page.waitForTimeout(1000);
+
+    expect(
+      await page.evaluate(() => (window as unknown as { frames: number }).frames),
+    ).toBeLessThan(5);
+  });
+}

@@ -43,10 +43,11 @@ export const routes: Routes = [
   },
   {
     path: 'contact',
+    data: { closing: false },
     loadComponent: () =>
       import('./features/contact/contact-page.component').then((m) => m.ContactPageComponent),
   },
   // Prerendered to /404/index.html; scripts/emit-404.mjs copies it to 404.html for the host.
-  { path: '404', loadComponent: notFound },
-  { path: '**', loadComponent: notFound },
+  { path: '404', data: { closing: false }, loadComponent: notFound },
+  { path: '**', data: { closing: false }, loadComponent: notFound },
 ];
