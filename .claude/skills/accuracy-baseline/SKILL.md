@@ -78,8 +78,8 @@ A fix to a claim is re-audited; the author of a change never passes their own cl
 17. PayFlow commits RECEIVED, RESERVING and the first command in one transaction, before the 202. Inbox row, effect and
     outgoing message commit together: never show them one after another.
 18. Settlement Lab's in-memory engine publishes directly and its outbox holds only failed publishes; `ledger-postgres` writes
-19. Neither repo has a licence: say "public" or "built in public", not "open source".
     every posting to a transactional outbox.
+19. Neither repo has a licence: say "public" or "built in public", not "open source".
 
 ## Simulations
 

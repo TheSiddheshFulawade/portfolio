@@ -102,7 +102,7 @@ One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so c
       register; their corrections go into the register and `.cache/accuracy/open.md`. Checks: `npm run verify`; register rows verified or removed.
 - [x] RD-02 [design] `design-system` skill updated to the blueprint (rail layout, type sizes, motion rules; remove eyebrows, count-up, magnetic
       buttons, dot grid, card glow); shared styles and the view-transition set-up (REQ-UI-103, REQ-MOT-101 to 103). Checks: contrast tests.
-- [ ] RD-03 [content] Content model above, with schemas and tests first (missing decision cost fails; skill without evidence hidden; any employer
+- [x] RD-03 [content] Content model above, with schemas and tests first (missing decision cost fails; skill without evidence hidden; any employer
       or institute from the work history outside Experience fails; results need every fact of REQ-ACC-004) (REQ-HOME-104, 105, REQ-EXP-101, REQ-PROJ-104). Finance and technical audit.
 - [x] RD-04 [web] Header, footer, contact section, 404 (REQ-UI-101, 102, 104). Smoke test extended.
 - [ ] RD-05 [web] Home (REQ-HOME-101 to 105, REQ-UI-105). Tests first: field model (pairs move together; net zero for all and for

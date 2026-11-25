@@ -69,7 +69,7 @@ platform and virtual threads, and three fault profiles (none, flaky, outage), 10
   the balance the other way; this run did not test that.
 - **Platform and virtual threads: no clear throughput winner** at the same cap of 8 workers. Virtual threads had the
   lower p99 and the higher p50 in all six pairs.
-- **No collapse under faults.** Against the same configuration without faults, the eight fault rows were between 31%
+- **No collapse under faults.** Against the same configuration without faults, the rates of the eight fault rows were between 31%
   lower and 24% higher (−30.6% to +24.2%); one run cannot separate this from noise. Publishing runs off the worker
   threads. In the outage rows the outbox peaked at 86,480 to 95,181 postings and drained afterwards.
 - **Every row passed all six invariants.**

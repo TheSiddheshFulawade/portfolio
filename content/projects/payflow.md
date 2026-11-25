@@ -42,11 +42,10 @@ risk-service applies payment, daily and velocity limits. Money is held first, th
 card authorisation and capture. In cards a capture submits the payment for clearing and money moves at settlement;
 here capture moves the balance at once.
 
-| Step | Command                  | Success reply   | Failure reply   | On failure                                  |
-| ---- | ------------------------ | --------------- | --------------- | ------------------------------------------- |
-| 1    | `ReserveFunds` to wallet | `FundsReserved` | `FundsRejected` | `REJECTED`                                  |
-| 2    | `CheckRisk` to risk      | `RiskApproved`  | `RiskRejected`  | `ReleaseFunds`, then `REVERSED` (specified) |
-| 3    | `CaptureFunds` to wallet | `FundsCaptured` | `CaptureFailed` | `ReleaseFunds`, then `REVERSED` (specified) |
+1. `ReserveFunds` to wallet. `FundsReserved` moves the saga on; `FundsRejected` ends the payment `REJECTED`.
+2. `CheckRisk` to risk. `RiskApproved` moves the saga on; `RiskRejected` leads to `ReleaseFunds`, then `REVERSED` (specified).
+3. `CaptureFunds` to wallet. `FundsCaptured` completes the payment; `CaptureFailed` leads to `ReleaseFunds`, then `REVERSED`
+   (specified).
 
 A payment ends in one of three states: `COMPLETED`, `REVERSED` or `REJECTED`. Per wallet, reserve moves an
 amount from available to held, release moves it back, and capture takes it from the payer's held and adds it to

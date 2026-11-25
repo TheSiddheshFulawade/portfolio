@@ -10,7 +10,7 @@ items:
     title: Orchestrated saga
     choice: One service, payment-service, owns each payment's state and sends the commands to the wallet and risk services.
     rejected: Choreography, where each service reacts to the others' events.
-    reason: Where a payment is and why is one query, and timeouts and compensation have one owner. In choreography the state machine is spread over the services. Timeouts and compensation are specified and not built yet (PF-06).
+    reason: Where a payment is and why is one query, and timeouts and compensation have one owner. In choreography the state machine is spread over the services. Deadlines are stored; the sweeper that acts on them, and compensation, are specified and not built yet (PF-06).
     cost: The orchestrator knows every step, so it is coupled to all of them.
     evidence:
       - label: PayFlow, ADR-0002 decision 2
