@@ -35,7 +35,7 @@
   min-width: 44px;
   justify-content: center;
   padding: 0 var(--space-3);
-  border: 1px solid var(--line);
+  border: 1px solid var(--control);
   border-radius: var(--radius-control);
   background: var(--panel);
   color: var(--text);
@@ -129,6 +129,20 @@
     &.active {
       color: var(--accent);
       box-shadow: inset 2px 0 0 var(--accent);
+    }
+  }
+}
+
+// The open menu scrolls inside a short viewport (400% zoom, landscape phones), so every link stays reachable.
+// The focus ring is drawn inside the links, because a scroll container clips it outside.
+@media (max-width: 55.99rem) {
+  .nav.open {
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    a {
+      outline-offset: -3px;
     }
   }
 }

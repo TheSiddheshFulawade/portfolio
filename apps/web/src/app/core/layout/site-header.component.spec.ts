@@ -28,7 +28,7 @@ describe('SiteHeaderComponent', () => {
       .map((a) => a.textContent?.trim());
 
     expect(nav.getAttribute('aria-label')).toBe('Main');
-    expect(labels).toEqual(['Home', 'Experience', 'Projects', 'About', 'Contact']);
+    expect(labels).toEqual(['Home', 'Projects', 'Experience', 'About', 'Contact']);
     expect(screen.getByRole('link', { name: 'Siddhesh Fulawade' }).getAttribute('href')).toBe('/');
   });
 
