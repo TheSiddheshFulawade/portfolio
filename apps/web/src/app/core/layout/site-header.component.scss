@@ -1,4 +1,7 @@
 :host {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: block;
   border-bottom: 1px solid var(--line);
   background: var(--bg);
@@ -10,8 +13,9 @@
   align-items: center;
   gap: var(--space-3);
   max-width: var(--layout-max);
+  min-height: 4rem; // aligned with --sticky-top (4rem bar plus a gap) and html scroll-padding-top
   margin: 0 auto;
-  padding: var(--space-3) var(--gutter);
+  padding: var(--space-2) var(--gutter);
 }
 
 .brand {

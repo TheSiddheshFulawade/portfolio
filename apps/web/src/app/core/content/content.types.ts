@@ -33,7 +33,18 @@ export interface Site {
   ogImageAlt: string;
   nav: NavItem[];
   pages: Record<PageKey, PageMeta>;
-  footer: { note: string; sourceLabel: string; sourceUrl: string };
+  footer: {
+    identity: string;
+    copyrightYear: number;
+    navLabel: string;
+    siteHeading: string;
+    systemsHeading: string;
+    profilesHeading: string;
+    note: string;
+    sourceLabel: string;
+    sourceUrl: string;
+  };
+  contact: { heading: string; body: string };
   ui: Record<string, string>;
   /** Home hero: a fixed lead and rotating phrases (REQ-HOME-101). */
   hero: Hero;
