@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Experience with a label rail and themed highlights, then education, certifications and achievements; About with the optional portrait, bio and capabilities with evidence (education moved to Experience; `site` evidence links to this site's source; skills without evidence hidden) (005 RD-06).
 - Design blueprint published in `docs/design/blueprint/` with the known errors of its simulations and their corrections (005).
 - `/progress` command: read-only status, effort-weighted percent and dates for the three projects from git, GitHub and the spec tasks; runs no tests (tooling).
 - Redesign content: `decisions.yaml` with six decisions and pinned evidence, four capability groups with evidence, themed experience highlights, PayFlow content that separates proven from planned, Settlement Lab rewritten for the Java 21 run, 12 measured rows from `results.json` at 3eb119a, hero and section labels, and the RD-01 content corrections (005 RD-03).

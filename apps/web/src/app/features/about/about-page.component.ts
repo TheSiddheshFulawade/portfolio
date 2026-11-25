@@ -2,18 +2,11 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
-import { formatMonthRange } from '../../shared/format/month';
-
-interface EvidenceLink {
-  id: string;
-  label: string;
-  link: string[];
-  fragment?: string;
-}
+import { resolveSkills } from '../../core/content/evidence';
 
 /**
- * About (REQ-PAGE-006): bio, skills grouped with evidence links, education. Experience evidence is labelled by
- * role and dates, never by company (brief decision 4: employer names appear on the Experience page only).
+ * About (REQ-ABOUT-101): photo when set, bio, and capabilities with evidence. A skill without resolvable
+ * evidence is hidden. Education lives on Experience (REQ-EXP-101).
  */
 @Component({
   selector: 'sf-about-page',
@@ -28,33 +21,9 @@ export class AboutPageComponent {
   protected readonly page = this.content.page('about');
   protected readonly profile = this.content.profile;
   protected readonly ui = this.content.site.ui;
-  protected readonly education = this.content.education;
-  protected readonly groups = this.content.skills.map((group) => ({
-    ...group,
-    skills: group.skills.map((skill) => ({
-      name: skill.name,
-      evidence: skill.evidence
-        .map((id) => this.evidence(id))
-        .filter((e): e is EvidenceLink => e !== undefined),
-    })),
-  }));
+  protected readonly groups = resolveSkills(this.content.skills, this.content);
 
   constructor() {
     inject(SeoService).page('about', '/about');
-  }
-
-  /** Resolves an evidence id to a link; unpublished or unknown ids are dropped (REQ-CONTENT-003). */
-  private evidence(id: string): EvidenceLink | undefined {
-    const project = this.content.project(id);
-    if (project) return { id, label: project.title, link: ['/projects', id] };
-    const role = this.content.experience.find((r) => r.id === id);
-    if (!role) return undefined;
-    const dates = formatMonthRange(
-      role.start,
-      role.end,
-      this.ui['present'],
-      this.content.site.locale,
-    );
-    return { id, label: `${role.title}, ${dates}`, link: ['/experience'], fragment: id };
   }
 }

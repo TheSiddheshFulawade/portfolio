@@ -106,6 +106,7 @@ ui:
   stack: Stack
   skillsHeading: Skills
   evidence: Evidence
+  thisSite: This site's source
   educationHeading: Education
   certificationsHeading: Certifications
   achievementsHeading: Achievements
