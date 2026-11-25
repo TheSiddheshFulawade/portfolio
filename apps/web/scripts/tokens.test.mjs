@@ -43,6 +43,8 @@ const PAIRS = [
   ['--line', '--bg', 1.2],
   // Spec 005 RD-02: second line colour, ink on solid buttons, text on the nested surface.
   ['--line-2', '--bg', 1.5],
+  ['--control', '--bg', 3],
+  ['--control', '--panel', 3],
   ['--accent-ink', '--accent', 4.5],
   ['--text', '--raise', 4.5],
   ['--text-strong', '--raise', 4.5],

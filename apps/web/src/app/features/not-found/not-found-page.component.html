@@ -1,8 +1,8 @@
-<section class="page">
-  <p class="eyebrow">404</p>
+<section class="page-head">
   <h1>{{ page.heading }}</h1>
-  <p>{{ page.body }}</p>
-  <p>
-    <a routerLink="/">{{ page.action }}</a>
-  </p>
+  <p class="lead">{{ page.body }}</p>
+  <div class="acts">
+    <a class="btn solid" routerLink="/">{{ page.action }}</a>
+  </div>
 </section>
+<canvas #field class="field" aria-hidden="true"></canvas>

@@ -12,6 +12,7 @@
     "nav",
     "pages",
     "footer",
+    "contact",
     "ui"
   ],
   "definitions": {
@@ -66,12 +67,41 @@
     },
     "footer": {
       "type": "object",
-      "required": ["note", "sourceLabel", "sourceUrl"],
+      "required": [
+        "identity",
+        "copyrightYear",
+        "navLabel",
+        "siteHeading",
+        "systemsHeading",
+        "profilesHeading",
+        "note",
+        "sourceLabel",
+        "sourceUrl"
+      ],
       "additionalProperties": false,
       "properties": {
+        "identity": { "$ref": "common.schema.json#/definitions/text" },
+        "copyrightYear": {
+          "type": "integer",
+          "minimum": 2026,
+          "maximum": 2100
+        },
+        "navLabel": { "$ref": "common.schema.json#/definitions/text" },
+        "siteHeading": { "$ref": "common.schema.json#/definitions/text" },
+        "systemsHeading": { "$ref": "common.schema.json#/definitions/text" },
+        "profilesHeading": { "$ref": "common.schema.json#/definitions/text" },
         "note": { "$ref": "common.schema.json#/definitions/text" },
         "sourceLabel": { "$ref": "common.schema.json#/definitions/text" },
         "sourceUrl": { "$ref": "common.schema.json#/definitions/url" }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "required": ["heading", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "heading": { "$ref": "common.schema.json#/definitions/text" },
+        "body": { "$ref": "common.schema.json#/definitions/text" }
       }
     },
     "ui": {

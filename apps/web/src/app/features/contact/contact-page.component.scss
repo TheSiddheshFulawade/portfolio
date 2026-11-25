@@ -43,6 +43,11 @@ dd {
   font-size: var(--step-1);
 }
 
+dd a {
+  display: inline-block;
+  padding-block: 2px;
+}
+
 .email {
   font-family: var(--font-mono);
   overflow-wrap: anywhere;

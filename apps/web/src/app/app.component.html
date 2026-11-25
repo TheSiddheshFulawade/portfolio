@@ -3,4 +3,7 @@
 <main id="main" class="container" tabindex="-1">
   <router-outlet />
 </main>
+@if (closing()) {
+  <sf-contact-section />
+}
 <sf-site-footer />

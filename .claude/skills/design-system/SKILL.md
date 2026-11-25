@@ -17,7 +17,8 @@ One accent (teal). Amber means in development or held; red means failed. Code: `
 | --panel | #10161d | #ffffff | simulations, footer |
 | --raise | #16202a | #e9eeec | nested surface, code |
 | --line | #1f2b36 | #d5dddb | rules between sections and rows |
-| --line-2 | #2e3d4b | #b7c3c0 | control borders, table heads |
+| --line-2 | #2e3d4b | #b7c3c0 | table heads, stronger rules |
+| --control | #5d6f80 | #7f8f8c | borders of buttons and chips (3:1 on bg and panel) |
 | --text | #d9e1e8 | #26313a | body |
 | --text-strong | #eef3f6 | #0d141a | headings, key words |
 | --dim | #93a3b1 | #55636f | secondary text |

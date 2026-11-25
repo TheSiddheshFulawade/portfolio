@@ -10,6 +10,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* The header is sticky and 4rem high: focus and anchors land below it (WCAG 2.2 focus not obscured). */
+  scroll-padding-top: var(--sticky-top);
 }
 
 body {
@@ -388,7 +390,7 @@ a.row:hover > h3 {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--control);
   border-radius: var(--radius-control);
   background: none;
   color: var(--text-strong);
@@ -562,4 +564,50 @@ sf-site-header {
   border-radius: var(--radius-control);
   background: var(--raise);
   font-size: 0.9em;
+}
+
+/* Closing contact section above the footer (REQ-UI-101). */
+.closing {
+  padding-inline: var(--gutter);
+}
+
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-6) var(--space-7);
+  align-items: end;
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+  border-top: 1px solid var(--line);
+}
+
+.contact h2 {
+  max-width: 15em;
+  font-size: var(--size-contact);
+}
+
+.contact p {
+  max-width: 36rem;
+  margin-top: var(--space-4);
+}
+
+.mail {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@media (max-width: 60rem) {
+  .contact {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Decorative dot field on the 404 page (REQ-UI-104); drawn by DotField. */
+.field {
+  display: block;
+  width: 100%;
+  height: clamp(11rem, 28vw, 17rem);
+  touch-action: pan-y;
 }

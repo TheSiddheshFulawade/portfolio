@@ -1,46 +1,109 @@
 :host {
   display: block;
-  margin-top: var(--space-8);
+}
+
+.foot {
   border-top: 1px solid var(--line);
+  background: var(--panel);
   color: var(--dim);
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-7);
+  padding-block: var(--space-7) var(--space-6);
+}
+
+h2 {
+  margin-bottom: var(--space-3);
+  color: var(--dim);
+  font-family: var(--font-body);
   font-size: var(--step--1);
+  font-weight: 600;
 }
 
-.inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  max-width: var(--layout-max);
-  margin: 0 auto;
-  padding: var(--space-6) var(--gutter);
-}
-
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-5);
+ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.links a,
-.meta a {
+.id {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 48rem) {
+  .cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(max-content, 1fr);
+  }
+}
+
+@media (min-width: 80rem) {
+  .cols {
+    grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)) minmax(max-content, 1fr);
+  }
+
+  .id {
+    grid-column: auto;
+  }
+}
+
+.id strong {
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.id p {
+  max-width: 25rem;
+  margin-top: var(--space-3);
+}
+
+li a,
+.base a {
   display: inline-block;
   padding: var(--space-1) 0;
 }
 
-.meta {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
-  max-width: none;
+li a {
+  color: var(--text);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
 }
 
+.base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-5);
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--step--1);
+
+  // Location sits left; the counter, note and source follow on the same row when they fit.
+  span:nth-child(2) {
+    margin-right: auto;
+  }
+}
+
+// Fixed-height slot so the counter never shifts the layout (REQ-COUNT-005).
 .counter {
   min-height: 1.6em;
-  max-width: none;
-  color: var(--dim);
-  font-size: var(--step--1);
+}
+
+@media (max-width: 40rem) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .base span:nth-child(2) {
+    margin-right: 0;
+  }
 }

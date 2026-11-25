@@ -1,23 +1,51 @@
-<footer class="footer">
-  <div class="inner">
-    <ul class="links">
-      @for (link of profile.links; track link.id) {
-        <li>
-          <a [href]="link.url" rel="me noopener">{{ link.label }}</a>
-        </li>
-      }
-      <li>
-        <a [href]="'mailto:' + profile.email">{{ profile.email }}</a>
-      </li>
-    </ul>
-    <!-- Fixed-height slot so the counter never shifts the layout (REQ-COUNT-005). -->
-    <p class="counter">
-      <sf-visitor-counter />
-    </p>
-    <p class="meta">
-      <span class="mono">© {{ year }} {{ profile.name }}</span>
+<footer class="foot">
+  <div class="wrap">
+    <div class="cols">
+      <div class="id">
+        <strong>{{ profile.name }}</strong>
+        <p>{{ footer.identity }}</p>
+      </div>
+      <nav [attr.aria-label]="footer.navLabel">
+        <h2>{{ footer.siteHeading }}</h2>
+        <ul>
+          @for (item of nav; track item.path) {
+            <li>
+              <a [routerLink]="item.path">{{ item.label }}</a>
+            </li>
+          }
+        </ul>
+      </nav>
+      <div>
+        <h2>{{ footer.systemsHeading }}</h2>
+        <ul>
+          @for (project of systems; track project.id) {
+            <li>
+              <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+      <div>
+        <h2>{{ footer.profilesHeading }}</h2>
+        <ul>
+          @for (link of profile.links; track link.id) {
+            <li>
+              <a [href]="link.url" rel="me noopener">{{ link.label }}</a>
+            </li>
+          }
+          <li>
+            <a [href]="'mailto:' + profile.email">{{ profile.email }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="base">
+      <span>© {{ footer.copyrightYear }} {{ profile.name }}</span>
+      <span>{{ profile.location }}</span>
+      <!-- Fixed-height slot so the counter never shifts the layout (REQ-COUNT-005). -->
+      <span class="counter"><sf-visitor-counter /></span>
       <span>{{ footer.note }}</span>
       <a [href]="footer.sourceUrl" rel="noopener">{{ footer.sourceLabel }}</a>
-    </p>
+    </div>
   </div>
 </footer>

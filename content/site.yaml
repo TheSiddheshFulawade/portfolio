@@ -51,9 +51,20 @@ pages:
     body: The page you asked for does not exist or has moved.
     action: Go to the home page
 footer:
+  identity: Full stack Java engineer. Payments, concurrency and failure recovery.
+  # Year of the copyright line, set here so the page never reads the clock.
+  copyrightYear: 2026
+  navLabel: Footer
+  siteHeading: Site
+  systemsHeading: Systems
+  profilesHeading: Elsewhere
   note: Built with Angular, prerendered, hosted on Cloudflare Pages.
   sourceLabel: Source on GitHub
   sourceUrl: https://github.com/TheSiddheshFulawade/portfolio
+# Closing call to action, shown above the footer on every page.
+contact:
+  heading: Building something that has to be right?
+  body: I'm glad to talk about payments, distributed systems and backend engineering roles.
 ui:
   skipLink: Skip to main content
   menu: Menu

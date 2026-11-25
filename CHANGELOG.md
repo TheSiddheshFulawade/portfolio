@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Sticky header, four-column footer (identity, site, systems, profiles, location, counter), closing contact section above the footer, and a 404 with a decorative dot field that is drawn once and settles (005 RD-04).
 - Design system moved to the redesign: new palette and display sizes, shared rail, row, button and chip styles, short route fades that reduced motion skips (005 RD-02).
 - Spec 005 (redesign, v1.2.0) approved and corrected after the RD-01 audit; `technical-auditor`, `finance-auditor` and `motion-designer` agents, the `accuracy-baseline` skill and the claim register, wired into `/review` and `/release` (005 RD-01).
 - `docs/threat-model.md`: STRIDE model of the site, content build, `/api/visits`, D1 and CI (security baseline).
