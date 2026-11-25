@@ -59,7 +59,7 @@ A fix to a claim is re-audited; the author of a change never passes their own cl
 3. A redelivery needs a cause. For a duplicate the inbox drops: the offset was not committed after the database commit (crash
    or rebalance), or a relay crashed after the ack and before `sent_at`. A failed handler is also redelivered (9 retries,
    500 ms apart), but nothing was committed, so it is not a duplicate.
-4. PayFlow's `REFUNDED` (specified, PF-06) means any hold was released (also by a release tombstone, when nothing was held): in card terms an authorisation reversal. Explain it wherever it appears.
+4. PayFlow's `REVERSED` (named REFUNDED before 8840834; specified, PF-06) means any hold was released (also by a release tombstone, when nothing was held): in card terms an authorisation reversal. Explain it wherever it appears.
 5. Retry sits **inside** the circuit breaker in Settlement Lab: the breaker counts the outcome after retries.
 6. Ordered locking against CAS is **2.9× to 4.6×** in throughput (172,734 / 59,859 = 2.886).
    One run, 4 cores, JDK 21.0.13: say so next to the numbers.
@@ -79,6 +79,7 @@ A fix to a claim is re-audited; the author of a change never passes their own cl
     outgoing message commit together: never show them one after another.
 18. Settlement Lab's in-memory engine publishes directly and its outbox holds only failed publishes; `ledger-postgres` writes
     every posting to a transactional outbox.
+19. Neither repo has a licence: say "public" or "built in public", not "open source".
 
 ## Simulations
 

@@ -16,6 +16,9 @@
     @for (group of groups; track group.id) {
       <div class="group">
         <h3>{{ group.label }}</h3>
+        @if (group.summary) {
+          <p class="dim">{{ group.summary }}</p>
+        }
         <ul>
           @for (skill of group.skills; track skill.name) {
             <li>

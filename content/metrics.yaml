@@ -3,25 +3,25 @@
 # employer (brief decision 4: employer names appear on the Experience page only).
 id: metrics
 published: true
-updated: 2026-11-19
+updated: 2026-11-24
 items:
-  - id: exactly-once
+  - id: thread-safe
     order: 10
-    value: Exactly-once
-    label: thread-safe transaction processing under concurrent load
+    value: Thread-safe
+    label: transaction processing under concurrent load, built with Java concurrency primitives
     source: Current role, 2024 to present. Details on the Experience page.
   - id: db-calls
     order: 20
     value: 30%
-    label: fewer database calls through batching and a distributed cache
+    label: fewer database calls through batch processing and Red Hat Data Grid caching
     source: Current role, 2024 to present. Details on the Experience page.
   - id: deploy-time
     order: 30
     value: 40%
-    label: shorter deployments after automating OpenShift releases
+    label: less deployment time, leading end-to-end OpenShift deployments with Docker and Jenkins
     source: Current role, 2024 to present. Details on the Experience page.
   - id: coverage
     order: 40
     value: 85%
-    label: unit test coverage on critical payment flows
+    label: unit test coverage, improving release confidence on critical payment flows
     source: Current role, 2024 to present. Details on the Experience page.

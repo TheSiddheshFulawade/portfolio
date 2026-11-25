@@ -18,7 +18,7 @@
         }
       </ul>
     </header>
-    <div class="prose" [innerHTML]="project.html"></div>
+    <div class="prose" [innerHTML]="body()"></div>
   </article>
 } @else {
   <sf-not-found-page />

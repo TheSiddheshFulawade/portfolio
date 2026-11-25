@@ -1,0 +1,173 @@
+# Generated from settlement-lab results/results.json at 3eb119a by a one-off conversion; values are exact.
+id: settlement-lab
+published: true
+updated: 2026-11-24
+measured: Submissions answered by the engine per second, applying transfers to the in-memory ledger, with duplicates and rejections included. Delivery to the simulated general ledger is not in the rate and finishes afterwards. p50 and p99 are the caller's time from submit to outcome.
+machine: Cloud container, Intel Xeon Processor @ 2.10GHz
+os: Linux amd64
+cores: 4
+jdk: 21.0.13.0.3 (Ubuntu)
+runs: 1
+runDate: 2026-11-19
+workload: 100,000 submissions per row from 64 closed-loop clients through 8 workers; 10,000 accounts; 20% of transfers within 20 hot accounts; 2% resent ids (2,006 duplicates per row); 802 to 853 rejections per row; seed 20261119. The run date is the date the results were committed.
+source:
+  repo: https://github.com/TheSiddheshFulawade/settlement-lab
+  commit: 3eb119a
+  path: results/results.json
+rows:
+  - ledger: LOCKING
+    threads: PLATFORM
+    fault: NONE
+    transfers: 100000
+    submissionsPerSecond: 248861
+    p50Us: 183
+    p99Us: 2008
+    rejected: 853
+    duplicates: 2006
+    retries: 0
+    breakerOpens: 0
+    outboxPeak: 0
+    invariantsPassed: true
+  - ledger: LOCKING
+    threads: PLATFORM
+    fault: FLAKY
+    transfers: 100000
+    submissionsPerSecond: 215823
+    p50Us: 197
+    p99Us: 2680
+    rejected: 825
+    duplicates: 2006
+    retries: 16739
+    breakerOpens: 0
+    outboxPeak: 3
+    invariantsPassed: true
+  - ledger: LOCKING
+    threads: PLATFORM
+    fault: OUTAGE
+    transfers: 100000
+    submissionsPerSecond: 172734
+    p50Us: 228
+    p99Us: 2840
+    rejected: 808
+    duplicates: 2006
+    retries: 54
+    breakerOpens: 1
+    outboxPeak: 90036
+    invariantsPassed: true
+  - ledger: LOCKING
+    threads: VIRTUAL
+    fault: NONE
+    transfers: 100000
+    submissionsPerSecond: 181706
+    p50Us: 340
+    p99Us: 800
+    rejected: 825
+    duplicates: 2006
+    retries: 0
+    breakerOpens: 0
+    outboxPeak: 0
+    invariantsPassed: true
+  - ledger: LOCKING
+    threads: VIRTUAL
+    fault: FLAKY
+    transfers: 100000
+    submissionsPerSecond: 225608
+    p50Us: 237
+    p99Us: 735
+    rejected: 814
+    duplicates: 2006
+    retries: 16763
+    breakerOpens: 0
+    outboxPeak: 3
+    invariantsPassed: true
+  - ledger: LOCKING
+    threads: VIRTUAL
+    fault: OUTAGE
+    transfers: 100000
+    submissionsPerSecond: 165981
+    p50Us: 368
+    p99Us: 1342
+    rejected: 832
+    duplicates: 2006
+    retries: 52
+    breakerOpens: 1
+    outboxPeak: 86480
+    invariantsPassed: true
+  - ledger: CAS
+    threads: PLATFORM
+    fault: NONE
+    transfers: 100000
+    submissionsPerSecond: 54027
+    p50Us: 878
+    p99Us: 9488
+    rejected: 820
+    duplicates: 2006
+    retries: 0
+    breakerOpens: 0
+    outboxPeak: 0
+    invariantsPassed: true
+  - ledger: CAS
+    threads: PLATFORM
+    fault: FLAKY
+    transfers: 100000
+    submissionsPerSecond: 49865
+    p50Us: 886
+    p99Us: 8784
+    rejected: 830
+    duplicates: 2006
+    retries: 16777
+    breakerOpens: 0
+    outboxPeak: 3
+    invariantsPassed: true
+  - ledger: CAS
+    threads: PLATFORM
+    fault: OUTAGE
+    transfers: 100000
+    submissionsPerSecond: 59859
+    p50Us: 829
+    p99Us: 6282
+    rejected: 813
+    duplicates: 2006
+    retries: 52
+    breakerOpens: 1
+    outboxPeak: 94167
+    invariantsPassed: true
+  - ledger: CAS
+    threads: VIRTUAL
+    fault: NONE
+    transfers: 100000
+    submissionsPerSecond: 55465
+    p50Us: 1011
+    p99Us: 3779
+    rejected: 826
+    duplicates: 2006
+    retries: 0
+    breakerOpens: 0
+    outboxPeak: 0
+    invariantsPassed: true
+  - ledger: CAS
+    threads: VIRTUAL
+    fault: FLAKY
+    transfers: 100000
+    submissionsPerSecond: 51813
+    p50Us: 1016
+    p99Us: 3507
+    rejected: 821
+    duplicates: 2006
+    retries: 16762
+    breakerOpens: 0
+    outboxPeak: 3
+    invariantsPassed: true
+  - ledger: CAS
+    threads: VIRTUAL
+    fault: OUTAGE
+    transfers: 100000
+    submissionsPerSecond: 54297
+    p50Us: 1046
+    p99Us: 3409
+    rejected: 802
+    duplicates: 2006
+    retries: 52
+    breakerOpens: 1
+    outboxPeak: 95181
+    invariantsPassed: true

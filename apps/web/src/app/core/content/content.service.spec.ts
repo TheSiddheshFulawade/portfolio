@@ -23,7 +23,7 @@ describe('ContentService', () => {
     const current = service().currentProjects.map((p) => p.id);
     const earlier = service().earlierProjects;
 
-    expect(current).toEqual(['settlement-lab', 'pennywise']);
+    expect(current).toEqual(['payflow', 'settlement-lab', 'pennywise']);
     expect(earlier.map((p) => p.id).sort()).toEqual(['anomaly-detection', 'helmet-detection']);
     expect(earlier.every((p) => p.repo === undefined)).toBe(true);
     expect(service().site.ui['earlierWork']).toBe('Earlier work');

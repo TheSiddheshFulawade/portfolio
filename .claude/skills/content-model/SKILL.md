@@ -39,7 +39,7 @@ updated: 2026-11-16
 ## Writing rules
 - Impact first, numbers over adjectives, one idea per bullet, international number format.
 - Every metric has a `source`. No employer volume or throughput figure (for example transactions per hour);
-  describe the guarantee instead ("thread-safe, exactly-once processing under concurrent load").
+  describe the guarantee instead ("thread-safe transaction processing under concurrent load").
 - Site email: hello@siddheshfulawade.com.
 - Employer work (ReBIT / e-Kuber 3.0) is experience only: resume-level facts, "contributed to";
   no internal names, diagrams, volumes, code or logos.

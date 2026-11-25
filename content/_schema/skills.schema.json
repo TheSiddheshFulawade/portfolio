@@ -1,7 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "skills.schema.json",
-  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/definitions/shared"
+    }
+  ],
   "type": "object",
   "required": ["groups"],
   "properties": {
@@ -17,9 +21,15 @@
         "required": ["id", "order", "label", "skills"],
         "additionalProperties": false,
         "properties": {
-          "id": { "$ref": "common.schema.json#/definitions/id" },
-          "order": { "type": "integer" },
-          "label": { "$ref": "common.schema.json#/definitions/text" },
+          "id": {
+            "$ref": "common.schema.json#/definitions/id"
+          },
+          "order": {
+            "type": "integer"
+          },
+          "label": {
+            "$ref": "common.schema.json#/definitions/text"
+          },
           "skills": {
             "type": "array",
             "items": {
@@ -27,16 +37,25 @@
               "required": ["name", "evidence"],
               "additionalProperties": false,
               "properties": {
-                "name": { "$ref": "common.schema.json#/definitions/text" },
+                "name": {
+                  "$ref": "common.schema.json#/definitions/text"
+                },
                 "evidence": {
                   "type": "array",
-                  "items": { "$ref": "common.schema.json#/definitions/id" }
+                  "items": {
+                    "$ref": "common.schema.json#/definitions/id"
+                  }
                 }
               }
             }
+          },
+          "summary": {
+            "$ref": "common.schema.json#/definitions/text"
           }
         }
-      }
+      },
+      "minItems": 4,
+      "maxItems": 4
     }
   },
   "additionalProperties": false

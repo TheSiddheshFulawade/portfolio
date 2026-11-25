@@ -35,8 +35,9 @@ describe('ExperiencePageComponent', () => {
       expect(text).toMatch(/[A-Z][a-z]{2} \d{4} – ([A-Z][a-z]{2} \d{4}|Present)/);
       const time = article.querySelector('time');
       expect(time?.getAttribute('datetime')).toBe(role.start);
-      for (const highlight of role.highlights) {
-        expect(within(article).getByText(highlight)).toBeTruthy();
+      for (const group of role.highlights) {
+        expect(within(article).getByRole('heading', { level: 3, name: group.theme })).toBeTruthy();
+        for (const item of group.items) expect(within(article).getByText(item)).toBeTruthy();
       }
     }
   });

@@ -1,0 +1,77 @@
+# Engineering decisions shown on Home (REQ-HOME-105): choice, rejected option, reason, cost and evidence.
+# Evidence points at the repository files at a recorded commit: payflow 8840834, settlement-lab b863270
+# (README) and 3eb119a (measured results). Claims are in docs/accuracy/claims.md.
+id: decisions
+published: true
+updated: 2026-11-24
+items:
+  - id: orchestrated-saga
+    order: 10
+    title: Orchestrated saga
+    choice: One service, payment-service, owns each payment's state and sends the commands to the wallet and risk services.
+    rejected: Choreography, where each service reacts to the others' events.
+    reason: Where a payment is and why is one query, and timeouts and compensation have one owner. In choreography the state machine is spread over the services. Deadlines are stored; the sweeper that acts on them, and compensation, are specified and not built yet (PF-06).
+    cost: The orchestrator knows every step, so it is coupled to all of them.
+    evidence:
+      - label: PayFlow, ADR-0002 decision 2
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+      - label: PayFlow, SPEC section 4
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/SPEC.md
+  - id: hold-then-capture
+    order: 20
+    title: Hold funds, then capture
+    choice: Reserve the amount as a hold, check risk, then capture the hold.
+    rejected: Check risk first, then debit the payer and credit the payee, with a refund credit if a step fails.
+    reason: No money leaves the payer before capture, so undoing a payment before capture is one local transaction that releases the hold. The end state REVERSED (specified, not built yet) means any hold was released and nothing was captured, an authorisation reversal in card terms, not captured money sent back.
+    cost: A hold is extra state. Every failure from the moment a hold may exist needs a release, the release must be safe to repeat, and a payment that has been captured is not undone this way.
+    evidence:
+      - label: PayFlow, ADR-0002 decision 3
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+      - label: PayFlow, SPEC section 4
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/SPEC.md
+  - id: transactional-outbox
+    order: 30
+    title: Transactional outbox
+    choice: Write the outgoing message to an outbox table in the same database transaction as the state change, and let a polling relay publish it.
+    rejected: Writing to the database and publishing to Kafka as two separate steps.
+    reason: A state change and its message commit together, so a crash cannot leave one without the other. Merged tests cover the rollback case and a relay crash after sending and before marking the row sent.
+    cost: Delivery becomes at least once, and the polling relay adds some latency and database load.
+    evidence:
+      - label: PayFlow, ADR-0002 decision 4
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+      - label: PayFlow, messaging module tests (OutboxWriterTest, OutboxRelayTest)
+        url: https://github.com/TheSiddheshFulawade/payflow/tree/8840834/messaging/src/test/java/com/siddheshfulawade/payflow/messaging
+  - id: idempotent-inbox
+    order: 40
+    title: Idempotent inbox
+    choice: Record each processed message id in an inbox table in the same transaction as the effect.
+    rejected: Kafka exactly-once transactions.
+    reason: Kafka transactions cover Kafka-to-Kafka work, and here the effect is a PostgreSQL row. Delivery stays at least once; the inbox makes the effect happen once.
+    cost: Each consumer keeps a processed-message table, and someone has to decide how long to keep its rows.
+    evidence:
+      - label: PayFlow, ADR-0002 decision 5
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+      - label: PayFlow, messaging module tests (IdempotentConsumerTest)
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/messaging/src/test/java/com/siddheshfulawade/payflow/messaging/IdempotentConsumerTest.java
+  - id: ordered-locking
+    order: 50
+    title: Ordered locking
+    choice: Take both account locks in ascending account id order for every transfer.
+    rejected: Compare-and-set (CAS) on an immutable snapshot of the whole balance table.
+    reason: A fixed order rules out deadlock between transfers, and a transfer touches only its two accounts. Each CAS write copies the whole balance table (80 KB at 10,000 accounts) and a failed swap throws the copy away. In six like-for-like pairs ordered locking answered 2.9× to 4.6× as many submissions per second as CAS.
+    cost: Transfers on a hot account run one at a time. With a small table and many readers CAS could come out ahead; that was not tested. The ratios come from one run on 4 cores.
+    evidence:
+      - label: Settlement Lab, measured results (one run, JDK 21.0.13, commit 3eb119a)
+        url: https://github.com/TheSiddheshFulawade/settlement-lab/blob/3eb119a/results/results.md
+      - label: Settlement Lab, README decisions at b863270
+        url: https://github.com/TheSiddheshFulawade/settlement-lab/blob/b863270/README.md
+  - id: explicit-sql
+    order: 60
+    title: Explicit SQL with JdbcClient
+    choice: Write the SQL by hand with Spring's JdbcClient and Flyway migrations.
+    rejected: JPA and Hibernate for everything.
+    reason: Locking, CHECK constraints and SKIP LOCKED are the design, so they stay visible in review instead of sitting behind a mapping layer.
+    cost: Row mapping is written by hand, and there is no change tracking to lean on.
+    evidence:
+      - label: PayFlow, ADR-0002 decision 10
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md

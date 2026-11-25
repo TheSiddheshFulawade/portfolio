@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "decisions.schema.json",
+  "description": "content/decisions.yaml. REQ-HOME-105: every decision states choice, rejected option, reason, cost and evidence.",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": ["items"],
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "order",
+          "title",
+          "choice",
+          "rejected",
+          "reason",
+          "cost",
+          "evidence"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/definitions/id" },
+          "order": { "type": "integer" },
+          "title": { "$ref": "common.schema.json#/definitions/text" },
+          "choice": { "$ref": "common.schema.json#/definitions/text" },
+          "rejected": { "$ref": "common.schema.json#/definitions/text" },
+          "reason": { "$ref": "common.schema.json#/definitions/text" },
+          "cost": { "$ref": "common.schema.json#/definitions/text" },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["label"],
+              "additionalProperties": false,
+              "properties": {
+                "label": { "$ref": "common.schema.json#/definitions/text" },
+                "ref": { "$ref": "common.schema.json#/definitions/text" },
+                "url": { "$ref": "common.schema.json#/definitions/url" }
+              },
+              "oneOf": [{ "required": ["ref"] }, { "required": ["url"] }]
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

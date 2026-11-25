@@ -46,12 +46,41 @@ export interface Site {
   };
   contact: { heading: string; body: string };
   ui: Record<string, string>;
+  /** Home hero: a fixed lead and rotating phrases (REQ-HOME-101). */
+  hero: Hero;
+  /** Section labels of the Home page (REQ-HOME-104). */
+  sections: Sections;
+}
+
+export interface Hero {
+  lead: string;
+  /** 2 to 5 phrases; the last is the resting state. */
+  phrases: string[];
+  /** The whole sentence for screen readers and reduced motion. */
+  srSentence: string;
+}
+
+export interface Sections {
+  selected: string;
+  experience: string;
+  decisions: string;
+  capabilities: string;
+  contact: string;
+  [key: string]: string;
 }
 
 export interface Link {
   id: string;
   label: string;
   url: string;
+}
+
+/** The portrait (REQ-UI-105): 4:5, under 60 KB, checked at build time. */
+export interface Photo {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
 }
 
 export interface Profile {
@@ -63,6 +92,7 @@ export interface Profile {
   email: string;
   links: Link[];
   resume?: { label: string; url: string };
+  photo?: Photo;
 }
 
 export interface Metric {
@@ -73,6 +103,12 @@ export interface Metric {
   source: string;
 }
 
+/** Impact bullets grouped under a theme (REQ-EXP-101); both order and grouping come from content. */
+export interface ThemedHighlights {
+  theme: string;
+  items: string[];
+}
+
 export interface Experience extends Shared {
   company: string;
   title: string;
@@ -81,7 +117,7 @@ export interface Experience extends Shared {
   start: string;
   end: string | null;
   summary: string;
-  highlights: string[];
+  highlights: ThemedHighlights[];
   recognition?: string[];
   stack: string[];
 }
@@ -94,9 +130,16 @@ export interface Project extends Shared {
   /** Shown under "Earlier work", without a repo link. */
   earlier?: boolean;
   repo?: string;
-  /** Rendered from the Markdown body at build time. */
-  html: string;
+  /** Release state (REQ-ACC-005); an in-development project lists what is proven and planned. */
+  phase?: ProjectPhase;
+  /** What merged tests prove. */
+  proven?: string[];
+  /** What is designed but not built or not proven yet. */
+  planned?: string[];
+  // The rendered Markdown body is not part of the shell: see project-bodies.ts.
 }
+
+export type ProjectPhase = 'in-development' | 'released';
 
 export interface Note extends Omit<Shared, 'order'> {
   /** Notes sort by date, newest first; order is not used. */
@@ -112,10 +155,12 @@ export interface Note extends Omit<Shared, 'order'> {
   html: string;
 }
 
+/** One of exactly four capability groups (REQ-ABOUT-101). Skills without evidence are removed at build time. */
 export interface SkillGroup {
   id: string;
   order: number;
   label: string;
+  summary?: string;
   skills: { name: string; evidence: string[] }[];
 }
 
@@ -143,3 +188,62 @@ export interface SiteContent {
   skills: SkillGroup[];
   education: Education;
 }
+
+/** An evidence link on a decision: a content id (`ref`) or an https/site url, never both. */
+export interface DecisionEvidence {
+  label: string;
+  ref?: string;
+  url?: string;
+}
+
+/** A design decision (REQ-HOME-105): what was chosen, what was rejected, why, and what it costs. */
+export interface Decision {
+  id: string;
+  order: number;
+  title: string;
+  choice: string;
+  rejected: string;
+  reason: string;
+  cost: string;
+  evidence: DecisionEvidence[];
+}
+
+/** src/generated/home.json: data only the Home page needs. */
+export interface HomeContent {
+  decisions: Decision[];
+}
+
+export interface ResultRow {
+  ledger: string;
+  threads: string;
+  fault: string;
+  transfers: number;
+  submissionsPerSecond: number;
+  p50Us: number;
+  p99Us: number;
+  rejected: number;
+  duplicates: number;
+  retries: number;
+  breakerOpens: number;
+  outboxPeak: number;
+  invariantsPassed: boolean;
+  firstFailure?: string;
+}
+
+/** A measured result with every fact of REQ-ACC-004, taken from the repo's results at a recorded commit. */
+export interface BenchmarkResult {
+  id: string;
+  measured: string;
+  machine: string;
+  os: string;
+  cores: number;
+  jdk: string;
+  runs: number;
+  runDate: string;
+  workload: string;
+  source: { repo: string; commit: string; path: string };
+  rows: ResultRow[];
+}
+
+/** src/generated/results.json, keyed by result id. */
+export type ResultsContent = Record<string, BenchmarkResult>;

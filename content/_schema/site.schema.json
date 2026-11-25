@@ -1,7 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "site.schema.json",
-  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/definitions/shared"
+    }
+  ],
   "type": "object",
   "required": [
     "title",
@@ -12,19 +16,33 @@
     "nav",
     "pages",
     "footer",
-    "contact",
-    "ui"
+    "ui",
+    "hero",
+    "sections",
+    "contact"
   ],
   "definitions": {
     "page": {
       "type": "object",
       "required": ["title", "description"],
       "properties": {
-        "title": { "$ref": "common.schema.json#/definitions/text" },
-        "description": { "type": "string", "minLength": 20, "maxLength": 170 },
-        "heading": { "$ref": "common.schema.json#/definitions/text" },
-        "body": { "$ref": "common.schema.json#/definitions/text" },
-        "action": { "$ref": "common.schema.json#/definitions/text" }
+        "title": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 170
+        },
+        "heading": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "body": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "action": {
+          "$ref": "common.schema.json#/definitions/text"
+        }
       },
       "additionalProperties": false
     }
@@ -35,11 +53,23 @@
     "featured": true,
     "order": true,
     "updated": true,
-    "title": { "$ref": "common.schema.json#/definitions/text" },
-    "url": { "type": "string", "pattern": "^https://[^/]+$" },
-    "locale": { "type": "string" },
-    "ogImage": { "type": "string", "pattern": "^/[^/].*\\.(png|jpg)$" },
-    "ogImageAlt": { "$ref": "common.schema.json#/definitions/text" },
+    "title": {
+      "$ref": "common.schema.json#/definitions/text"
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https://[^/]+$"
+    },
+    "locale": {
+      "type": "string"
+    },
+    "ogImage": {
+      "type": "string",
+      "pattern": "^/[^/].*\\.(png|jpg)$"
+    },
+    "ogImageAlt": {
+      "$ref": "common.schema.json#/definitions/text"
+    },
     "nav": {
       "type": "array",
       "minItems": 1,
@@ -48,8 +78,13 @@
         "required": ["label", "path"],
         "additionalProperties": false,
         "properties": {
-          "label": { "$ref": "common.schema.json#/definitions/text" },
-          "path": { "type": "string", "pattern": "^/" }
+          "label": {
+            "$ref": "common.schema.json#/definitions/text"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          }
         }
       }
     },
@@ -63,7 +98,9 @@
         "contact",
         "notFound"
       ],
-      "additionalProperties": { "$ref": "#/definitions/page" }
+      "additionalProperties": {
+        "$ref": "#/definitions/page"
+      }
     },
     "footer": {
       "type": "object",
@@ -80,19 +117,75 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "identity": { "$ref": "common.schema.json#/definitions/text" },
+        "identity": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
         "copyrightYear": {
           "type": "integer",
           "minimum": 2026,
           "maximum": 2100
         },
-        "navLabel": { "$ref": "common.schema.json#/definitions/text" },
-        "siteHeading": { "$ref": "common.schema.json#/definitions/text" },
-        "systemsHeading": { "$ref": "common.schema.json#/definitions/text" },
-        "profilesHeading": { "$ref": "common.schema.json#/definitions/text" },
-        "note": { "$ref": "common.schema.json#/definitions/text" },
-        "sourceLabel": { "$ref": "common.schema.json#/definitions/text" },
-        "sourceUrl": { "$ref": "common.schema.json#/definitions/url" }
+        "navLabel": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "siteHeading": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "systemsHeading": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "profilesHeading": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "note": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "sourceLabel": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "sourceUrl": {
+          "$ref": "common.schema.json#/definitions/url"
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "common.schema.json#/definitions/text"
+      }
+    },
+    "hero": {
+      "type": "object",
+      "required": ["lead", "phrases", "srSentence"],
+      "additionalProperties": false,
+      "properties": {
+        "lead": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "phrases": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "$ref": "common.schema.json#/definitions/text"
+          }
+        },
+        "srSentence": {
+          "$ref": "common.schema.json#/definitions/text"
+        }
+      }
+    },
+    "sections": {
+      "type": "object",
+      "required": [
+        "selected",
+        "experience",
+        "decisions",
+        "capabilities",
+        "contact"
+      ],
+      "additionalProperties": {
+        "$ref": "common.schema.json#/definitions/text"
       }
     },
     "contact": {
@@ -100,13 +193,13 @@
       "required": ["heading", "body"],
       "additionalProperties": false,
       "properties": {
-        "heading": { "$ref": "common.schema.json#/definitions/text" },
-        "body": { "$ref": "common.schema.json#/definitions/text" }
+        "heading": {
+          "$ref": "common.schema.json#/definitions/text"
+        },
+        "body": {
+          "$ref": "common.schema.json#/definitions/text"
+        }
       }
-    },
-    "ui": {
-      "type": "object",
-      "additionalProperties": { "$ref": "common.schema.json#/definitions/text" }
     }
   },
   "additionalProperties": false

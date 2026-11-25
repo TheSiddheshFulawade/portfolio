@@ -1,26 +1,27 @@
 # Public profile. No phone number, no personal email, no availability line (brief decisions 2 and 3).
 id: profile
 published: true
-updated: 2026-11-19
+updated: 2026-11-24
 name: Siddhesh Fulawade
 headline: Full stack Java engineer · payments and distributed systems
 location: Navi Mumbai, India
 summary: >-
   I build payment software that has to stay correct under load: Spring Boot microservices for
-  ISO 20022 messages, Kafka and IBM MQ pipelines, and thread-safe, exactly-once transaction
-  processing for large-value payment systems.
+  ISO 20022 messages, Kafka and IBM MQ pipelines, and thread-safe transaction processing in
+  central banking payment systems. I design the failure path first, then test the guarantee.
 bio:
   - >-
     I am a full stack Java engineer working on central banking payment systems. My day-to-day is
-    Spring Boot microservices that process ISO 20022 payment messages, reconcile against the general
-    ledger, and keep working when Kafka, a cache or an external API does not.
+    Spring Boot microservices that process ISO 20022 payment messages, integrate with general
+    ledger APIs for reconciliation, and fall back and recover when Kafka, a cache, SFTP or an external API fails.
   - >-
-    What I care about most is correctness under concurrency: every transfer applied exactly once,
-    no money created or lost, and failures that degrade gracefully instead of silently. Settlement Lab,
-    my open-source project, is where I test those ideas in public, with property-based and stress tests.
+    What I care about most is correctness under concurrency and failure: a transfer should take
+    effect once, money should not be created or lost, and failures should be visible rather than
+    silent. Settlement Lab and PayFlow, my public projects, are where I test those ideas, with
+    property-based and stress tests.
   - >-
     Before payments, I built backends for a Finland-based news startup (Azure Functions, vector
-    search, GPT summarisation) and for four research projects at IIT Bombay's NanoBios Lab.
+    search, GPT summaries) and for four med-tech research projects at a university lab.
 email: hello@siddheshfulawade.com
 links:
   - id: github
