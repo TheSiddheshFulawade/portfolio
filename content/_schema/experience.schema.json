@@ -53,6 +53,9 @@
     "summary": {
       "$ref": "common.schema.json#/definitions/text"
     },
+    "homeSummary": {
+      "$ref": "common.schema.json#/definitions/text"
+    },
     "highlights": {
       "type": "array",
       "minItems": 1,

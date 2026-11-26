@@ -1,46 +1,199 @@
-<section class="hero" aria-labelledby="home-title">
-  <p class="eyebrow">{{ profile.location }}</p>
-  <h1 id="home-title">{{ profile.name }}</h1>
-  <p class="headline">{{ profile.headline }}</p>
-  <p class="summary">{{ profile.summary }}</p>
-  <div class="actions">
-    @if (profile.resume; as resume) {
-      <a class="button primary" [href]="resume.url">{{ resume.label }}</a>
+<section class="wrap hero" aria-labelledby="home-title">
+  <div class="intro">
+    <p class="role">{{ profile.headline }}</p>
+    <h1 id="home-title" [attr.aria-label]="hero.srSentence">
+      {{ hero.lead }} <span class="phrase">{{ phrase() }}</span>
+    </h1>
+    @if (hero.support; as support) {
+      <p class="lead">{{ support }}</p>
     }
-    <a class="button" routerLink="/contact">{{ ui['contactCta'] }}</a>
+    <div class="acts">
+      <a class="btn solid" routerLink="/projects">
+        {{ ui['seeSystems'] }}
+        <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" />
+        </svg>
+      </a>
+      <a class="btn" routerLink="/experience">{{ ui['readExperience'] }}</a>
+      @if (profile.resume; as resume) {
+        <a class="btn" [href]="resume.url">{{ resume.label }}</a>
+      }
+    </div>
+    <p class="where">
+      <span>{{ profile.location }}</span>
+      @for (link of profile.links; track link.id) {
+        <a [href]="link.url">{{ link.label }}</a>
+      }
+      <a [href]="'mailto:' + profile.email">{{ profile.email }}</a>
+    </p>
   </div>
+  @if (profile.photo; as photo) {
+    <figure class="photo">
+      <img
+        [src]="photo.src"
+        [alt]="photo.alt"
+        [width]="photo.width"
+        [height]="photo.height"
+        decoding="async"
+      />
+    </figure>
+  }
 </section>
 
-<section class="metrics" aria-labelledby="metrics-title">
-  <h2 id="metrics-title">{{ ui['metricsHeading'] }}</h2>
-  <ul class="metric-grid" aria-labelledby="metrics-title">
-    @for (metric of metrics; track metric.id) {
-      <li><sf-metric-tile [metric]="metric" [sourceLabel]="ui['metricSource']" /></li>
+<div class="strip">
+  <ul data-testid="tech-strip" [attr.aria-label]="ui['technologies']">
+    @for (tech of technologies; track tech) {
+      <li>{{ tech }}</li>
     }
   </ul>
-</section>
+</div>
 
-<section class="featured" aria-labelledby="featured-title">
-  <h2 id="featured-title">{{ ui['featuredHeading'] }}</h2>
-  <ul class="project-list">
-    @for (project of featured; track project.id) {
-      <li class="project">
-        <div class="project-top">
-          <h3>
-            <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
-          </h3>
-          <sf-status-pill [label]="project.status" />
+<sf-invariant-field />
+
+<div class="wrap">
+  <section class="band" aria-labelledby="selected-title">
+    <div class="rail">
+      <h2 id="selected-title">{{ sections['selected'] }}</h2>
+      <p>{{ sections['selectedIntro'] }}</p>
+    </div>
+    <div class="detail">
+      <ul class="rows">
+        @for (project of featured; track project.id) {
+          <li>
+            <div class="row">
+              <h3>
+                <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
+              </h3>
+              <p class="sub">{{ project.tagline }}</p>
+              <ul class="facts">
+                @for (tech of project.stack; track tech) {
+                  <li>{{ tech }}</li>
+                }
+              </ul>
+              <div class="side"><sf-status-pill [label]="project.status" /></div>
+            </div>
+          </li>
+        }
+      </ul>
+      <p class="after">
+        <a class="more" routerLink="/projects">
+          {{ ui['seeSystems'] }}
+          <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" />
+          </svg>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="experience-title">
+    <div class="rail">
+      <h2 id="experience-title">{{ sections['experience'] }}</h2>
+      <p>{{ sections['experienceIntro'] }}</p>
+    </div>
+    <div class="detail">
+      <ul class="rows">
+        @for (role of roles; track role.id) {
+          <li>
+            <div class="row">
+              <h3>{{ role.title }}</h3>
+              <p class="sub">{{ role.location }}</p>
+              <p>{{ role.summary }}</p>
+              <div class="side">
+                <span>{{ role.dates }}</span>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+      <p class="after">
+        <a class="more" routerLink="/experience">
+          {{ ui['fullExperience'] }}
+          <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" />
+          </svg>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="decisions-title">
+    <div class="rail">
+      <h2 id="decisions-title">{{ sections['decisions'] }}</h2>
+      <p>{{ sections['decisionsIntro'] }}</p>
+    </div>
+    <div class="detail">
+      <ul class="rows">
+        @for (d of decisions; track d.id) {
+          <li>
+            <article class="row">
+              <h3>{{ d.title }}</h3>
+              <dl class="decision">
+                <div>
+                  <dt>{{ ui['chosen'] }}</dt>
+                  <dd>{{ d.choice }}</dd>
+                </div>
+                <div>
+                  <dt>{{ ui['rejected'] }}</dt>
+                  <dd>{{ d.rejected }}</dd>
+                </div>
+                <div>
+                  <dt>{{ ui['reason'] }}</dt>
+                  <dd>{{ d.reason }}</dd>
+                </div>
+                <div>
+                  <dt>{{ ui['cost'] }}</dt>
+                  <dd>{{ d.cost }}</dd>
+                </div>
+              </dl>
+              <p class="sub">
+                {{ ui['evidence'] }}:
+                @for (e of d.links; track e.label; let last = $last) {
+                  @if (e.href) {
+                    <a [href]="e.href">{{ e.label }}</a>
+                  } @else {
+                    <a [routerLink]="e.link">{{ e.label }}</a>
+                  }
+                  @if (!last) {
+                    <span aria-hidden="true"> · </span>
+                  }
+                }
+              </p>
+            </article>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="capabilities-title">
+    <div class="rail">
+      <h2 id="capabilities-title">{{ sections['capabilities'] }}</h2>
+      <p>{{ sections['capabilitiesIntro'] }}</p>
+    </div>
+    <div class="detail groups">
+      @for (group of groups; track group.id) {
+        <div class="group">
+          <h3>{{ group.label }}</h3>
+          <ul>
+            @for (skill of group.skills; track skill.name) {
+              <li>
+                <span>{{ skill.name }}</span>
+                <span class="visually-hidden">{{ ui['evidence'] }}:</span>
+                <span class="evidence">
+                  @for (item of skill.evidence; track item.id) {
+                    @if (item.href) {
+                      <a [href]="item.href">{{ item.label }}</a>
+                    } @else {
+                      <a [routerLink]="item.link">{{ item.label }}</a>
+                    }
+                  }
+                </span>
+              </li>
+            }
+          </ul>
         </div>
-        <p>{{ project.tagline }}</p>
-        <ul class="stack" [attr.aria-label]="ui['stack']">
-          @for (tech of project.stack; track tech) {
-            <li>{{ tech }}</li>
-          }
-        </ul>
-      </li>
-    }
-  </ul>
-  <p>
-    <a class="all-projects" routerLink="/projects">{{ ui['allProjects'] }}</a>
-  </p>
-</section>
+      }
+    </div>
+  </section>
+</div>

@@ -931,6 +931,116 @@ test('REQ-HOME-101 the real site.yaml has the hero and section labels', async ()
   assert.ok(content.site.sections.decisions);
 });
 
+// --- site.field: copy of the invariant field (REQ-HOME-103) -----------------------------------
+const FIELD = {
+  heading: 'A ledger that heals',
+  intro: ['A browser illustration of double entry.', 'Break it and watch it recover.'],
+  actions: { node: 'Drop a node', partition: 'Partition', duplicate: 'Deliver twice' },
+  counters: {
+    committed: 'Committed',
+    reachable: 'Reachable',
+    unreachable: 'Unreachable',
+    recovering: 'Recovering',
+    duplicates: 'Duplicate transactions not applied',
+    net: 'Debits minus credits',
+  },
+  status: {
+    rest: 'At rest.',
+    node: 'Node down.',
+    nodeDone: 'Replayed from the log. Net still zero.',
+    partition: 'Partitioned.',
+    partitionDone: 'Link restored.',
+    duplicate: 'Delivered again.',
+    duplicateDone: 'Nothing was applied a second time.',
+  },
+  caption: 'A simplified model.',
+};
+const withField = (mutate) =>
+  withContent((d) =>
+    editYaml(d, 'site.yaml', (y) => {
+      y.hero = structuredClone(HERO);
+      y.sections = structuredClone(SECTIONS);
+      y.field = structuredClone(FIELD);
+      mutate?.(y);
+    }),
+  );
+const fieldErrs = (errors) => errors.filter((e) => /^site\.yaml: \/field/.test(e));
+
+test('REQ-HOME-103 a complete site.field builds into site.field without errors', async () => {
+  const c = withField();
+
+  const { content, errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.deepEqual(fieldErrs(errors), []);
+  assert.equal(content.site.field.heading, FIELD.heading);
+  assert.deepEqual(content.site.field.intro, FIELD.intro);
+  assert.equal(content.site.field.actions.node, FIELD.actions.node);
+});
+
+test('REQ-HOME-103 a site.yaml without site.field fails the build', async () => {
+  const c = withContent((d) =>
+    editYaml(d, 'site.yaml', (y) => {
+      y.hero = structuredClone(HERO);
+      y.sections = structuredClone(SECTIONS);
+      delete y.field;
+    }),
+  );
+
+  const { errors } = await buildContent({ contentDir: c.dir });
+  c.done();
+
+  assert.match(joined(errors), /site\.yaml: \/ must have required property 'field'/);
+});
+
+for (const key of ['heading', 'intro', 'actions', 'counters', 'status', 'caption']) {
+  test(`REQ-HOME-103 a site.field without ${key} fails the build, naming it`, async () => {
+    const c = withField((y) => delete y.field[key]);
+
+    const { errors } = await buildContent({ contentDir: c.dir });
+    c.done();
+
+    assert.match(
+      joined(errors),
+      new RegExp(`site\\.yaml: /field must have required property '${key}'`),
+    );
+  });
+}
+
+for (const [group, keys] of [
+  ['actions', Object.keys(FIELD.actions)],
+  ['counters', Object.keys(FIELD.counters)],
+  ['status', Object.keys(FIELD.status)],
+]) {
+  for (const key of keys) {
+    test(`REQ-HOME-103 a site.field.${group} without ${key} fails the build, naming it`, async () => {
+      const c = withField((y) => delete y.field[group][key]);
+
+      const { errors } = await buildContent({ contentDir: c.dir });
+      c.done();
+
+      assert.match(
+        joined(errors),
+        new RegExp(`site\\.yaml: /field/${group} must have required property '${key}'`),
+      );
+    });
+  }
+}
+
+test('REQ-HOME-103 site.field.intro must be a non-empty list of paragraphs, and a label must not be empty', async () => {
+  const cases = [
+    ['intro as a string', withField((y) => (y.field.intro = 'one paragraph as a string'))],
+    ['empty intro', withField((y) => (y.field.intro = []))],
+    ['empty label', withField((y) => (y.field.counters.committed = ''))],
+  ];
+
+  for (const [name, c] of cases) {
+    const { errors } = await buildContent({ contentDir: c.dir });
+    c.done();
+    assert.notDeepEqual(fieldErrs(errors), [], name);
+  }
+});
+
 // --- profile photo (REQ-UI-105) --------------------------------------------------------------
 const PHOTO = {
   src: '/portrait.jpg',
@@ -1151,7 +1261,13 @@ test('REQ-PERF-101 main writes content.json, home.json and results.json; the she
     assert.equal(shell.results, undefined);
     assert.ok(!readFileSync(files.out, 'utf8').includes(home.decisions[0].cost));
     assert.equal(shell.skills.length, 4);
-    assert.ok(shell.site.hero);
+    assert.equal(shell.site.hero, undefined);
+    assert.equal(shell.site.field, undefined);
+    assert.equal(shell.site.sections, undefined);
+    assert.ok(home.hero && home.sections && home.field);
+    assert.ok(home.ui.seeSystems);
+    assert.equal(shell.site.ui.seeSystems, undefined);
+    assert.ok(!readFileSync(files.out, 'utf8').includes(home.field.intro[0]));
   } finally {
     rmSync(out, { recursive: true, force: true });
     rmSync(pub, { recursive: true, force: true });
@@ -1168,4 +1284,40 @@ test('REQ-PERF-101 --check writes none of the generated files', async () => {
   rmSync(out, { recursive: true, force: true });
 
   assert.deepEqual(wrote, []);
+});
+
+// --- experience.homeSummary: what Home shows instead of `summary` (REQ-HOME-104) ----------------
+test('REQ-HOME-104 the Home-visible summary of every role names no employer, institution or system', async () => {
+  const { content, errors } = await buildContent({ contentDir: REAL });
+
+  assert.deepEqual(errors, []);
+  assert.ok(content.experience.length >= 3);
+  for (const role of content.experience) {
+    const visible = role.homeSummary ?? role.summary;
+    assert.doesNotMatch(
+      visible,
+      /ReBIT|Reserve Bank|RBI\b|e-?Kuber|Lumu|IIT Bombay|NanoBios/i,
+      `${role.id}: the Home summary names an employer or system`,
+    );
+  }
+});
+
+test('REQ-HOME-104 homeSummary is optional, kept when present, and must not be empty', async () => {
+  const withHome = (value) =>
+    withContent((d) =>
+      editYaml(d, 'experience/2024-11-rebit.yaml', (y) => (y.homeSummary = value)),
+    );
+  const ok = withHome('A short summary for Home.');
+  const good = await buildContent({ contentDir: ok.dir });
+  ok.done();
+  const empty = withHome('');
+  const bad = await buildContent({ contentDir: empty.dir });
+  empty.done();
+
+  assert.deepEqual(good.errors, []);
+  assert.equal(
+    good.content.experience.find((r) => r.id === '2024-11-rebit').homeSummary,
+    'A short summary for Home.',
+  );
+  assert.match(joined(bad.errors), /homeSummary/);
 });

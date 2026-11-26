@@ -15,6 +15,21 @@ import { parse as parseYaml } from 'yaml';
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_CONTENT_DIR = resolve(HERE, '../../../content');
 export const DEFAULT_OUT_FILE = resolve(HERE, '../src/generated/content.json');
+/** ui labels only the Home page uses: they go to home.json with the hero, sections and field copy. */
+export const HOME_UI_KEYS = [
+  'seeSystems',
+  'readExperience',
+  'fullExperience',
+  'chosen',
+  'rejected',
+  'reason',
+  'cost',
+  'technologies',
+];
+
+const omit = (object, keys) =>
+  Object.fromEntries(Object.entries(object).filter(([k]) => !keys.includes(k)));
+
 export const DEFAULT_HOME_FILE = resolve(HERE, '../src/generated/home.json');
 export const DEFAULT_RESULTS_FILE = resolve(HERE, '../src/generated/results.json');
 export const DEFAULT_BODIES_FILE = resolve(HERE, '../src/generated/bodies.json');
@@ -307,7 +322,13 @@ export async function buildContent({
     },
   };
   // REQ-PERF-101: Home-only data, kept out of the shell file.
-  const home = { decisions: sortList(single.decisions?.items) };
+  const home = {
+    decisions: sortList(single.decisions?.items),
+    hero: site?.hero,
+    sections: site?.sections,
+    field: site?.field,
+    ui: Object.fromEntries(HOME_UI_KEYS.filter((k) => site?.ui?.[k]).map((k) => [k, site.ui[k]])),
+  };
   return { content, home, results, errors };
 }
 
@@ -373,8 +394,10 @@ export async function main(
   // REQ-PERF-101: the shell (content.json) holds what every page needs. Project bodies, decisions and
   // results are separate files that only the page components import, so they stay out of main-*.js.
   const bodies = Object.fromEntries(content.projects.map((p) => [p.id, p.html]));
+  const { hero: _hero, sections: _sections, field: _field, ...shellSite } = content.site;
   const shell = {
     ...content,
+    site: { ...shellSite, ui: omit(shellSite.ui, HOME_UI_KEYS) },
     projects: content.projects.map(({ html: _html, ...p }) => p),
   };
   for (const [file, data] of [

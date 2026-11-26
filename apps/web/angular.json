@@ -120,6 +120,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "runner": "vitest",
+            "runnerConfig": true,
             "coverageReporters": ["text-summary", "lcov"],
             "coverageInclude": ["src/app/**/*.ts"],
             "coverageExclude": [

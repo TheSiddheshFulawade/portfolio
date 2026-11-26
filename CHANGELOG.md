@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Home redesign: headline that cycles once and ends on the prerendered phrase, technology strip, the invariant field (a seeded double-entry model of node loss, partition and duplicate delivery, with counters derived from the entries), selected systems, experience without employer names, decisions and capabilities with evidence; `site.field` and `hero.support` content (005 RD-05).
 - Design blueprint published in `docs/design/blueprint/` with the known errors of its simulations and their corrections (005).
 - `/progress` command: read-only status, effort-weighted percent and dates for the three projects from git, GitHub and the spec tasks; runs no tests (tooling).
 - Redesign content: `decisions.yaml` with six decisions and pinned evidence, four capability groups with evidence, themed experience highlights, PayFlow content that separates proven from planned, Settlement Lab rewritten for the Java 21 run, 12 measured rows from `results.json` at 3eb119a, hero and section labels, and the RD-01 content corrections (005 RD-03).

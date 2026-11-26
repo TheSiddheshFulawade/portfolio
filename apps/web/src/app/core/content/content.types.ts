@@ -46,10 +46,22 @@ export interface Site {
   };
   contact: { heading: string; body: string };
   ui: Record<string, string>;
-  /** Home hero: a fixed lead and rotating phrases (REQ-HOME-101). */
-  hero: Hero;
-  /** Section labels of the Home page (REQ-HOME-104). */
-  sections: Sections;
+}
+
+/** Copy of the invariant field: a simplified double-entry model run in the browser. */
+export interface FieldContent {
+  heading: string;
+  intro: string[];
+  actions: Record<'node' | 'partition' | 'duplicate', string>;
+  counters: Record<
+    'committed' | 'reachable' | 'unreachable' | 'recovering' | 'duplicates' | 'net',
+    string
+  >;
+  status: Record<
+    'rest' | 'node' | 'nodeDone' | 'partition' | 'partitionDone' | 'duplicate' | 'duplicateDone',
+    string
+  >;
+  caption: string;
 }
 
 export interface Hero {
@@ -58,6 +70,8 @@ export interface Hero {
   phrases: string[];
   /** The whole sentence for screen readers and reduced motion. */
   srSentence: string;
+  /** One line under the headline: the failure path first, then the guarantee. */
+  support?: string;
 }
 
 export interface Sections {
@@ -117,6 +131,8 @@ export interface Experience extends Shared {
   start: string;
   end: string | null;
   summary: string;
+  /** Shown on Home instead of `summary` when set, so Home names no employer or system. */
+  homeSummary?: string;
   highlights: ThemedHighlights[];
   recognition?: string[];
   stack: string[];
@@ -208,9 +224,17 @@ export interface Decision {
   evidence: DecisionEvidence[];
 }
 
-/** src/generated/home.json: data only the Home page needs. */
+/** src/generated/home.json: data only the Home page needs (REQ-PERF-101), kept out of the shell. */
 export interface HomeContent {
   decisions: Decision[];
+  /** Home hero: a fixed lead and rotating phrases (REQ-HOME-101). */
+  hero: Hero;
+  /** Section labels of the Home page (REQ-HOME-104). */
+  sections: Sections;
+  /** The invariant field (REQ-HOME-103). */
+  field: FieldContent;
+  /** The Home-only ui labels. */
+  ui: Record<string, string>;
 }
 
 export interface ResultRow {
