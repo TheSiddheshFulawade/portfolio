@@ -7,7 +7,7 @@ describe('invariant field counter labels (REQ-HOME-103)', () => {
       committed: 'Committed entries',
       reachable: 'Reachable entries',
       unreachable: 'Unreachable entries',
-      recovering: 'Entries being replayed',
+      recovering: 'Entries awaiting replay',
       duplicates: 'Duplicate transactions not applied',
     });
   });

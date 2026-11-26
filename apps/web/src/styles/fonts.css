@@ -49,7 +49,7 @@
     format('woff2');
 }
 
-/* Fallbacks sized to the web fonts (measured text width against Arial), so the swap does not re-wrap or move text. */
+/* Fallbacks sized to the web fonts (measured text width against Arial, and Arial Bold for the 600 heading face), so the swap moves little. */
 @font-face {
   font-family: 'Plex Sans Fallback';
   src: local('Arial');
@@ -60,7 +60,7 @@
 }
 @font-face {
   font-family: 'Plex Condensed Fallback';
-  src: local('Arial');
+  src: local('Arial Bold'), local('Arial-BoldMT');
   font-weight: 600;
   size-adjust: 88.5%;
   ascent-override: 115.8%;

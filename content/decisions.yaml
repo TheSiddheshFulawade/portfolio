@@ -1,5 +1,5 @@
 # Engineering decisions shown on Home (REQ-HOME-105): choice, rejected option, reason, cost and evidence.
-# Evidence points at the repository files at a recorded commit: payflow 8840834, settlement-lab b863270
+# Evidence points at the repository files at a recorded commit: payflow 167d172, settlement-lab b863270
 # (README) and 3eb119a (measured results). Claims are in docs/accuracy/claims.md.
 id: decisions
 published: true
@@ -10,25 +10,25 @@ items:
     title: Orchestrated saga
     choice: One service, payment-service, owns each payment's state and sends the commands to the wallet and risk services.
     rejected: Choreography, where each service reacts to the others' events.
-    reason: Where a payment is and why is one query, and timeouts and compensation have one owner. In choreography the state machine is spread over the services. Deadlines are stored; the sweeper that acts on them, and compensation, are specified and not built yet (PF-06).
+    reason: Where a payment is and why is one query, and timeouts and compensation have one owner. In choreography the state machine is spread over the services. A sweeper re-sends an overdue command up to 3 times under a new message id, then compensates by releasing any hold (merged and tested per service in PF-06; chaos tests are not built yet).
     cost: The orchestrator knows every step, so it is coupled to all of them.
     evidence:
       - label: PayFlow, ADR-0002 decision 2
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/docs/adr/0002-architecture.md
       - label: PayFlow, SPEC section 4
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/SPEC.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/SPEC.md
   - id: hold-then-capture
     order: 20
     title: Hold funds, then capture
     choice: Reserve the amount as a hold, check risk, then capture the hold.
     rejected: Check risk first, then debit the payer and credit the payee, with a compensating transaction that returns the money if a later step fails.
-    reason: No money leaves the payer before capture, so undoing a payment before capture is one local transaction that releases the hold. The end state REVERSED (specified, not built yet) means any hold was released and nothing was captured, an authorisation reversal in card terms, not captured money sent back.
+    reason: No money leaves the payer before capture, so undoing a payment before capture is one local transaction that releases the hold. The end state REVERSED (merged in PF-06) means any hold was released and nothing was captured, an authorisation reversal in card terms, not captured money sent back. If the release finds the hold already captured, the payment ends COMPLETED, never REVERSED.
     cost: A hold is extra state. Every failure from the moment a hold may exist needs a release, the release must be safe to repeat, and a payment that has been captured is not undone this way.
     evidence:
       - label: PayFlow, ADR-0002 decision 3
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/docs/adr/0002-architecture.md
       - label: PayFlow, SPEC section 4
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/SPEC.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/SPEC.md
   - id: transactional-outbox
     order: 30
     title: Transactional outbox
@@ -38,9 +38,9 @@ items:
     cost: Delivery becomes at least once, and the polling relay adds some latency and database load.
     evidence:
       - label: PayFlow, ADR-0002 decision 4
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/docs/adr/0002-architecture.md
       - label: PayFlow, messaging module tests (OutboxWriterTest, OutboxRelayTest)
-        url: https://github.com/TheSiddheshFulawade/payflow/tree/8840834/messaging/src/test/java/com/siddheshfulawade/payflow/messaging
+        url: https://github.com/TheSiddheshFulawade/payflow/tree/167d172/messaging/src/test/java/com/siddheshfulawade/payflow/messaging
   - id: idempotent-inbox
     order: 40
     title: Idempotent inbox
@@ -50,16 +50,16 @@ items:
     cost: Each consumer keeps a processed-message table, and someone has to decide how long to keep its rows.
     evidence:
       - label: PayFlow, ADR-0002 decision 5
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/docs/adr/0002-architecture.md
       - label: PayFlow, messaging module tests (IdempotentConsumerTest)
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/messaging/src/test/java/com/siddheshfulawade/payflow/messaging/IdempotentConsumerTest.java
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/messaging/src/test/java/com/siddheshfulawade/payflow/messaging/IdempotentConsumerTest.java
   - id: ordered-locking
     order: 50
     title: Ordered locking
     choice: Take both account locks in ascending account id order for every transfer.
     rejected: Compare-and-set (CAS) on an immutable snapshot of the whole balance table.
     reason: A fixed order rules out deadlock between transfers, and a transfer touches only its two accounts. Each CAS write copies the whole balance table (80 KB at 10,000 accounts) and a failed swap throws the copy away. In six like-for-like pairs ordered locking answered 2.9× to 4.6× as many submissions per second as CAS.
-    cost: Transfers on a hot account run one at a time. With a small table and many readers CAS could come out ahead; that was not tested. The ratios come from one run on 4 cores.
+    cost: "Transfers on a hot account run one at a time. With a small table and many readers CAS could come out ahead; that was not tested. The ratios come from one run committed on 19 Nov 2026: 100,000 submissions per row from 64 closed-loop clients on 10,000 accounts, a 4-core Intel Xeon at 2.10 GHz, JDK 21.0.13."
     evidence:
       - label: Settlement Lab, measured results (one run, JDK 21.0.13, commit 3eb119a)
         url: https://github.com/TheSiddheshFulawade/settlement-lab/blob/3eb119a/results/results.md
@@ -74,4 +74,4 @@ items:
     cost: Row mapping is written by hand, and there is no change tracking to lean on.
     evidence:
       - label: PayFlow, ADR-0002 decision 10
-        url: https://github.com/TheSiddheshFulawade/payflow/blob/8840834/docs/adr/0002-architecture.md
+        url: https://github.com/TheSiddheshFulawade/payflow/blob/167d172/docs/adr/0002-architecture.md

@@ -33,7 +33,7 @@ field:
   heading: The sum has to hold, whatever fails.
   intro:
     - Double entry records each transaction with equal total debits and credits, so the entries of a ledger net to zero. Each dot is one committed entry; two dots, a debit and a credit of the same amount, make one transaction. A zero net shows that the books balance, not that they are right.
-    - Drop a node and its committed entries are unreachable until they are replayed from the durable log. Partition the network and the far side is unreadable until the link returns. Deliver the batch twice and every id is already recorded. This assumes the log survives the node. The net stays zero.
+    - Drop a node and its committed entries are unreachable until they are replayed from the durable log. Partition the network and the far side is unreadable until the link returns. Deliver the batch twice and every id is already recorded. The model assumes the log survives the node and keeps both entries of a transaction together, on one node and one side of the partition, so the entries you can still read net to zero too. The net stays zero.
   actions:
     node: Drop a node
     partition: Partition the network
@@ -42,17 +42,17 @@ field:
     committed: Committed entries
     reachable: Reachable entries
     unreachable: Unreachable entries
-    recovering: Entries being replayed
+    recovering: Entries awaiting replay
     duplicates: Duplicate transactions not applied
     net: Debits − credits
   status:
-    rest: Inject a failure, or drag across the field.
+    rest: Inject a failure.
     node: Node down. Its committed entries are unreachable, not undone, until they are replayed from the durable log, in order.
     nodeReplay: The node is back and replays its durable log, in order. Nothing committed was lost.
     nodeDone: Replayed from the log. Net still zero.
     partition: Partitioned. The far side keeps its committed entries, but this side cannot read them until the link returns.
     partitionDone: Link restored. Every entry can be read again.
-    duplicate: The batch is delivered again. Every id is already recorded, so no transaction is applied a second time.
+    duplicate: The batch is delivered again. Every id is already recorded, so none of it will be applied a second time.
     duplicateDone: Nothing was applied a second time.
   caption: >-
     A simplified model, run in your browser, to illustrate double entry. Neither project runs a replicated ledger. Settlement Lab checks a related property after every run: the sum of all balances is conserved.
