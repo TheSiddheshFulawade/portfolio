@@ -1,48 +1,97 @@
-<header class="intro">
+<header class="page-head">
   <h1>{{ page.heading }}</h1>
-  <p class="lede">{{ page.description }}</p>
+  <p class="lead">{{ page.description }}</p>
 </header>
 
 <ol class="roles">
   @for (role of roles; track role.id) {
     <li>
-      <article class="role" [id]="role.id" [attr.aria-labelledby]="'role-' + role.id">
-        <header class="role-head">
-          <h2 [id]="'role-' + role.id">{{ role.title }}</h2>
-          <p class="company">{{ role.company }}</p>
-          <p class="meta">
+      <article class="band role" [id]="role.id" [attr.aria-labelledby]="'role-' + role.id">
+        <aside class="rail" [attr.aria-labelledby]="'role-' + role.id">
+          <p class="when">
             <time [attr.datetime]="role.start">{{ role.dates }}</time>
-            <span aria-hidden="true">·</span>
-            <span>{{ role.location }}</span>
-            <span aria-hidden="true">·</span>
-            <span>{{ role.mode }}</span>
           </p>
-        </header>
-        <p>{{ role.summary }}</p>
-        @for (group of role.highlights; track group.theme) {
-          <h3 class="theme">{{ group.theme }}</h3>
-          <ul class="highlights">
-            @for (item of group.items; track item) {
-              <li>{{ item }}</li>
+          <p>{{ role.location }}, {{ role.mode }}</p>
+          <ul class="facts" [attr.aria-label]="ui['stack']">
+            @for (tech of role.stack; track tech) {
+              <li>{{ tech }}</li>
             }
           </ul>
-        }
-        @if (role.recognition?.length) {
-          <div class="recognition">
-            <h3>{{ ui['recognition'] }}</h3>
-            <ul>
-              @for (item of role.recognition; track item) {
-                <li>{{ item }}</li>
-              }
-            </ul>
-          </div>
-        }
-        <ul class="stack" [attr.aria-label]="ui['stack']">
-          @for (tech of role.stack; track tech) {
-            <li>{{ tech }}</li>
+        </aside>
+        <div class="detail">
+          <h2 [id]="'role-' + role.id">{{ role.title }}</h2>
+          <p class="company">{{ role.company }}</p>
+          <p class="lead summary">{{ role.summary }}</p>
+          @for (group of role.highlights; track group.theme) {
+            <div class="theme">
+              <h3>{{ group.theme }}</h3>
+              <ul>
+                @for (item of group.items; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
           }
-        </ul>
+          @if (role.recognition?.length) {
+            <div class="theme recognition">
+              <h3>{{ ui['recognition'] }}</h3>
+              <ul>
+                @for (item of role.recognition; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
       </article>
     </li>
   }
 </ol>
+
+<section class="band" aria-labelledby="education-title">
+  <header class="rail">
+    <h2 id="education-title">{{ ui['educationHeading'] }}</h2>
+  </header>
+  <div class="detail">
+    <ul class="rows">
+      @for (degree of education.degrees; track degree.id) {
+        <li>
+          <div class="row">
+            <h3>{{ degree.degree }}</h3>
+            <p class="sub">{{ degree.institution }}</p>
+            <p class="side">
+              <span class="mono">{{ degree.start }}–{{ degree.end }}</span>
+              @if (degree.grade) {
+                <span class="mono">{{ degree.grade }}</span>
+              }
+            </p>
+          </div>
+        </li>
+      }
+    </ul>
+
+    @if (education.certifications.length) {
+      <div class="theme">
+        <h3>{{ ui['certificationsHeading'] }}</h3>
+        <ul>
+          @for (cert of education.certifications; track cert.id) {
+            <li>
+              {{ cert.name }}<span class="issuer"> · {{ cert.issuer }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (education.achievements.length) {
+      <div class="theme">
+        <h3>{{ ui['achievementsHeading'] }}</h3>
+        <ul>
+          @for (item of education.achievements; track item.id) {
+            <li>{{ item.text }}</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</section>

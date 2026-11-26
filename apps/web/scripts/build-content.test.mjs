@@ -1263,7 +1263,8 @@ test('REQ-PERF-101 main writes content.json, home.json and results.json; the she
     assert.equal(shell.skills.length, 4);
     assert.equal(shell.site.hero, undefined);
     assert.equal(shell.site.field, undefined);
-    assert.equal(shell.site.sections, undefined);
+    assert.equal(shell.site.sections.selected, undefined);
+    assert.ok(shell.site.sections.capabilitiesIntro);
     assert.ok(home.hero && home.sections && home.field);
     assert.ok(home.ui.seeSystems);
     assert.equal(shell.site.ui.seeSystems, undefined);

@@ -394,10 +394,18 @@ export async function main(
   // REQ-PERF-101: the shell (content.json) holds what every page needs. Project bodies, decisions and
   // results are separate files that only the page components import, so they stay out of main-*.js.
   const bodies = Object.fromEntries(content.projects.map((p) => [p.id, p.html]));
-  const { hero: _hero, sections: _sections, field: _field, ...shellSite } = content.site;
+  // About reads two section labels from the shell; the rest of `sections` is Home-only.
+  const { hero: _hero, sections, field: _field, ...shellSite } = content.site;
   const shell = {
     ...content,
-    site: { ...shellSite, ui: omit(shellSite.ui, HOME_UI_KEYS) },
+    site: {
+      ...shellSite,
+      sections: {
+        capabilities: sections.capabilities,
+        capabilitiesIntro: sections.capabilitiesIntro,
+      },
+      ui: omit(shellSite.ui, HOME_UI_KEYS),
+    },
     projects: content.projects.map(({ html: _html, ...p }) => p),
   };
   for (const [file, data] of [

@@ -46,6 +46,8 @@ export interface Site {
   };
   contact: { heading: string; body: string };
   ui: Record<string, string>;
+  /** The two section labels About shows; the full set is Home-only (HomeContent.sections). */
+  sections: Pick<Sections, 'capabilities' | 'capabilitiesIntro'>;
 }
 
 /** Copy of the invariant field: a simplified double-entry model run in the browser. */

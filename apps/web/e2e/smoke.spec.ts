@@ -571,3 +571,48 @@ test('REQ-MOT-101 REQ-MOT-103 nothing runs an animation frame 6 s after Home loa
 
   expect(await page.evaluate(() => (window as unknown as { frames: number }).frames)).toBe(0);
 });
+
+// REQ-UI-103: the label rail is sticky from 60rem (960 px) and not below.
+for (const [width, expected] of [
+  [959, 'static'],
+  [960, 'sticky'],
+  [1280, 'sticky'],
+] as const) {
+  test(`REQ-UI-103 the Experience rail is ${expected} at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/experience', { waitUntil: 'networkidle' });
+
+    const position = await page
+      .locator('article aside')
+      .first()
+      .evaluate((el) => getComputedStyle(el).position);
+
+    expect(position).toBe(expected);
+  });
+}
+
+// REQ-EXP-101: skill evidence on About links to a role by fragment; the heading must clear the sticky header.
+test('REQ-EXP-101 an About evidence link lands on the role with its heading below the sticky header', async ({
+  page,
+}) => {
+  const roleIds = new Set(content.experience.map((r) => r.id));
+  const id = content.skills
+    .flatMap((g) => g.skills.flatMap((s) => s.evidence))
+    .find((e) => roleIds.has(e))!;
+  const role = content.experience.find((r) => r.id === id)!;
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/about', { waitUntil: 'networkidle' });
+
+  await page.locator(`main a[href="/experience#${id}"]`).first().click();
+
+  await expect(page).toHaveURL(new RegExp(`/experience/?#${id}$`));
+  const heading = page.getByRole('heading', { level: 2, name: role.title, exact: true });
+  const header = page.getByRole('banner').first();
+  await expect
+    .poll(async () => {
+      const h = await heading.boundingBox();
+      const b = await header.boundingBox();
+      return h && b ? h.y >= b.y + b.height - 1 && h.y < 800 : false;
+    })
+    .toBe(true);
+});

@@ -108,7 +108,7 @@ One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so c
 - [x] RD-05 [web] Home (REQ-HOME-101 to 105, REQ-UI-105). Tests first: field model (pairs move together; net zero for all and for
       reachable entries in every state; counters sum to committed; the near side of a partition stays reachable; redelivered ids are
       whole pairs and change no balance; displacement and pointer change no counter; returns to rest); headline ends within 5 s; reduced motion.
-- [ ] RD-06 [web] Experience and About (REQ-EXP-101, REQ-ABOUT-101). Tests: every highlight in content is rendered once.
+- [x] RD-06 [web] Experience and About (REQ-EXP-101, REQ-ABOUT-101). Tests: every highlight in content is rendered once.
 - [ ] RD-07 [web] Settlement Lab model, view and results table (REQ-PROJ-101, 103 to 105). Tests first, 30 seeds per combination: safe modes pass all
       six invariants; unordered locking deadlocks on these seeds and a finishing run says so; without synchronisation the exact failing
       set is asserted per seed (POSTINGS_EXPLAIN_BALANCES always, TOTAL_CONSERVED on these seeds); the six checks equal
