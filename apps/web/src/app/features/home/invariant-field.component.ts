@@ -77,7 +77,6 @@ export class InvariantFieldComponent {
   private last: number | null = null;
   private carry = 0;
   private onScreen = true;
-  private pressed?: HTMLElement;
 
   constructor() {
     const theme = inject(ThemeService).theme;
@@ -107,7 +106,7 @@ export class InvariantFieldComponent {
       this.canvas?.refreshColours();
     });
     this.destroyRef.onDestroy(() => {
-      cancelAnimationFrame(this.frame);
+      if (this.frame) cancelAnimationFrame(this.frame);
       this.canvas?.destroy();
     });
   }
@@ -116,9 +115,8 @@ export class InvariantFieldComponent {
     return this.values()[key].toLocaleString('en-US').replace('-', '−');
   }
 
-  protected run(mode: FailMode, event: Event): void {
-    if (!this.model.fail(mode)) return;
-    this.pressed = event.currentTarget as HTMLElement;
+  protected run(mode: FailMode): void {
+    if (this.busy() || !this.model.fail(mode)) return;
     this.statusKey.set(mode);
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
       // Reduced motion: the final state, counters and text at once (REQ-MOT-102).
@@ -136,20 +134,18 @@ export class InvariantFieldComponent {
     const snap = this.model.snapshot;
     this.snap.set(snap);
     this.canvas?.setSnapshot(snap);
-    if (this.model.atRest) {
+    if (!this.model.atRest) {
+      if (snap.phase === 'replaying' && this.statusKey() === 'node')
+        this.statusKey.set('nodeReplay');
+    } else {
       const done = this.statusKey();
-      if (done === 'node' || done === 'partition' || done === 'duplicate') {
+      if (done === 'node' || done === 'nodeReplay') {
+        this.statusKey.set('nodeDone');
+      } else if (done === 'partition' || done === 'duplicate') {
         this.statusKey.set(`${done}Done`);
       }
       if (this.busy()) {
         this.busy.set(false);
-        // A disabled button drops focus; give it back to the button that started the run.
-        const button = this.pressed;
-        queueMicrotask(() => {
-          if (button?.isConnected && this.document.activeElement === this.document.body) {
-            button.focus();
-          }
-        });
       }
     }
     // The frame loop is not an Angular event: update the view now, so text and counters never lag the canvas.

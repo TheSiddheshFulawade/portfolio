@@ -232,6 +232,7 @@
           "required": [
             "rest",
             "node",
+            "nodeReplay",
             "nodeDone",
             "partition",
             "partitionDone",
@@ -242,6 +243,7 @@
           "properties": {
             "rest": { "$ref": "common.schema.json#/definitions/text" },
             "node": { "$ref": "common.schema.json#/definitions/text" },
+            "nodeReplay": { "$ref": "common.schema.json#/definitions/text" },
             "nodeDone": { "$ref": "common.schema.json#/definitions/text" },
             "partition": { "$ref": "common.schema.json#/definitions/text" },
             "partitionDone": { "$ref": "common.schema.json#/definitions/text" },

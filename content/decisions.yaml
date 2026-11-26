@@ -21,7 +21,7 @@ items:
     order: 20
     title: Hold funds, then capture
     choice: Reserve the amount as a hold, check risk, then capture the hold.
-    rejected: Check risk first, then debit the payer and credit the payee, with a refund credit if a step fails.
+    rejected: Check risk first, then debit the payer and credit the payee, with a compensating transaction that returns the money if a later step fails.
     reason: No money leaves the payer before capture, so undoing a payment before capture is one local transaction that releases the hold. The end state REVERSED (specified, not built yet) means any hold was released and nothing was captured, an authorisation reversal in card terms, not captured money sent back.
     cost: A hold is extra state. Every failure from the moment a hold may exist needs a release, the release must be safe to repeat, and a payment that has been captured is not undone this way.
     evidence:

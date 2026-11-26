@@ -60,7 +60,14 @@ export interface FieldContent {
     string
   >;
   status: Record<
-    'rest' | 'node' | 'nodeDone' | 'partition' | 'partitionDone' | 'duplicate' | 'duplicateDone',
+    | 'rest'
+    | 'node'
+    | 'nodeReplay'
+    | 'nodeDone'
+    | 'partition'
+    | 'partitionDone'
+    | 'duplicate'
+    | 'duplicateDone',
     string
   >;
   caption: string;

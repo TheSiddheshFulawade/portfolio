@@ -82,12 +82,7 @@
   content: attr(data-text);
 }
 
-// Reduced motion keeps the final sentence and never swaps, so nothing needs reserving.
-@media (prefers-reduced-motion: reduce) {
-  .hold {
-    display: none;
-  }
-}
+// The reserve stays under reduced motion too: the headline keeps one height whatever the font or phrase (CLS).
 
 .photo {
   margin: 0;
@@ -219,12 +214,17 @@
     display: none;
   }
 
-  h3 {
+  .title {
+    color: var(--text-strong);
+    font-family: var(--font-display);
     font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.12;
+    text-wrap: balance;
   }
 
-  summary:hover h3,
-  &[open] h3 {
+  summary:hover .title,
+  &[open] .title {
     color: var(--accent);
   }
 

@@ -947,6 +947,7 @@ const FIELD = {
   status: {
     rest: 'At rest.',
     node: 'Node down.',
+    nodeReplay: 'Replaying the log.',
     nodeDone: 'Replayed from the log. Net still zero.',
     partition: 'Partitioned.',
     partitionDone: 'Link restored.',

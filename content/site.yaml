@@ -39,15 +39,16 @@ field:
     partition: Partition the network
     duplicate: Deliver the batch twice
   counters:
-    committed: Committed
-    reachable: Reachable
-    unreachable: Unreachable
-    recovering: Recovering
+    committed: Committed entries
+    reachable: Reachable entries
+    unreachable: Unreachable entries
+    recovering: Entries being replayed
     duplicates: Duplicate transactions not applied
     net: Debits − credits
   status:
     rest: Inject a failure, or drag across the field.
     node: Node down. Its committed entries are unreachable, not undone, until they are replayed from the durable log, in order.
+    nodeReplay: The node is back and replays its durable log, in order. Nothing committed was lost.
     nodeDone: Replayed from the log. Net still zero.
     partition: Partitioned. The far side keeps its committed entries, but this side cannot read them until the link returns.
     partitionDone: Link restored. Every entry can be read again.

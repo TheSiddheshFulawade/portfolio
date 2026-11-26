@@ -14,7 +14,12 @@
         <div class="side">
           <div class="ctl">
             @for (mode of modes; track mode) {
-              <button type="button" class="btn" [disabled]="busy()" (click)="run(mode, $event)">
+              <button
+                type="button"
+                class="btn"
+                [attr.aria-disabled]="busy() ? 'true' : null"
+                (click)="run(mode)"
+              >
                 {{ copy.actions[mode] }}
               </button>
             }

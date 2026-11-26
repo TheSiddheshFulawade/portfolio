@@ -6,8 +6,10 @@
 :root {
   color-scheme: dark light;
 
-  --font-display: 'IBM Plex Sans Condensed', 'Arial Narrow', system-ui, sans-serif;
-  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display:
+    'IBM Plex Sans Condensed', 'Plex Condensed Fallback', 'Arial Narrow', system-ui, sans-serif;
+  --font-body:
+    'IBM Plex Sans', 'Plex Sans Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   --step--2: 0.75rem;
