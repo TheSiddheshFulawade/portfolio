@@ -1,5 +1,7 @@
 # 004 · v2 Lab page · Spec
 
+PARKED by the user, 2026-11-26: the Settlement Lab API is not deployed.
+
 Release v2.0, target Tue 1 Dec 2026 (ADR-0004). One spec, approved once. API source of truth: settlement-lab
 `docs/api-contract.md` (approved 2026-11-23, "the contract"). Layout: settlement-lab `docs/explainer/ui-mockup.svg`.
 
