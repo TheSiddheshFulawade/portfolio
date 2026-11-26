@@ -2,7 +2,13 @@
   <div class="intro">
     <p class="role">{{ profile.headline }}</p>
     <h1 id="home-title" [attr.aria-label]="hero.srSentence">
-      {{ hero.lead }} <span class="phrase">{{ phrase() }}</span>
+      {{ hero.lead }}
+      <span class="swap">
+        <span #livePhrase class="now">{{ phrase() }}</span>
+        @for (held of reserve; track $index) {
+          <span class="hold" aria-hidden="true" [attr.data-text]="held"></span>
+        }
+      </span>
     </h1>
     @if (hero.support; as support) {
       <p class="lead">{{ support }}</p>
@@ -30,6 +36,7 @@
   @if (profile.photo; as photo) {
     <figure class="photo">
       <img
+        class="frame"
         [src]="photo.src"
         [alt]="photo.alt"
         [width]="photo.width"
@@ -60,7 +67,7 @@
       <ul class="rows">
         @for (project of featured; track project.id) {
           <li>
-            <div class="row">
+            <div class="row linked">
               <h3>
                 <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
               </h3>
@@ -70,7 +77,14 @@
                   <li>{{ tech }}</li>
                 }
               </ul>
-              <div class="side"><sf-status-pill [label]="project.status" /></div>
+              <div class="side">
+                <span class="status" [class.dev]="project.phase === 'in-development'">{{
+                  project.status
+                }}</span>
+                <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
+              </div>
             </div>
           </li>
         }
@@ -123,43 +137,37 @@
       <p>{{ sections['decisionsIntro'] }}</p>
     </div>
     <div class="detail">
-      <ul class="rows">
-        @for (d of decisions; track d.id) {
+      <ul class="decs">
+        @for (d of decisions; track d.id; let first = $first) {
           <li>
-            <article class="row">
-              <h3>{{ d.title }}</h3>
-              <dl class="decision">
-                <div>
-                  <dt>{{ ui['chosen'] }}</dt>
-                  <dd>{{ d.choice }}</dd>
-                </div>
-                <div>
-                  <dt>{{ ui['rejected'] }}</dt>
-                  <dd>{{ d.rejected }}</dd>
-                </div>
-                <div>
-                  <dt>{{ ui['reason'] }}</dt>
-                  <dd>{{ d.reason }}</dd>
-                </div>
-                <div>
-                  <dt>{{ ui['cost'] }}</dt>
-                  <dd>{{ d.cost }}</dd>
-                </div>
+            <details class="dec" name="decisions" [attr.open]="first ? '' : null">
+              <summary>
+                <h3>{{ d.title }}</h3>
+                <svg class="plus" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 2v12M2 8h12" />
+                </svg>
+              </summary>
+              <dl>
+                <dt>{{ ui['chosen'] }}</dt>
+                <dd>{{ d.choice }}</dd>
+                <dt>{{ ui['rejected'] }}</dt>
+                <dd>{{ d.rejected }}</dd>
+                <dt>{{ ui['reason'] }}</dt>
+                <dd>{{ d.reason }}</dd>
+                <dt>{{ ui['cost'] }}</dt>
+                <dd>{{ d.cost }}</dd>
+                <dt>{{ ui['evidence'] }}</dt>
+                <dd class="links">
+                  @for (e of d.links; track e.label) {
+                    @if (e.href) {
+                      <a [href]="e.href">{{ e.label }}</a>
+                    } @else {
+                      <a [routerLink]="e.link">{{ e.label }}</a>
+                    }
+                  }
+                </dd>
               </dl>
-              <p class="sub">
-                {{ ui['evidence'] }}:
-                @for (e of d.links; track e.label; let last = $last) {
-                  @if (e.href) {
-                    <a [href]="e.href">{{ e.label }}</a>
-                  } @else {
-                    <a [routerLink]="e.link">{{ e.label }}</a>
-                  }
-                  @if (!last) {
-                    <span aria-hidden="true"> · </span>
-                  }
-                }
-              </p>
-            </article>
+            </details>
           </li>
         }
       </ul>
@@ -171,7 +179,7 @@
       <h2 id="capabilities-title">{{ sections['capabilities'] }}</h2>
       <p>{{ sections['capabilitiesIntro'] }}</p>
     </div>
-    <div class="detail groups">
+    <div class="detail caps">
       @for (group of groups; track group.id) {
         <div class="group">
           <h3>{{ group.label }}</h3>

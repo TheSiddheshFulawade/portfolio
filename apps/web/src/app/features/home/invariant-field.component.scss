@@ -1,58 +1,112 @@
-// The invariant field: a panel with the dot canvas, the three failure buttons, the status line and the counters.
-// Layout and tokens only; the motion designer styles the canvas and controls further.
-.stage {
+// The invariant field (blueprint .inv): one panel, the canvas on the left and the controls, status and counters in
+// a 17rem column on the right; stacked below 60rem. FieldCanvas draws into the canvas and reads its tokens.
+:host {
+  display: block;
+}
+
+.inv {
   display: grid;
-  gap: var(--space-5);
-  padding: var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 2.4rem;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--panel);
-}
-
-.canvas {
-  display: block;
-  width: 100%;
-  aspect-ratio: 5 / 2;
-}
-
-.side {
-  display: grid;
-  gap: var(--space-4);
 
   @media (min-width: 60rem) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) 17rem;
   }
 }
 
-.controls {
-  display: grid;
-  gap: var(--space-4);
+.stage {
+  position: relative;
+  min-height: 17rem;
+
+  @media (min-width: 60rem) {
+    min-height: 25rem;
+  }
 }
 
+canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: pan-y;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding: var(--space-5);
+  border-top: 1px solid var(--line);
+
+  @media (min-width: 60rem) {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+}
+
+.ctl {
+  display: grid;
+  gap: 0.55rem;
+
+  .btn {
+    justify-content: flex-start;
+    min-height: 2.75rem;
+    padding: 0.6rem 0.85rem;
+    font-size: var(--size-note);
+    font-weight: 400;
+    text-align: left;
+  }
+
+  .btn:not(:disabled):hover {
+    border-color: var(--accent);
+  }
+}
+
+// Room for the longest status line, so the counters never move when it changes.
 .say {
-  min-height: 3em;
-  color: var(--text);
+  min-height: 6.4em;
   font-size: var(--size-note);
+  line-height: 1.6;
 }
 
-.counters {
+.tally {
   display: grid;
-  gap: var(--space-2);
-  margin: 0;
+  gap: 0.1rem;
+  margin: auto 0 0;
   padding: 0;
   list-style: none;
-  font-size: var(--size-note);
 
   li {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     gap: var(--space-4);
-    padding-block: var(--space-1);
+    padding: 0.32rem 0;
     border-bottom: 1px solid var(--line);
+    font-size: var(--size-note);
+  }
+
+  li:last-child {
+    border-bottom: 0;
+  }
+
+  span:first-child {
+    color: var(--dim);
+    line-height: 1.35;
   }
 
   .mono {
     color: var(--text-strong);
+    white-space: nowrap;
+  }
+
+  .ok .mono {
+    color: var(--accent);
   }
 }

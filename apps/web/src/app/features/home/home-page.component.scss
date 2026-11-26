@@ -1,15 +1,16 @@
-// Home: hero, technology strip and the plain content sections. Shared classes (band, rail, rows, btn, more)
-// live in styles/base.css. The motion designer styles the headline swap and the strip.
+// Home, ported from the blueprint (docs/design/blueprint/style.css: hero, strip, rows, decisions, capabilities).
+// Shared classes (band, rail, rows, btn, more, status, arrow) live in styles/base.css.
 :host {
   display: block;
 }
 
+// Hero. Without profile.photo the layout closes up to one column (REQ-UI-105).
 .hero {
   display: grid;
-  gap: var(--space-7) var(--space-8);
+  gap: clamp(2.5rem, 7vw, 6.5rem);
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  padding-block: clamp(3.2rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem);
+  padding-block: clamp(3.5rem, 8vw, 6.5rem) clamp(3rem, 6vw, 5rem);
 
   @media (min-width: 60rem) {
     &:has(.photo) {
@@ -17,35 +18,31 @@
     }
   }
 
-  h1 {
-    margin-top: var(--space-4);
-    font-size: var(--size-hero);
-    line-height: 1.05;
-  }
-
-  .phrase {
-    display: block;
-    color: var(--accent);
-  }
-
   .role {
+    margin-bottom: 1.4rem;
     color: var(--dim);
+  }
+
+  h1 {
+    font-size: var(--size-hero);
+    letter-spacing: -0.015em;
+    line-height: 1.05;
   }
 
   .lead {
     max-width: 37rem;
-    margin-top: var(--space-5);
+    margin-top: 1.7rem;
   }
 
   .acts {
-    margin-top: var(--space-5);
+    margin-top: 2.1rem;
   }
 
   .where {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1) var(--space-5);
-    margin-top: var(--space-5);
+    gap: 0.4rem 1.6rem;
+    margin-top: 2.1rem;
     color: var(--dim);
     font-size: var(--size-note);
   }
@@ -53,52 +50,204 @@
   .where a {
     color: var(--text);
   }
+
+  // On a phone the line breaks in fixed places (place; profiles; email), so the web font arriving after the
+  // fallback cannot re-wrap it and push the page down (CLS).
+  @media (max-width: 30rem) {
+    .where {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+
+      > :first-child,
+      > :last-child {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}
+
+// The headline's last phrase: the live phrase and the reserved boxes share one grid cell, so the cell is as tall
+// as the longest phrase before any script runs. Only the live phrase moves (opacity and transform).
+.swap {
+  display: grid;
+  color: var(--accent);
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.hold::before {
+  visibility: hidden;
+  content: attr(data-text);
+}
+
+// Reduced motion keeps the final sentence and never swaps, so nothing needs reserving.
+@media (prefers-reduced-motion: reduce) {
+  .hold {
+    display: none;
+  }
 }
 
 .photo {
   margin: 0;
 
-  img {
+  @media (max-width: 59.99rem) {
+    order: -1;
+    width: 11.5rem;
+  }
+
+  .frame {
     display: block;
     width: 100%;
     height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
     border: 1px solid var(--line);
     border-radius: var(--radius-card);
+    background: var(--panel);
   }
 }
 
+// Technology strip (REQ-HOME-102): wrapped rows at rest, with reduced motion and without scroll timelines. Where
+// scroll timelines exist it is one line that slides only as the page scrolls: at the top of the page it rests at
+// the start, and it has moved half a viewport width once the page has scrolled one viewport height.
 .strip {
+  overflow: hidden;
   border-block: 1px solid var(--line);
   background: var(--panel);
 
   ul {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1) var(--space-6);
+    gap: 0.4rem 2rem;
     max-width: var(--layout-max);
     margin: 0 auto;
-    padding: var(--space-4) var(--gutter);
+    padding: 1.05rem var(--gutter);
     list-style: none;
   }
 
   li {
     color: var(--dim);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  li::before {
+    display: inline-block;
+    width: 0.36rem;
+    height: 0.36rem;
+    margin-right: 0.9rem;
+    border-radius: 50%;
+    background: var(--line-2);
+    vertical-align: 0.14em;
+    content: '';
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .strip ul {
+      flex-wrap: nowrap;
+      gap: 0 3rem;
+      width: max-content;
+      max-width: none;
+      margin: 0;
+      padding-inline: max(var(--gutter), calc((100vw - 1200px) / 2));
+      animation: strip-slide linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+  }
+}
+
+@keyframes strip-slide {
+  to {
+    transform: translateX(-50vw);
   }
 }
 
 .after {
-  margin-top: var(--space-4);
+  margin-top: 1rem;
 }
 
-.row .facts {
-  margin-top: var(--space-1);
+// Selected systems: the title link covers the whole row, as in the blueprint, so the row is one target.
+.linked {
+  position: relative;
+
+  h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h3 a::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+  }
+
+  &:hover h3 {
+    color: var(--accent);
+  }
+
+  .facts {
+    margin-top: 0.7rem;
+  }
 }
 
-.decision {
-  display: grid;
-  gap: var(--space-3);
-  max-width: 43rem;
+// Engineering decisions: one open at a time (details name), the plus turns to a cross when open.
+.decs {
   margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dec {
+  border-top: 1px solid var(--line);
+
+  summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 1.3rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  summary:hover h3,
+  &[open] h3 {
+    color: var(--accent);
+  }
+
+  .plus {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: var(--dim);
+    stroke-width: 1.5;
+    transition: transform var(--dur-enter) var(--ease);
+  }
+
+  &[open] .plus {
+    transform: rotate(45deg);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 0.75rem 1.5rem;
+    margin: 0;
+    padding: 0.2rem 0 1.9rem;
+  }
 
   dt {
     color: var(--dim);
@@ -106,42 +255,70 @@
   }
 
   dd {
+    max-width: 41rem;
     margin: 0;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1.2rem;
+  }
+
+  @media (max-width: 40rem) {
+    dl {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.15rem;
+    }
+
+    dd {
+      margin-bottom: 0.8rem;
+    }
   }
 }
 
-.groups {
-  display: grid;
-  gap: var(--space-6);
+li:last-child > .dec {
+  border-bottom: 1px solid var(--line);
+}
 
-  @media (min-width: 40rem) {
+// Capabilities: two columns of ruled lists, the evidence on the right of each skill.
+.caps {
+  display: grid;
+  gap: 2.6rem clamp(2rem, 5vw, 4.5rem);
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 40.01rem) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .group {
   h3 {
-    font-size: var(--size-row);
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.15rem;
   }
 
   ul {
-    display: grid;
-    gap: var(--space-3);
-    margin: var(--space-3) 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  // The blueprint puts evidence right of the skill; the real labels name a role and its dates, too long for
+  // that column, so the evidence sits under the skill at every width.
   li {
     display: grid;
-    gap: var(--space-1);
+    gap: 0.15rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent);
   }
 
   .evidence {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1) var(--space-3);
-    color: var(--dim);
-    font-size: var(--size-note);
+    gap: 0.1rem 1rem;
+    font-size: 0.92rem;
   }
 }

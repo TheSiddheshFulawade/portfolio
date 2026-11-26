@@ -7,22 +7,22 @@
       }
     </div>
     <div class="detail">
-      <div class="stage">
-        <canvas #field class="canvas" aria-hidden="true"></canvas>
+      <div class="inv">
+        <div class="stage">
+          <canvas #field aria-hidden="true"></canvas>
+        </div>
         <div class="side">
-          <div class="controls">
-            <div class="acts">
-              @for (mode of modes; track mode) {
-                <button type="button" class="btn" [disabled]="busy()" (click)="run(mode, $event)">
-                  {{ copy.actions[mode] }}
-                </button>
-              }
-            </div>
-            <p class="say" role="status" aria-live="polite">{{ status() }}</p>
+          <div class="ctl">
+            @for (mode of modes; track mode) {
+              <button type="button" class="btn" [disabled]="busy()" (click)="run(mode, $event)">
+                {{ copy.actions[mode] }}
+              </button>
+            }
           </div>
-          <ul class="counters">
+          <p class="say" role="status" aria-live="polite">{{ status() }}</p>
+          <ul class="tally">
             @for (key of counterKeys; track key) {
-              <li>
+              <li [class.ok]="key === 'net'">
                 <span>{{ copy.counters[key] }}</span>
                 <span class="mono">{{ value(key) }}</span>
               </li>

@@ -84,11 +84,8 @@ export class InvariantFieldComponent {
 
     afterNextRender(() => {
       const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-      this.canvas = new FieldCanvas(
-        this.canvasRef().nativeElement,
-        this.snap().entries,
-        !still,
-        () => this.schedule(),
+      this.canvas = new FieldCanvas(this.canvasRef().nativeElement, this.snap(), !still, () =>
+        this.schedule(),
       );
       if (typeof IntersectionObserver !== 'undefined') {
         const observer = new IntersectionObserver((entries) => {
@@ -138,7 +135,7 @@ export class InvariantFieldComponent {
   private sync(): void {
     const snap = this.model.snapshot;
     this.snap.set(snap);
-    this.canvas?.setEntries(snap.entries);
+    this.canvas?.setSnapshot(snap);
     if (this.model.atRest) {
       const done = this.statusKey();
       if (done === 'node' || done === 'partition' || done === 'duplicate') {

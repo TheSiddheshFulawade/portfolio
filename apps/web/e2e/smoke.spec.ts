@@ -339,10 +339,13 @@ for (const route of allPaths) {
 
     await page.waitForTimeout(5000);
 
+    // Time-based animations only: a scroll-driven one (the Home technology strip, REQ-HOME-102) is listed too,
+    // but it moves only while the page scrolls.
     expect(
       await page.evaluate(() =>
         document
           .getAnimations()
+          .filter((a) => a.timeline === document.timeline)
           .map((a) => `${a.constructor.name} ${(a as CSSAnimation).animationName ?? ''}`),
       ),
     ).toEqual([]);

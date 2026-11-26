@@ -3,9 +3,11 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  ElementRef,
   afterNextRender,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ContentService } from '../../core/content/content.service';
@@ -15,8 +17,11 @@ import { decisions, homeContent } from '../../core/content/home-content';
 import { SeoService } from '../../core/seo/seo.service';
 import { headlineFrames } from '../../shared/canvas/headline-cycle';
 import { formatMonthRange } from '../../shared/format/month';
-import { StatusPillComponent } from '../../shared/ui/status-pill.component';
 import { InvariantFieldComponent } from './invariant-field.component';
+
+/** The headline swap: 120 ms out and 200 ms in, the 320 ms fade that headlineFrames allows for. */
+const SWAP_OUT_MS = 120;
+const SWAP_IN_MS = 200;
 
 /** An evidence link under a decision: an external url, or a route of this site. */
 interface DecisionLink {
@@ -32,7 +37,7 @@ interface DecisionLink {
  */
 @Component({
   selector: 'sf-home-page',
-  imports: [RouterLink, StatusPillComponent, InvariantFieldComponent],
+  imports: [RouterLink, InvariantFieldComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,6 +82,12 @@ export class HomePageComponent {
 
   /** The headline's cycling phrase. It starts on the last phrase, which is the prerendered text. */
   protected readonly phrase = signal(this.hero.phrases[this.hero.phrases.length - 1]);
+  /**
+   * The other phrases, as empty boxes stacked under the live one: CSS draws each invisibly from its data-text, so
+   * the headline is as tall as its longest phrase from the first paint and the swap moves nothing (CLS).
+   */
+  protected readonly reserve = this.hero.phrases.slice(0, -1);
+  private readonly phraseRef = viewChild.required<ElementRef<HTMLElement>>('livePhrase');
 
   constructor() {
     inject(SeoService).page('home', '/');
@@ -86,13 +97,44 @@ export class HomePageComponent {
     afterNextRender(() => {
       if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return;
       const { phrases } = this.hero;
-      const timers = headlineFrames(phrases.length).map((f) =>
-        setTimeout(() => {
-          this.phrase.set(phrases[f.index]);
-          this.view.detectChanges();
-        }, f.at),
-      );
-      destroyRef.onDestroy(() => timers.forEach(clearTimeout));
+      const el = this.phraseRef().nativeElement;
+      const timers: ReturnType<typeof setTimeout>[] = [];
+      const animations: Animation[] = [];
+      // Each frame: the phrase leaves upward (opacity, transform), the text swaps, the next one rises in.
+      // No fill outlives a swap, so nothing is left animating once the last phrase is in (REQ-MOT-101).
+      for (const f of headlineFrames(phrases.length)) {
+        timers.push(
+          setTimeout(() => {
+            const out = el.animate?.(
+              [
+                { opacity: 1, transform: 'none' },
+                { opacity: 0, transform: 'translateY(-0.35em)' },
+              ],
+              { duration: SWAP_OUT_MS, easing: 'cubic-bezier(0.6, 0, 0.8, 0.3)', fill: 'forwards' },
+            );
+            if (out) animations.push(out);
+            timers.push(
+              setTimeout(() => {
+                this.phrase.set(phrases[f.index]);
+                this.view.detectChanges();
+                out?.cancel();
+                const enter = el.animate?.(
+                  [
+                    { opacity: 0, transform: 'translateY(0.4em)' },
+                    { opacity: 1, transform: 'none' },
+                  ],
+                  { duration: SWAP_IN_MS, easing: 'cubic-bezier(0.15, 0.75, 0.25, 1)' },
+                );
+                if (enter) animations.push(enter);
+              }, SWAP_OUT_MS),
+            );
+          }, f.at),
+        );
+      }
+      destroyRef.onDestroy(() => {
+        timers.forEach(clearTimeout);
+        animations.forEach((a) => a.cancel());
+      });
     });
   }
 
