@@ -6,6 +6,9 @@ import { leaks } from './verify-bundle.mjs';
 const generated = {
   home: {
     decisions: [{ reason: 'A fixed lock order makes a lock cycle impossible by construction.' }],
+    field: {
+      intro: ['Double entry records each transaction with equal total debits and credits.'],
+    },
   },
   results: { lab: { workload: '100,000 transfers per row with two percent duplicates injected.' } },
   bodies: { lab: '<p>The ledger moves money between accounts without losing a single cent.</p>' },
@@ -19,4 +22,9 @@ test('REQ-PERF-101 page-only data in the main bundle is named', () => {
   const main =
     'x="A fixed lock order makes a lock cycle impossible by construction.";y="The ledger moves money between accounts without losing a single cent."';
   assert.deepEqual(leaks(main, generated), ['decisions', 'project bodies']);
+});
+
+test('REQ-PERF-101 the invariant field copy in the main bundle is named', () => {
+  const main = 'x="Double entry records each transaction with equal total debits and credits."';
+  assert.deepEqual(leaks(main, generated), ['invariant field copy']);
 });

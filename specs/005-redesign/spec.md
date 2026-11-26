@@ -105,7 +105,7 @@ One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so c
 - [x] RD-03 [content] Content model above, with schemas and tests first (missing decision cost fails; skill without evidence hidden; any employer
       or institute from the work history outside Experience fails; results need every fact of REQ-ACC-004) (REQ-HOME-104, 105, REQ-EXP-101, REQ-PROJ-104). Finance and technical audit.
 - [x] RD-04 [web] Header, footer, contact section, 404 (REQ-UI-101, 102, 104). Smoke test extended.
-- [ ] RD-05 [web] Home (REQ-HOME-101 to 105, REQ-UI-105). Tests first: field model (pairs move together; net zero for all and for
+- [x] RD-05 [web] Home (REQ-HOME-101 to 105, REQ-UI-105). Tests first: field model (pairs move together; net zero for all and for
       reachable entries in every state; counters sum to committed; the near side of a partition stays reachable; redelivered ids are
       whole pairs and change no balance; displacement and pointer change no counter; returns to rest); headline ends within 5 s; reduced motion.
 - [x] RD-06 [web] Experience and About (REQ-EXP-101, REQ-ABOUT-101). Tests: every highlight in content is rendered once.

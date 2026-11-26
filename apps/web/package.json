@@ -19,7 +19,7 @@
     "lint": "ng lint && prettier --check .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "postbuild": "node scripts/emit-404.mjs && node scripts/emit-headers.mjs && node scripts/verify-prerender.mjs && node scripts/verify-bundle.mjs",
+    "postbuild": "node scripts/inline-critical.mjs && node scripts/emit-404.mjs && node scripts/emit-headers.mjs && node scripts/verify-prerender.mjs && node scripts/verify-bundle.mjs",
     "content:check": "node scripts/build-content.mjs --check",
     "og-image": "node scripts/og-image.mjs",
     "test:functions": "node --test \"server/**/*.test.ts\""

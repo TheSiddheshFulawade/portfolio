@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Home redesign: headline that cycles once and ends on the prerendered phrase, technology strip, the invariant field (a seeded double-entry model of node loss, partition and duplicate delivery, with counters derived from the entries), selected systems, experience without employer names, decisions and capabilities with evidence; `site.field` and `hero.support` content; browser-only work skipped on the server so prerender passes, the replay announced, run buttons keep focus, metric-matched font fallbacks and the theme script and global styles inlined by hash (no render-blocking request), audited field and decision wording, PayFlow evidence pinned to 167d172 (005 RD-05).
 - Spec 004 (Lab page) parked: the Settlement Lab API is not deployed; the live demos stay browser simulations (docs).
 - Experience with a label rail and themed highlights, then education, certifications and achievements; About with the optional portrait, bio and capabilities with evidence (education moved to Experience; `site` evidence links to this site's source; skills without evidence hidden) (005 RD-06).
 - Shell fixes from the RD-04 re-review: the open mobile menu scrolls in short viewports, scroll padding covers a wrapped header on small phones, header buttons use the control border, and the navigation follows the spec order (005 RD-04).
