@@ -1,4 +1,4 @@
-// REQ-PERF-101: runs as `postbuild`. Fails the build when page-only data (decisions, measured results,
+// REQ-PERF-101: runs as `postbuild`. Fails the build when page-only data (decisions, the invariant field copy, measured results,
 // project bodies) ended up in main-*.js, which every visitor downloads. Those datasets reach the browser only
 // through page chunks (src/app/core/content/home-content.ts, results-content.ts, project-bodies.ts).
 // Usage: node scripts/verify-bundle.mjs [distDir]   (default: dist/web)
@@ -20,6 +20,8 @@ export function pageOnlySamples(generated) {
   const out = [];
   const decision = generated.home?.decisions?.[0];
   if (decision) out.push(['decisions', sample(decision.reason)]);
+  const field = generated.home?.field?.intro?.[0];
+  if (field) out.push(['invariant field copy', sample(field)]);
   const result = Object.values(generated.results ?? {})[0];
   if (result) out.push(['results', sample(result.workload)]);
   const body = Object.values(generated.bodies ?? {})[0];

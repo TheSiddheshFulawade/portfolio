@@ -3,7 +3,10 @@ import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 import { formatMonthRange } from '../../shared/format/month';
 
-/** Experience (REQ-PAGE-003): roles in content order (newest first), with dates, location and impact bullets. */
+/**
+ * Experience (REQ-EXP-101): every role in full (label rail plus detail column), then education, certifications
+ * and achievements. Role ids stay as anchors for evidence links.
+ */
 @Component({
   selector: 'sf-experience-page',
   templateUrl: './experience-page.component.html',
@@ -15,6 +18,7 @@ export class ExperiencePageComponent {
 
   protected readonly page = this.content.page('experience');
   protected readonly ui = this.content.site.ui;
+  protected readonly education = this.content.education;
   protected readonly roles = this.content.experience.map((role) => ({
     ...role,
     dates: formatMonthRange(role.start, role.end, this.ui['present'], this.content.site.locale),

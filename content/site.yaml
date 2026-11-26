@@ -16,6 +16,7 @@ hero:
     - broker outages.
     - partial failure.
   srSentence: I build payment systems designed to stay correct under partial failure.
+  support: I design the failure path first, then test the guarantee. PayFlow and Settlement Lab are two systems built in public.
 # Home section labels (REQ-HOME-104) and their one-line introductions.
 sections:
   selected: Selected systems
@@ -27,6 +28,34 @@ sections:
   capabilities: Capabilities
   capabilitiesIntro: Each one points to where it was used.
   contact: Contact
+# The invariant field (REQ-HOME-103): a simplified double-entry model, run in the browser. See docs/design/blueprint/KNOWN-ERRORS.md.
+field:
+  heading: The sum has to hold, whatever fails.
+  intro:
+    - Double entry records each transaction with equal total debits and credits, so the entries of a ledger net to zero. Each dot is one committed entry; two dots, a debit and a credit of the same amount, make one transaction. A zero net shows that the books balance, not that they are right.
+    - Drop a node and its committed entries are unreachable until they are replayed from the durable log. Partition the network and the far side is unreadable until the link returns. Deliver the batch twice and every id is already recorded. The model assumes the log survives the node and keeps both entries of a transaction together, on one node and one side of the partition, so the entries you can still read net to zero too. The net stays zero.
+  actions:
+    node: Drop a node
+    partition: Partition the network
+    duplicate: Deliver the batch twice
+  counters:
+    committed: Committed entries
+    reachable: Reachable entries
+    unreachable: Unreachable entries
+    recovering: Entries awaiting replay
+    duplicates: Duplicate transactions not applied
+    net: Debits − credits
+  status:
+    rest: Inject a failure.
+    node: Node down. Its committed entries are unreachable, not undone, until they are replayed from the durable log, in order.
+    nodeReplay: The node is back and replays its durable log, in order. Nothing committed was lost.
+    nodeDone: Replayed from the log. Net still zero.
+    partition: Partitioned. The far side keeps its committed entries, but this side cannot read them until the link returns.
+    partitionDone: Link restored. Every entry can be read again.
+    duplicate: The batch is delivered again. Every id is already recorded, so none of it will be applied a second time.
+    duplicateDone: Nothing was applied a second time.
+  caption: >-
+    A simplified model, run in your browser, to illustrate double entry. Neither project runs a replicated ledger. Settlement Lab checks a related property after every run: the sum of all balances is conserved.
 # Open Graph image for link previews (1200 x 630, public/og.png) and its alt text.
 ogImage: /og.png
 ogImageAlt: Siddhesh Fulawade, full stack Java engineer, payments and distributed systems
@@ -100,12 +129,20 @@ ui:
   metricSource: Source
   featuredHeading: Featured work
   allProjects: All projects
+  seeSystems: See the systems
+  readExperience: Read the experience
+  fullExperience: Full experience
+  chosen: Choice
+  rejected: Chosen over
+  reason: Reason
+  cost: Cost
   repoLink: Source code on GitHub
   present: Present
   recognition: Recognition
   stack: Stack
-  skillsHeading: Skills
   evidence: Evidence
+  thisSite: This site's source
+  technologies: Technologies
   educationHeading: Education
   certificationsHeading: Certifications
   achievementsHeading: Achievements

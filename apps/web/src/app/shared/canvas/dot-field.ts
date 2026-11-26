@@ -67,7 +67,7 @@ export class DotField {
   }
 
   destroy(): void {
-    cancelAnimationFrame(this.frame);
+    if (this.frame) cancelAnimationFrame(this.frame);
     this.frame = 0;
     this.cleanup.forEach((fn) => fn());
   }

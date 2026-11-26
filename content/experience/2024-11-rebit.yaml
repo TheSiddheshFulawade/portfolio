@@ -14,6 +14,8 @@ end: null
 summary: >-
   Contributor to RBI's e-Kuber 3.0, its next-generation core banking solution, on RTGS and NEFT
   payment modules.
+# Shown on Home instead of `summary`: Home names no employer or system (REQ-HOME-104).
+homeSummary: Contributor to a central bank's next-generation core banking solution, on RTGS and NEFT payment modules.
 highlights:
   - theme: Transaction processing
     items:

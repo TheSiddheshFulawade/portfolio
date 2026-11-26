@@ -32,7 +32,7 @@ export class NotFoundPageComponent {
 
     // Decorative "404" in dots, drawn once the canvas has a size; browser only.
     afterNextRender(() => {
-      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const still = !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
       this.field = new DotField(this.canvas().nativeElement, '404', still);
     });
     // The theme change is applied to the page before this runs, so the tokens read back are the new ones.
