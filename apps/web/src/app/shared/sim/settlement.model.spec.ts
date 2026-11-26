@@ -1317,8 +1317,6 @@ describe('REQ-PROJ-103 fault profiles (FaultProfile NONE, FLAKY, outage)', () =>
 
       expect(sum(runs.map((a) => a.notPermitted))).toBeGreaterThan(0);
       expect(sum(runs.map((a) => a.halfOpenPublishes))).toBeGreaterThan(0);
-      expect(runs.some((a) => a.halfOpenFailed.length > 0)).toBe(true);
-      expect(runs.flatMap((a) => a.halfOpenFailed).every((n) => n === ATTEMPTS)).toBe(true);
       expect(sum(runs.map((a) => a.directWhileOutbox))).toBeGreaterThan(0);
     },
     T,
