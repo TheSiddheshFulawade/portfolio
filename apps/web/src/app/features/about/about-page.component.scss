@@ -1,54 +1,67 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  padding-block: var(--space-7) var(--space-4);
-}
-
-.intro,
-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.intro p:not(:has(.resume)) {
-  font-size: var(--step-1);
-}
-
-.groups {
+.top {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6) var(--rail-gap);
+  padding-bottom: var(--band);
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-5);
+.photo {
+  margin: 0;
+  width: min(100%, 11.5rem);
+}
+
+.photo img {
+  display: block;
+  aspect-ratio: 4 / 5;
+  width: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
-  background: var(--panel);
+  object-fit: cover;
+}
 
-  h3 {
-    font-size: var(--step-1);
+.bio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--measure);
+  font-size: var(--size-lead);
+}
+
+@media (min-width: 40rem) {
+  .top.with-photo {
+    grid-template-columns: 17rem minmax(0, 1fr);
+    align-items: start;
   }
 
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  .photo {
+    width: 100%;
   }
+}
 
-  li {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
+.caps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-7) var(--rail-gap);
+}
+
+.group > h3 {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--step-2);
+}
+
+.group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.group li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--line);
 }
 
 .skill {
@@ -60,36 +73,6 @@ section {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
-  font-size: var(--step--1);
-}
-
-.plain {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.bullets {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding-left: var(--space-5);
-}
-
-.strong {
-  color: var(--text-strong);
-  font-weight: 500;
-}
-
-.dim {
   color: var(--dim);
-}
-
-h3 {
-  margin-top: var(--space-3);
-  font-size: var(--step-1);
+  font-size: var(--size-note);
 }

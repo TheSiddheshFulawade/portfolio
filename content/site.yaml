@@ -104,8 +104,8 @@ ui:
   present: Present
   recognition: Recognition
   stack: Stack
-  skillsHeading: Skills
   evidence: Evidence
+  thisSite: This site's source
   educationHeading: Education
   certificationsHeading: Certifications
   achievementsHeading: Achievements
