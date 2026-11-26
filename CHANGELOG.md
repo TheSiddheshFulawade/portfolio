@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Spec 004 (Lab page) parked: the Settlement Lab API is not deployed; the live demos stay browser simulations (docs).
 - Experience with a label rail and themed highlights, then education, certifications and achievements; About with the optional portrait, bio and capabilities with evidence (education moved to Experience; `site` evidence links to this site's source; skills without evidence hidden) (005 RD-06).
 - Shell fixes from the RD-04 re-review: the open mobile menu scrolls in short viewports, scroll padding covers a wrapped header on small phones, header buttons use the control border, and the navigation follows the spec order (005 RD-04).
 - Design blueprint published in `docs/design/blueprint/` with the known errors of its simulations and their corrections (005).
