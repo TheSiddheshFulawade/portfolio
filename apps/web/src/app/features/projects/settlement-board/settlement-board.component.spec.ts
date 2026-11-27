@@ -343,6 +343,21 @@ describe('REQ-ACC-004 REQ-MOT-102 labels, copy and reduced motion', () => {
     for (const s of [S1, S2, S3, S4, S5, S6]) expect(text()).toContain(s);
   });
 
+  it('REQ-A11Y-101 the outbox chart has a text caption, and the board is aria-busy only while a run plays', async () => {
+    stubBrowser();
+    const { container } = await board('cas', 'outage');
+    const region = container.querySelector('.board')!;
+
+    expect(text()).toContain(
+      'Outbox depth over model ticks, with the breaker state as a band below; the same numbers are in the counters and the step log.',
+    );
+    expect(region.getAttribute('aria-busy')).toBeNull();
+    run();
+    expect(region.getAttribute('aria-busy')).toBe('true');
+    frames(40_000);
+    expect(region.getAttribute('aria-busy')).toBeNull();
+  });
+
   it('REQ-ACC-004 the model tick is never set beside the measured 2.9x to 4.6x', async () => {
     stubBrowser();
     await render(SettlementBoardComponent, { inputs: { seed: SEED } });

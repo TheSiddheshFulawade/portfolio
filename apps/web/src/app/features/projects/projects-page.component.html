@@ -24,7 +24,7 @@
 
 <section class="lab" aria-labelledby="lab-title">
   <h2 id="lab-title">{{ lab.heading }}</h2>
-  @defer (on viewport) {
+  @defer (on idle; hydrate on viewport) {
     <sf-settlement-board />
   } @placeholder {
     <div class="lab-placeholder">

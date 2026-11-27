@@ -290,6 +290,7 @@ export interface LabContent {
     label: string;
     lead: string;
     notes: string[];
+    chartCaption: string;
     controls: {
       mode: string;
       fault: string;

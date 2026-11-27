@@ -26,6 +26,7 @@
         "label",
         "lead",
         "notes",
+        "chartCaption",
         "controls",
         "status",
         "invariants",
@@ -39,6 +40,7 @@
         "heading": { "$ref": "#/definitions/text" },
         "label": { "$ref": "#/definitions/text" },
         "lead": { "$ref": "#/definitions/text" },
+        "chartCaption": { "$ref": "#/definitions/text" },
         "notes": {
           "type": "array",
           "minItems": 6,

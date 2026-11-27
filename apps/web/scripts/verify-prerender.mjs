@@ -40,6 +40,16 @@ for (const page of PAGES) {
     errors.push(`${file} has no non-empty <h1> inside <sf-root>`);
   }
 }
+// REQ-SEC-001: the Settlement Lab board is prerendered (incremental hydration), so its component styles are in the
+// HTML and hashed into the CSP. A board that only appears at runtime would have its styles blocked.
+const projects = join(dist, 'browser', 'projects/index.html');
+if (existsSync(projects)) {
+  const html = readFileSync(projects, 'utf8');
+  if (!/<sf-settlement-board[\s\S]*?<select[\s\S]*?<select[\s\S]*?<button/.test(html))
+    errors.push(
+      `${projects} does not contain the prerendered Settlement Lab board (selects and Run button)`,
+    );
+}
 for (const server of find(dist, 'server.mjs'))
   errors.push(`${server} was emitted (output must be static, no server)`);
 

@@ -1,11 +1,11 @@
-<div class="board">
+<div class="board" [attr.aria-busy]="playing() ? 'true' : null">
   <header class="head">
     <p class="tag">{{ copy.label }}</p>
     <p class="lead-text">{{ copy.lead }}</p>
   </header>
 
   <div class="bar">
-    <div class="field">
+    <div class="control">
       <label for="lab-mode">{{ copy.controls.mode }}</label>
       <select id="lab-mode" (change)="choose('mode', $any($event.target).value)">
         @for (m of modes; track m) {
@@ -13,7 +13,7 @@
         }
       </select>
     </div>
-    <div class="field">
+    <div class="control">
       <label for="lab-fault">{{ copy.controls.fault }}</label>
       <select id="lab-fault" (change)="choose('fault', $any($event.target).value)">
         @for (f of faults; track f) {
@@ -73,6 +73,7 @@
       </div>
 
       <div class="part chart-part">
+        <p class="visually-hidden">{{ copy.chartCaption }}</p>
         <canvas #chart class="chart" aria-hidden="true"></canvas>
         <ul class="legend" aria-hidden="true">
           <li>
