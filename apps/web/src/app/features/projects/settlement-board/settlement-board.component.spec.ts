@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { SettlementSim, checkInvariants } from '../../../shared/sim/settlement.model';
 import { SettlementBoardComponent } from './settlement-board.component';
+import { OutboxChart, type ChartSeries } from './outbox-chart';
 
 // REQ-PROJ-103, 105, REQ-ACC-003, 004, REQ-MOT-101 to 103, REQ-A11Y-101: the Settlement Lab view only draws the model.
 //
@@ -397,5 +398,42 @@ describe('REQ-SEC CSP: no inline styles', () => {
     frames(20_000);
 
     expect(container.querySelectorAll('[style]')).toHaveLength(0);
+  });
+});
+
+describe('REQ-ACC-003 the outbox chart draws only the model', () => {
+  it('REQ-ACC-003 the chart series is the outbox depth and breaker states from the model events, ending at the model outbox depth', async () => {
+    stubBrowser({ reduced: true });
+    const set = vi.spyOn(OutboxChart.prototype, 'set');
+    await board('ordered', 'outage');
+    run();
+
+    const sim = new SettlementSim({ mode: 'ordered', fault: 'outage', seed: SEED });
+    let n = 0;
+    while (sim.snapshot.end === '' && n++ < 60_000) sim.step();
+    let depth = 0;
+    const expectedDepth: { tick: number; depth: number }[] = [];
+    const expectedBreaker: { tick: number; state: string }[] = [{ tick: 0, state: 'closed' }];
+    const states: Record<string, string> = {
+      BREAKER_OPEN: 'open',
+      BREAKER_HALF_OPEN: 'half-open',
+      BREAKER_CLOSED: 'closed',
+    };
+    for (const e of sim.events) {
+      if (e.code === 'OUTBOX_ENQUEUED' || e.code === 'OUTBOX_DELIVERED') {
+        depth += e.code === 'OUTBOX_ENQUEUED' ? 1 : -1;
+        expectedDepth.push({ tick: e.tick, depth });
+      }
+      if (states[e.code]) expectedBreaker.push({ tick: e.tick, state: states[e.code] });
+    }
+
+    expect(set).toHaveBeenCalled();
+    const last = set.mock.calls.at(-1)?.[0] as ChartSeries;
+    expect(last.tick).toBe(sim.snapshot.tick);
+    expect(last.depth).toEqual(expectedDepth);
+    expect(last.breaker).toEqual(expectedBreaker);
+    expect(expectedDepth.length).toBeGreaterThan(0);
+    expect(expectedBreaker.length).toBeGreaterThan(1);
+    expect(last.depth.at(-1)?.depth ?? 0).toBe(sim.snapshot.outboxDepth);
   });
 });

@@ -1,34 +1,54 @@
-// Settlement Lab board: one panel for the simulation (design system: panels only for simulations and figures).
-// Colour is never the only signal: every state also has a word. Nothing here animates.
+// Settlement Lab board, ported from the blueprint's `.sim` / `.lab`: one panel (design system: panels only for
+// simulations), ruled inside, no boxes in boxes. Left: the flow (queue, outbox and breaker, chart, workers, accounts).
+// Right: the verdict (status, invariants, counters). Below: the step log and the notes.
+// Colour is never the only signal: every state also has a word, and the marks differ in shape. Nothing here animates
+// in CSS; the component changes SVG attributes and the canvas only while a run plays.
 :host {
   display: block;
+  --pad: var(--space-5);
+
+  @media (max-width: 40rem) {
+    --pad: var(--space-4);
+  }
 }
 
 .board {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  padding: var(--space-5);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--panel);
-
-  @media (max-width: 40rem) {
-    padding: var(--space-4);
-  }
 }
+
+h3 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  color: var(--dim);
+  font-family: var(--font-body);
+  font-size: var(--size-note);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.val {
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+// Head and controls
 
 .head {
   display: grid;
   gap: var(--space-2);
-
-  h3 {
-    font-size: var(--size-row);
-  }
+  padding: var(--pad) var(--pad) 0;
 }
 
 .tag {
   justify-self: start;
+  margin: 0;
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--control);
   border-radius: var(--radius-pill);
@@ -38,19 +58,24 @@
 
 .lead-text {
   max-width: var(--measure);
+  margin: 0;
   color: var(--dim);
 }
 
-.controls {
+.bar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--space-4);
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-4) var(--pad) var(--pad);
+  border-bottom: 1px solid var(--line);
 }
 
 .field {
   display: grid;
+  flex: 1 1 14rem;
   gap: var(--space-1);
+  max-width: 20rem;
   font-size: var(--size-note);
 
   label {
@@ -59,31 +84,309 @@
 }
 
 select {
+  width: 100%;
   min-height: 2.75rem;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--control);
   border-radius: var(--radius-control);
-  background: var(--raise);
+  background: var(--panel);
   color: var(--text-strong);
   font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+  }
 }
 
-.btn {
+.run {
+  justify-content: center;
+  min-width: 7rem;
   min-height: 2.75rem;
+  margin-left: auto;
+
+  @media (max-width: 40rem) {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
 }
 
 .btn[aria-disabled='true'] {
-  border-color: var(--line);
+  border-color: var(--line-2);
   background: none;
   color: var(--dim);
   cursor: default;
 }
 
+// Layout: flow | verify from 60rem, one column below
+
+.lab {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 60rem) {
+    grid-template-columns: minmax(0, 1fr) 19rem;
+  }
+}
+
+.flow,
+.verify {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--pad);
+}
+
+.verify {
+  border-top: 1px solid var(--line);
+
+  @media (min-width: 60rem) {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+}
+
+.two {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 40rem) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  }
+}
+
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+// Queue, outbox and breaker
+
+.meter {
+  display: block;
+  width: 100%;
+  height: 0.7rem;
+
+  .track {
+    fill: var(--raise);
+    stroke: var(--line-2);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .level {
+    fill: var(--accent);
+  }
+}
+
+.pair {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+
+  > div {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+  }
+}
+
+.figure {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-size: var(--step-2);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.breaker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--step-1);
+}
+
+.switch {
+  flex: none;
+  width: 1.75rem;
+  height: 0.75rem;
+  overflow: visible;
+  color: var(--accent);
+
+  circle {
+    fill: currentColor;
+  }
+
+  path {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.75;
+  }
+}
+
+.b-open .switch,
+.b-half-open .switch {
+  color: var(--amber);
+}
+
+// Outbox chart (canvas) and its legend
+
+.chart {
+  display: block;
+  width: 100%;
+  height: 7.5rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  color: var(--dim);
+  font-size: var(--step--2);
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  svg {
+    width: 1rem;
+    height: 0.5rem;
+  }
+
+  .k-line {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .k-open {
+    fill: var(--amber);
+  }
+
+  .k-frame {
+    fill: none;
+    stroke: var(--amber);
+  }
+
+  .k-hatch {
+    stroke: var(--amber);
+    stroke-width: 1.25;
+  }
+}
+
+// Workers and accounts
+
+.workers,
+.invariants,
+.log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workers {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fill, minmax(6.75rem, 1fr));
+
+  li {
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    min-height: 3.4rem;
+    padding: var(--space-2);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-control);
+    color: var(--dim);
+    font-size: var(--step--2);
+    line-height: 1.35;
+  }
+
+  .who {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-strong);
+    font-family: var(--font-mono);
+  }
+
+  .w-lock-1,
+  .w-lock-2 {
+    border-color: var(--amber);
+  }
+
+  .w-read,
+  .w-work {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  li.stuck {
+    border-color: var(--red);
+  }
+
+  .mark {
+    width: 0.625rem;
+    height: 0.625rem;
+
+    path {
+      stroke: var(--red);
+      stroke-linecap: round;
+      stroke-width: 1.75;
+    }
+  }
+}
+
+.accounts {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+
+  rect {
+    fill: var(--raise);
+    stroke: var(--control);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  rect.locked {
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+
+  rect.stuck {
+    fill: var(--red);
+    stroke: var(--red);
+  }
+
+  .cross {
+    stroke: var(--panel);
+    stroke-linecap: round;
+    stroke-width: 1.5px;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+// Status, invariants and counters
+
 .status-box {
   display: grid;
   gap: var(--space-1);
+  min-height: 3.5rem;
   padding-left: var(--space-3);
-  border-left: 2px solid var(--accent);
+  border-left: 2px solid var(--line-2);
   font-size: var(--size-note);
 
   p {
@@ -96,109 +399,60 @@ select {
   }
 }
 
-.panels {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
-
-  @media (min-width: 48rem) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.o-running,
+.o-done {
+  border-left-color: var(--accent);
 }
 
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-width: 0;
-  padding: var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  background: var(--raise);
-
-  h4 {
-    font-size: var(--size-note);
-    font-weight: 600;
-  }
-}
-
-.stats {
-  display: grid;
-  gap: var(--space-2) var(--space-4);
-  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-  margin: 0;
-
-  dt {
-    color: var(--dim);
-    font-size: var(--step--1);
-  }
-
-  dd {
-    margin: 0;
-    color: var(--text-strong);
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-.workers,
-.invariants,
-.log {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.workers {
-  display: grid;
-  gap: var(--space-1);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  font-size: var(--step--1);
-
-  li {
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-1) var(--space-2);
-    border-left: 2px solid var(--line-2);
-    color: var(--dim);
-  }
-
-  .w-lock-1,
-  .w-lock-2 {
-    border-left-color: var(--amber);
-  }
-
-  .w-read,
-  .w-work {
-    border-left-color: var(--accent);
-    color: var(--text);
-  }
-}
-
-.accounts {
-  width: 100%;
-  max-width: 20rem;
-
-  rect {
-    fill: var(--line-2);
-  }
-
-  rect.locked {
-    fill: var(--amber);
-  }
+.o-stopped {
+  border-left-color: var(--red);
 }
 
 .invariants li {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  gap: 2px var(--space-2);
   padding-block: var(--space-2);
   border-bottom: 1px solid var(--line);
   font-size: var(--step--1);
+
+  &:first-child {
+    border-top: 1px solid var(--line);
+  }
+
+  code {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+    background: none;
+    color: var(--text);
+    font-size: var(--step--2);
+    overflow-wrap: anywhere;
+  }
+}
+
+.glyph {
+  flex: none;
+  align-self: center;
+  width: 0.75rem;
+  height: 0.75rem;
+
+  path {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.75;
+  }
+
+  circle {
+    fill: currentColor;
+  }
 }
 
 .verdict {
+  margin-left: auto;
   font-weight: 600;
 }
 
@@ -216,23 +470,67 @@ select {
 
 .v-idle {
   color: var(--dim);
-  font-weight: 400;
-}
 
-.log-panel {
-  @media (min-width: 48rem) {
-    grid-column: 1 / -1;
+  .verdict {
+    font-weight: 400;
   }
 }
 
-.log {
+.stats {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  margin: 0;
+
+  dt {
+    color: var(--dim);
+    font-size: var(--step--2);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Step log and notes
+
+.log-part,
+.notes {
+  padding: var(--pad);
+  border-top: 1px solid var(--line);
+}
+
+.log {
   min-height: 6rem;
+  max-height: 18rem;
+  overflow: auto;
   font-family: var(--font-mono);
   font-size: var(--step--2);
   line-height: 1.5;
   overflow-wrap: anywhere;
+  scrollbar-width: thin;
+
+  li {
+    padding: var(--space-1) 0 var(--space-1) var(--space-3);
+    border-bottom: 1px solid var(--line);
+    border-left: 2px solid transparent;
+  }
+
+  .l-held {
+    border-left-color: var(--amber);
+  }
+
+  .l-ok {
+    border-left-color: var(--accent);
+  }
+
+  .l-bad {
+    border-left-color: var(--red);
+  }
 }
 
 .notes {
