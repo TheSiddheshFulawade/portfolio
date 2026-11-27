@@ -57,7 +57,9 @@ describe('REQ-PROJ-103 F6c Breaker (Resilience4j rule, hand traced)', () => {
   it('REQ-PROJ-103 F6c 4 failures in 10 calls (40 %) stay closed', () => {
     const b = new Breaker();
 
-    expect(feed(b, [true, false, true, false, true, false, true, false, true, true])).toEqual(Array(10).fill(null));
+    expect(feed(b, [true, false, true, false, true, false, true, false, true, true])).toEqual(
+      Array(10).fill(null),
+    );
     expect(b.state).toBe('closed');
   });
 

@@ -82,9 +82,15 @@ function stubBrowser(options: { reduced?: boolean; intersection?: boolean } = {}
         constructor(cb: IntersectionObserverCallback) {
           observers.push(cb);
         }
-        observe() {}
-        unobserve() {}
-        disconnect() {}
+        observe() {
+          // stub: the test drives the callback
+        }
+        unobserve() {
+          // stub: the test drives the callback
+        }
+        disconnect() {
+          // stub: the test drives the callback
+        }
       },
     );
   }
@@ -113,6 +119,7 @@ function setHidden(hidden: boolean) {
 }
 
 async function board(mode: string, fault: string, seed = SEED) {
+  TestBed.resetTestingModule(); // two boards in one test need a fresh module
   const view = await render(SettlementBoardComponent, { inputs: { seed } });
   fireEvent.change(screen.getByLabelText('Ledger mode'), { target: { value: mode } });
   fireEvent.change(screen.getByLabelText('Fault'), { target: { value: fault } });
@@ -148,14 +155,18 @@ describe('REQ-PROJ-105 start, controls and end', () => {
 
     expect(rafQueue).toHaveLength(0);
     expect(log().textContent?.trim() ?? '').toBe('');
-    for (const li of invariantItems()) expect(norm(li.textContent)).not.toMatch(/pass|fail|not evaluated/i);
+    for (const li of invariantItems())
+      expect(norm(li.textContent)).not.toMatch(/pass|fail|not evaluated/i);
   });
 
   it('REQ-PROJ-103 REQ-PROJ-105 the mode selector offers ordered, CAS and the two modes marked unsafe and browser only', async () => {
     stubBrowser();
     await render(SettlementBoardComponent, { inputs: { seed: SEED } });
     const select = screen.getByLabelText('Ledger mode') as HTMLSelectElement;
-    const options = [...select.options].map((o) => ({ value: o.value, label: norm(o.textContent) }));
+    const options = [...select.options].map((o) => ({
+      value: o.value,
+      label: norm(o.textContent),
+    }));
 
     expect(options.map((o) => o.value)).toEqual(['ordered', 'cas', 'unordered', 'unsynchronised']);
     for (const o of options.slice(2)) expect(o.label).toMatch(/unsafe/i);

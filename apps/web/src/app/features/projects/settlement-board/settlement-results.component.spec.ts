@@ -38,7 +38,8 @@ describe('REQ-PROJ-104 REQ-ACC-004 measured results table', () => {
     const headers = screen.getAllByRole('columnheader').map((h) => norm(h.textContent));
 
     expect(headers).toContain('Submissions/s');
-    for (const h of headers) expect(h).not.toMatch(/throughput|tps|transfers\/s|delivered|delivery/i);
+    for (const h of headers)
+      expect(h).not.toMatch(/throughput|tps|transfers\/s|delivered|delivery/i);
   });
 
   it('REQ-PROJ-104 REQ-ACC-004 states what was measured, as the content words it', async () => {
@@ -69,7 +70,9 @@ describe('REQ-PROJ-104 REQ-ACC-004 measured results table', () => {
     await render(SettlementResultsComponent);
     const cells = within(screen.getByRole('table')).getAllByRole('cell');
 
-    expect(cells.some((c) => norm(c.textContent) === intl(result!.rows[0].submissionsPerSecond))).toBe(true);
+    expect(
+      cells.some((c) => norm(c.textContent) === intl(result!.rows[0].submissionsPerSecond)),
+    ).toBe(true);
     for (const c of cells) expect(norm(c.textContent)).not.toMatch(/^\d{4,}$/);
   });
 

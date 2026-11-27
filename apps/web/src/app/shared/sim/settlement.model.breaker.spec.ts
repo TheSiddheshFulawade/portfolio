@@ -79,7 +79,8 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
             if (waiting || inTick.some((e) => e.code === 'BREAKER_OPEN')) continue;
             checked++;
             const relayed = inTick.some(
-              (e) => (e.code === 'GL_ATTEMPT' || e.code === 'GL_NOT_PERMITTED') && e.source === 'relay',
+              (e) =>
+                (e.code === 'GL_ATTEMPT' || e.code === 'GL_NOT_PERMITTED') && e.source === 'relay',
             );
             if (!relayed) bad.push(`${mode}/${seed}@${t}`);
           }
@@ -103,7 +104,9 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
           for (let t = 1; t <= r.ticks; t++) {
             if (r.startBreaker[t - 1] !== 'open') continue;
             openTicks++;
-            if (r.events.some((e) => e.tick === t && e.code === 'GL_ATTEMPT' && e.source === 'relay'))
+            if (
+              r.events.some((e) => e.tick === t && e.code === 'GL_ATTEMPT' && e.source === 'relay')
+            )
               bad.push(`${mode}/${seed}@${t}`);
           }
         }
@@ -145,7 +148,9 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
         for (const seed of SEEDS) {
           const r = run(mode, 'outage', seed);
           if (r.end !== 'done' || r.opens !== 1 || r.breaker !== 'closed' || r.outboxDepth !== 0)
-            bad.push(`${mode}/${seed}:${r.end}/opens=${r.opens}/${r.breaker}/outbox=${r.outboxDepth}`);
+            bad.push(
+              `${mode}/${seed}:${r.end}/opens=${r.opens}/${r.breaker}/outbox=${r.outboxDepth}`,
+            );
         }
       }
 
@@ -195,8 +200,16 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
           const closedAfter = (sim.events as unknown as Ev[]).some(
             (e) => e.code === 'BREAKER_CLOSED' && e.tick > settledAt,
           );
-          if (s.end !== 'done' || !closedAfter || s.breaker !== 'closed' || s.outboxDepth !== 0 || s.tick <= settledAt)
-            bad.push(`${mode}/${seed}:${s.end}/closedAfter=${closedAfter}/${s.breaker}/outbox=${s.outboxDepth}`);
+          if (
+            s.end !== 'done' ||
+            !closedAfter ||
+            s.breaker !== 'closed' ||
+            s.outboxDepth !== 0 ||
+            s.tick <= settledAt
+          )
+            bad.push(
+              `${mode}/${seed}:${s.end}/closedAfter=${closedAfter}/${s.breaker}/outbox=${s.outboxDepth}`,
+            );
         }
       }
 
@@ -219,7 +232,8 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
             if (sim.snapshot.cycle.length > 0) bad.push(`${fault}/${seed}@${sim.snapshot.tick}`);
           }
           if (sim.snapshot.end === 'deadlock') bad.push(`${fault}/${seed}:deadlock`);
-          if (sim.events.some((e) => e.code === 'DEADLOCK_DETECTED')) bad.push(`${fault}/${seed}:event`);
+          if (sim.events.some((e) => e.code === 'DEADLOCK_DETECTED'))
+            bad.push(`${fault}/${seed}:event`);
         }
       }
 
@@ -236,8 +250,15 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
       // after which the failure rate of those 3 probes is compared with the same threshold: 1/3 = 33 % < 50 % closes,
       // 2/3 = 67 % >= 50 % opens. https://resilience4j.readme.io/docs/circuitbreaker
       // Trace the model's own events (one outcome per publish, after the retries) through that rule, call by call.
-      const failedRate = (calls: boolean[]) => calls.filter((c) => !c).length * 100 >= 50 * calls.length;
-      const seen = { open: 0, closeFromHalf: 0, reopenFromHalf: 0, fiveOfTen: 0, probesOneFailed: 0 };
+      const failedRate = (calls: boolean[]) =>
+        calls.filter((c) => !c).length * 100 >= 50 * calls.length;
+      const seen = {
+        open: 0,
+        closeFromHalf: 0,
+        reopenFromHalf: 0,
+        fiveOfTen: 0,
+        probesOneFailed: 0,
+      };
       const bad: string[] = [];
       for (const mode of ['ordered', 'cas'] as Mode[]) {
         for (const seed of SEEDS) {
@@ -256,11 +277,13 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
             } else if (e.code === 'BREAKER_OPEN') {
               seen.open++;
               if (state === 'closed') {
-                if (window.length < 10 || !failedRate(window)) bad.push(`${mode}/${seed}#${i}: opened below rule (${window.length} calls)`);
+                if (window.length < 10 || !failedRate(window))
+                  bad.push(`${mode}/${seed}#${i}: opened below rule (${window.length} calls)`);
                 if (window.length === 10 && window.filter((c) => !c).length === 5) seen.fiveOfTen++;
               } else if (state === 'half-open') {
                 seen.reopenFromHalf++;
-                if (probes.length !== 3 || probes.filter((c) => !c).length < 2) bad.push(`${mode}/${seed}#${i}: reopened on ${probes.length} probes`);
+                if (probes.length !== 3 || probes.filter((c) => !c).length < 2)
+                  bad.push(`${mode}/${seed}#${i}: reopened on ${probes.length} probes`);
               } else bad.push(`${mode}/${seed}#${i}: open from open`);
               state = 'open';
               window = [];
@@ -270,7 +293,11 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
               state = 'half-open';
               probes = [];
             } else if (e.code === 'BREAKER_CLOSED') {
-              if (state !== 'half-open' || probes.length !== 3 || probes.filter((c) => !c).length > 1)
+              if (
+                state !== 'half-open' ||
+                probes.length !== 3 ||
+                probes.filter((c) => !c).length > 1
+              )
                 bad.push(`${mode}/${seed}#${i}: closed on ${probes.length} probes`);
               else if (probes.filter((c) => !c).length === 1) seen.probesOneFailed++;
               seen.closeFromHalf++;
@@ -279,9 +306,17 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
               probes = [];
             }
             // the rule held at every closed outcome: if it is met the breaker must have opened at this very event
-            if (state === 'closed' && (e.code === 'PUBLISH_OK' || e.code === 'PUBLISH_FAILED') && window.length >= 10 && failedRate(window)) {
+            if (
+              state === 'closed' &&
+              (e.code === 'PUBLISH_OK' || e.code === 'PUBLISH_FAILED') &&
+              window.length >= 10 &&
+              failedRate(window)
+            ) {
               const next = r.events[i + 1];
-              if (!next || next.code !== 'BREAKER_OPEN') bad.push(`${mode}/${seed}#${i}: rule met (${window.length} calls) but the breaker stayed closed`);
+              if (!next || next.code !== 'BREAKER_OPEN')
+                bad.push(
+                  `${mode}/${seed}#${i}: rule met (${window.length} calls) but the breaker stayed closed`,
+                );
             }
           }
         }

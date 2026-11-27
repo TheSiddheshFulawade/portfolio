@@ -22,6 +22,8 @@ export function pageOnlySamples(generated) {
   if (decision) out.push(['decisions', sample(decision.reason)]);
   const field = generated.home?.field?.intro?.[0];
   if (field) out.push(['invariant field copy', sample(field)]);
+  const lab = generated.lab?.board?.notes?.[0];
+  if (lab) out.push(['lab copy', sample(lab)]);
   const result = Object.values(generated.results ?? {})[0];
   if (result) out.push(['results', sample(result.workload)]);
   const body = Object.values(generated.bodies ?? {})[0];
@@ -47,7 +49,12 @@ export function main(distArg = process.argv[2]) {
     return 1;
   }
   const read = (name) => JSON.parse(readFileSync(join(GENERATED, `${name}.json`), 'utf8'));
-  const generated = { home: read('home'), results: read('results'), bodies: read('bodies') };
+  const generated = {
+    home: read('home'),
+    results: read('results'),
+    lab: read('lab'),
+    bodies: read('bodies'),
+  };
   const found = leaks(readFileSync(join(browser, mains[0]), 'utf8'), generated);
   if (found.length) {
     console.error(

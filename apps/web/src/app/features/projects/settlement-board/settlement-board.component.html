@@ -1,0 +1,106 @@
+<div class="board">
+  <header class="head">
+    <p class="tag">{{ copy.label }}</p>
+    <p class="lead-text">{{ copy.lead }}</p>
+  </header>
+
+  <div class="controls">
+    <div class="field">
+      <label for="lab-mode">{{ copy.controls.mode }}</label>
+      <select id="lab-mode" (change)="choose('mode', $any($event.target).value)">
+        @for (m of modes; track m) {
+          <option [value]="m" [selected]="m === mode()">{{ copy.controls.modes[m] }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="lab-fault">{{ copy.controls.fault }}</label>
+      <select id="lab-fault" (change)="choose('fault', $any($event.target).value)">
+        @for (f of faults; track f) {
+          <option [value]="f" [selected]="f === fault()">{{ copy.controls.faults[f] }}</option>
+        }
+      </select>
+    </div>
+    <button
+      type="button"
+      class="btn solid"
+      [attr.aria-disabled]="playing() ? 'true' : null"
+      (click)="run()"
+    >
+      {{ copy.controls.run }}
+    </button>
+  </div>
+
+  <div class="status-box" role="status">
+    <p>{{ status() }}</p>
+    @if (noDeadlock()) {
+      <p class="strong">{{ copy.status['noDeadlock'] }}</p>
+    }
+  </div>
+
+  <div class="panels">
+    <section class="panel">
+      <h4 id="board-stats">{{ copy.stats['heading'] }}</h4>
+      <dl class="stats">
+        @for (s of stats(); track s.label) {
+          <div>
+            <dt>{{ s.label }}</dt>
+            <dd>{{ s.value }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h4 id="board-workers">{{ copy.workers.heading }}</h4>
+      <ul class="workers">
+        @for (w of workers(); track w.n) {
+          <li [class]="'w-' + w.state">
+            <span class="mono">{{ copy.workers.label }} {{ w.n }}</span>
+            <span>{{ w.word }}</span>
+          </li>
+        }
+      </ul>
+      <svg class="accounts" viewBox="0 0 100 40" aria-hidden="true" focusable="false">
+        @for (locked of accounts(); track $index) {
+          <rect
+            [attr.x]="($index % 10) * 10"
+            [attr.y]="(($index - ($index % 10)) / 10) * 10"
+            width="8"
+            height="8"
+            rx="1"
+            [class.locked]="locked"
+          />
+        }
+      </svg>
+      <p class="note-text">{{ lockedSummary() }}</p>
+    </section>
+
+    <section class="panel">
+      <h4 id="board-invariants">{{ copy.invariants['heading'] }}</h4>
+      <ul class="invariants" aria-labelledby="board-invariants">
+        @for (r of rows(); track r.name) {
+          <li>
+            <code>{{ r.name }}</code>
+            <span class="verdict" [class]="'v-' + r.state">{{ r.word }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="panel log-panel">
+      <h4 id="board-log">{{ copy.log.heading }}</h4>
+      <ol class="log" role="log" aria-labelledby="board-log">
+        @for (line of lines(); track line.i) {
+          <li>{{ line.text }}</li>
+        }
+      </ol>
+    </section>
+  </div>
+
+  <div class="notes">
+    @for (note of copy.notes; track $index) {
+      <p class="note-text">{{ note }}</p>
+    }
+  </div>
+</div>

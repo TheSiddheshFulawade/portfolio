@@ -280,3 +280,44 @@ export interface BenchmarkResult {
 
 /** src/generated/results.json, keyed by result id. */
 export type ResultsContent = Record<string, BenchmarkResult>;
+
+type Texts = Record<string, string>;
+
+/** Copy of the Settlement Lab board and results table (content/lab.yaml, spec 005 RD-07). */
+export interface LabContent {
+  board: {
+    heading: string;
+    label: string;
+    lead: string;
+    notes: string[];
+    controls: {
+      mode: string;
+      fault: string;
+      run: string;
+      modes: Texts;
+      faults: Texts;
+    };
+    status: Texts;
+    invariants: Texts;
+    stats: Texts;
+    breakerStates: Texts;
+    workers: { heading: string; label: string; states: Texts };
+    accounts: { summary: string };
+    /** Heading, the start and end lines, one template per event code, and the words for the publish sources. */
+    log: { heading: string; sources: Texts; [line: string]: string | Texts };
+  };
+  results: {
+    heading: string;
+    intro: string;
+    caption: string;
+    scrollLabel: string;
+    facts: Texts;
+    cores: string;
+    runOne: string;
+    runMany: string;
+    columns: Texts;
+    values: Texts;
+    invariantsPassed: string;
+    invariantsFailed: string;
+  };
+}

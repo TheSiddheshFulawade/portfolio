@@ -31,6 +31,7 @@ const omit = (object, keys) =>
   Object.fromEntries(Object.entries(object).filter(([k]) => !keys.includes(k)));
 
 export const DEFAULT_HOME_FILE = resolve(HERE, '../src/generated/home.json');
+export const DEFAULT_LAB_FILE = resolve(HERE, '../src/generated/lab.json');
 export const DEFAULT_RESULTS_FILE = resolve(HERE, '../src/generated/results.json');
 export const DEFAULT_BODIES_FILE = resolve(HERE, '../src/generated/bodies.json');
 export const DEFAULT_PUBLIC_DIR = resolve(HERE, '../public');
@@ -203,6 +204,14 @@ export async function buildContent({
     single[name] = data;
   }
 
+  // content/lab.yaml: copy of the Settlement Lab board (spec 005 RD-07). Optional: only /projects reads it.
+  const labPath = join(contentDir, 'lab.yaml');
+  if (existsSync(labPath)) {
+    const data = readYaml(labPath);
+    if (data !== undefined) check('lab.yaml', 'lab', data);
+    single.lab = data;
+  }
+
   /** REQ-UI-105: the portrait exists, is under 60 KB, is declared 4:5 and has alt text (schema). */
   function checkPhoto(photo) {
     if (!photo || typeof photo !== 'object') return;
@@ -329,7 +338,13 @@ export async function buildContent({
     field: site?.field,
     ui: Object.fromEntries(HOME_UI_KEYS.filter((k) => site?.ui?.[k]).map((k) => [k, site.ui[k]])),
   };
-  return { content, home, results, errors };
+  return {
+    content,
+    home,
+    results,
+    lab: single.lab?.published === false ? null : (single.lab ?? null),
+    errors,
+  };
 }
 
 /**
@@ -373,6 +388,7 @@ export async function main(
     out = DEFAULT_OUT_FILE,
     homeOut = DEFAULT_HOME_FILE,
     resultsOut = DEFAULT_RESULTS_FILE,
+    labOut = DEFAULT_LAB_FILE,
     bodiesOut = DEFAULT_BODIES_FILE,
     contentDir = DEFAULT_CONTENT_DIR,
     publicDir = DEFAULT_PUBLIC_DIR,
@@ -380,7 +396,7 @@ export async function main(
     error = console.error,
   } = {},
 ) {
-  const { content, home, results, errors } = await buildContent({ contentDir, publicDir });
+  const { content, home, results, lab, errors } = await buildContent({ contentDir, publicDir });
   if (errors.length) {
     error(
       `build-content: ${errors.length} problem(s) in content/:\n${errors.map((e) => `  - ${e}`).join('\n')}`,
@@ -412,6 +428,7 @@ export async function main(
     [out, shell],
     [homeOut, home],
     [resultsOut, results],
+    [labOut, lab],
     [bodiesOut, bodies],
   ]) {
     mkdirSync(dirname(file), { recursive: true });

@@ -17,7 +17,8 @@ async function page() {
   const view = await render(ProjectsPageComponent, { providers: [provideRouter([])] });
   return { ...view, root: view.container as HTMLElement };
 }
-const before = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+const before = (a: Element, b: Element) =>
+  !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
 describe('REQ-PROJ-101 /projects composition', () => {
   it('REQ-PROJ-101 lists PayFlow, then Settlement Lab, then Earlier work, each linking to its detail page', async () => {
@@ -61,7 +62,10 @@ describe('REQ-PROJ-101 /projects composition', () => {
       .map((f) => f.replace(/\\/g, '/'))
       .filter((f) => f.endsWith('.ts') && !f.endsWith('.spec.ts'))
       .filter((f) => /from\s+['"][^'"]*settlement\.model['"]/.test(readFileSync(app + f, 'utf8')));
-    const template = readFileSync(`${process.cwd()}/src/app/features/projects/projects-page.component.html`, 'utf8');
+    const template = readFileSync(
+      `${process.cwd()}/src/app/features/projects/projects-page.component.html`,
+      'utf8',
+    );
     const defer = template.indexOf('@defer');
 
     expect(importers.length).toBeGreaterThan(0);

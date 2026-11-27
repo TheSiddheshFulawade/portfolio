@@ -276,7 +276,12 @@ function audit(t: Trace): Audit {
         );
         pending = null;
       }
-      if (pendingDeliver !== null && e.code !== 'OUTBOX_DELIVERED') {
+      // with F1 a relay success can be the deciding half-open probe: its BREAKER_* event comes first
+      if (
+        pendingDeliver !== null &&
+        e.code !== 'OUTBOX_DELIVERED' &&
+        !e.code.startsWith('BREAKER_')
+      ) {
         v['outbox'].push(
           `event ${i}: a successful relay publish of ${pendingDeliver} must be followed by OUTBOX_DELIVERED`,
         );

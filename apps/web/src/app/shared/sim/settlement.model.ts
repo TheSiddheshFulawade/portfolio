@@ -5,7 +5,7 @@ import { createRng } from './rng';
  * then a direct publish to a simulated general ledger with retry inside a circuit breaker, and an outbox for failures.
  * Pure and seeded: no DOM, no timers, no clock. One step() is one tick. Sizes and waits are scaled down (40 accounts
  * instead of the runner's, a queue of 64 instead of 1,024, waits in ticks); retry and breaker limits are the repository's
- * (ResilienceConfig.defaults): 3 attempts, window 20, minimum 10 calls, 50 %, 3 half-open probes.
+ * (ResilienceConfig.defaults): 3 attempts, a sliding sample of 20, minimum 10 calls, 50 %, 3 half-open probes (class Breaker).
  * Ordered and CAS are the repository's ledgers. 'unordered' and 'unsynchronised' exist only in this browser model.
  */
 export type LabMode = 'ordered' | 'cas' | 'unordered' | 'unsynchronised';
@@ -70,6 +70,70 @@ export interface LabSnapshot {
   cycle: number[];
 }
 
+interface BreakerConfig {
+  windowSize: number;
+  minCalls: number;
+  failurePercent: number;
+  probes: number;
+}
+
+/**
+ * Resilience4j's count-based circuit breaker (settlement-lab ResilienceConfig.defaults): sliding sample of the last 20
+ * calls, at least 10 calls, opens at 50 % failures; half-open lets 3 probes through and decides on the 3rd.
+ * Pure: no clock. The model decides when to call halfOpen().
+ */
+export class Breaker {
+  private readonly config: BreakerConfig;
+  private current: BreakerState = 'closed';
+  private recent: boolean[] = [];
+  private probed: boolean[] = [];
+
+  constructor(config: Partial<BreakerConfig> = {}) {
+    this.config = { windowSize: 20, minCalls: 10, failurePercent: 50, probes: 3, ...config };
+  }
+
+  get state(): BreakerState {
+    return this.current;
+  }
+
+  permits(): boolean {
+    return this.current !== 'open';
+  }
+
+  /** One outcome per publish. Returns the new state on a transition. Ignored while open. */
+  record(ok: boolean): BreakerState | null {
+    const failed = (calls: boolean[]) => calls.filter((c) => !c).length;
+    const { windowSize, minCalls, failurePercent, probes } = this.config;
+    let to: BreakerState | null = null;
+    if (this.current === 'closed') {
+      this.recent.push(ok);
+      if (this.recent.length > windowSize) this.recent.shift();
+      if (
+        this.recent.length >= minCalls &&
+        failed(this.recent) * 100 >= failurePercent * this.recent.length
+      )
+        to = 'open';
+    } else if (this.current === 'half-open') {
+      this.probed.push(ok);
+      if (this.probed.length === probes)
+        to = failed(this.probed) * 100 >= failurePercent * probes ? 'open' : 'closed';
+    }
+    if (to === null) return null;
+    this.recent = [];
+    this.probed = [];
+    this.current = to;
+    return to;
+  }
+
+  halfOpen(): boolean {
+    if (this.current !== 'open') return false;
+    this.current = 'half-open';
+    this.recent = [];
+    this.probed = [];
+    return true;
+  }
+}
+
 const sum = (a: readonly number[]): number => a.reduce((x, y) => x + y, 0);
 
 /** The six checks of InvariantChecker. Pure. A run that never finished is not evaluated. */
@@ -125,18 +189,13 @@ const SUBMIT_PER_TICK = 4;
 const MAX_TICKS = 20_000;
 // ResilienceConfig.defaults, OutboxPublisher (16 senders, one relay), FaultProfile (FLAKY 10 % + 5 %).
 const ATTEMPTS = 3;
-const WINDOW = 20;
-const MIN_CALLS = 10;
-const FAILURE_PERCENT = 50;
-const PROBES = 3;
 const SENDERS = 16;
 const ERROR_PERCENT = 10;
 const LOST_ACK_PERCENT = 5;
 // Scaled waits, in ticks.
-const OPEN_WAIT = 15;
+const OPEN_WAIT = 90;
 const RELAY_BACKOFF = 2;
-const OUTAGE_FROM = 40;
-const OUTAGE_TO = 110;
+const OUTAGE = { from: 40, to: 110 };
 
 type WorkerState = 'idle' | 'lock-1' | 'lock-2' | 'read' | 'work';
 interface Transfer {
@@ -187,9 +246,8 @@ export class SettlementSim {
   private sendQueue: Posting[] = [];
   private outbox: Posting[] = [];
   private relayWait = 0;
-  private breaker: BreakerState = 'closed';
-  private recent: boolean[] = [];
-  private probes: boolean[] = [];
+  private readonly breaker = new Breaker();
+  private readonly outage: { from: number; to: number };
   private openedAt = 0;
   private opens = 0;
   private retries = 0;
@@ -202,7 +260,13 @@ export class SettlementSim {
   private end: EndState = '';
   private readonly log: LabEvent[] = [];
 
-  constructor(options: { mode: LabMode; fault: LabFault; seed: number }) {
+  constructor(options: {
+    mode: LabMode;
+    fault: LabFault;
+    seed: number;
+    outage?: { from: number; to: number };
+  }) {
+    this.outage = options.outage ?? OUTAGE;
     this.mode = options.mode;
     this.fault = options.fault;
     const seed = options.seed >>> 0;
@@ -243,7 +307,7 @@ export class SettlementSim {
       })),
       postings: [...this.postings],
       generalLedger: { ...this.gl },
-      breaker: this.breaker,
+      breaker: this.breaker.state,
       opens: this.opens,
       retries: this.retries,
       rejected: this.rejected,
@@ -276,11 +340,12 @@ export class SettlementSim {
     }
     this.publishDirect();
     this.relay();
-    if (this.breaker === 'open' && this.tick - this.openedAt >= OPEN_WAIT) {
-      this.breaker = 'half-open';
-      this.probes = [];
+    if (
+      this.breaker.state === 'open' &&
+      this.tick - this.openedAt >= OPEN_WAIT &&
+      this.breaker.halfOpen()
+    )
       this.emit('BREAKER_HALF_OPEN');
-    }
     if (this.mode === 'unordered' && this.findCycle()) {
       this.end = 'deadlock';
       this.emit('DEADLOCK_DETECTED');
@@ -320,7 +385,7 @@ export class SettlementSim {
         if (known) this.answerDuplicate(index, known);
         else this.waiting.set(index, (this.waiting.get(index) ?? 0) + 1);
       } else {
-        if (this.queue.length >= QUEUE) return; // the client waits for room (the repository's offer timeout, scaled)
+        if (this.queue.length >= QUEUE) return; // the client waits for room (here the client waits for room; the engine would wait 100 ms, answer QUEUE_FULL and free the id)
         this.claimed.add(index);
         this.queue.push(this.transfers[index]);
         this.emit('QUEUED', { transferId: this.transfers[index].id });
@@ -448,7 +513,7 @@ export class SettlementSim {
 
   // General ledger: FakeGeneralLedger keyed by transfer id, with FaultProfile.
   private callGl(p: Posting): GlResult {
-    if (this.fault === 'outage' && this.tick >= OUTAGE_FROM && this.tick < OUTAGE_TO)
+    if (this.fault === 'outage' && this.tick >= this.outage.from && this.tick < this.outage.to)
       return 'OUTAGE';
     const roll = this.fault === 'flaky' ? Math.floor(this.rngGl() * 100) : 100;
     if (roll < ERROR_PERCENT) return 'ERROR';
@@ -461,7 +526,7 @@ export class SettlementSim {
   /** Retry sits inside the breaker: the breaker records one outcome per publish, after the retries. */
   private publish(p: Posting, source: 'direct' | 'relay'): boolean {
     const transferId = p.transferId;
-    if (this.breaker === 'open') {
+    if (!this.breaker.permits()) {
       this.emit('GL_NOT_PERMITTED', { transferId, source }); // no call, not recorded by the breaker
       return false;
     }
@@ -478,25 +543,8 @@ export class SettlementSim {
   }
 
   private record(ok: boolean): void {
-    const failed = (calls: boolean[]) => calls.filter((c) => !c).length;
-    let to: 'open' | 'closed' | null = null;
-    if (this.breaker === 'closed') {
-      this.recent.push(ok);
-      if (this.recent.length > WINDOW) this.recent.shift();
-      if (
-        this.recent.length >= MIN_CALLS &&
-        failed(this.recent) * 100 >= FAILURE_PERCENT * this.recent.length
-      )
-        to = 'open';
-    } else if (this.breaker === 'half-open') {
-      this.probes.push(ok);
-      if (this.probes.length === PROBES)
-        to = failed(this.probes) * 100 >= FAILURE_PERCENT * PROBES ? 'open' : 'closed';
-    }
+    const to = this.breaker.record(ok);
     if (to === null) return;
-    this.recent = [];
-    this.probes = [];
-    this.breaker = to;
     if (to === 'open') {
       this.openedAt = this.tick;
       this.opens++;
@@ -515,17 +563,14 @@ export class SettlementSim {
     }
   }
 
-  /** One relay retries the head of the outbox, in order, at most once a tick. It takes no final half-open probe. */
+  /** One relay retries the head of the outbox, in order, at most once a tick. */
   private relay(): void {
     if (this.relayWait > 0) {
       this.relayWait--;
       return;
     }
     const head = this.outbox[0];
-    const allowed =
-      this.breaker === 'closed' ||
-      (this.breaker === 'half-open' && this.probes.length < PROBES - 1);
-    if (!head || !allowed) return;
+    if (!head || !this.breaker.permits()) return;
     if (this.publish(head, 'relay')) {
       this.outbox.shift();
       this.emit('OUTBOX_DELIVERED', { transferId: head.transferId });
