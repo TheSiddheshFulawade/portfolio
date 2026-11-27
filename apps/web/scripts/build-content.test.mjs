@@ -1240,6 +1240,7 @@ function generatedPaths() {
       out: join(out, 'content.json'),
       homeOut: join(out, 'home.json'),
       resultsOut: join(out, 'results.json'),
+      labOut: join(out, 'lab.json'),
     },
   };
 }

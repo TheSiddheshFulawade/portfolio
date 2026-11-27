@@ -22,6 +22,18 @@
   }
 </ul>
 
+<section class="lab" aria-labelledby="lab-title">
+  <h2 id="lab-title">{{ lab.heading }}</h2>
+  @defer (on idle; hydrate on viewport) {
+    <sf-settlement-board />
+  } @placeholder {
+    <div class="lab-placeholder">
+      <p>{{ lab.lead }}</p>
+    </div>
+  }
+  <sf-settlement-results />
+</section>
+
 @if (earlier.length) {
   <section class="earlier" aria-labelledby="earlier-title">
     <h2 id="earlier-title">{{ ui['earlierWork'] }}</h2>

@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "lab.schema.json",
+  "description": "content/lab.yaml: copy of the Settlement Lab board and results table on /projects (spec 005 RD-07). The six notes are audited wording.",
+  "allOf": [{ "$ref": "common.schema.json#/definitions/shared" }],
+  "type": "object",
+  "required": ["board", "results"],
+  "definitions": {
+    "text": { "$ref": "common.schema.json#/definitions/text" },
+    "texts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "common.schema.json#/definitions/text" }
+    }
+  },
+  "properties": {
+    "id": true,
+    "published": true,
+    "featured": true,
+    "order": true,
+    "updated": true,
+    "board": {
+      "type": "object",
+      "required": [
+        "heading",
+        "label",
+        "lead",
+        "notes",
+        "chartCaption",
+        "controls",
+        "status",
+        "invariants",
+        "stats",
+        "breakerStates",
+        "workers",
+        "accounts",
+        "log"
+      ],
+      "properties": {
+        "heading": { "$ref": "#/definitions/text" },
+        "label": { "$ref": "#/definitions/text" },
+        "lead": { "$ref": "#/definitions/text" },
+        "chartCaption": { "$ref": "#/definitions/text" },
+        "notes": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": { "$ref": "#/definitions/text" }
+        },
+        "controls": {
+          "type": "object",
+          "required": ["mode", "fault", "run", "modes", "faults"],
+          "properties": {
+            "mode": { "$ref": "#/definitions/text" },
+            "fault": { "$ref": "#/definitions/text" },
+            "run": { "$ref": "#/definitions/text" },
+            "modes": {
+              "type": "object",
+              "required": ["ordered", "cas", "unordered", "unsynchronised"],
+              "additionalProperties": { "$ref": "#/definitions/text" }
+            },
+            "faults": {
+              "type": "object",
+              "required": ["none", "flaky", "outage"],
+              "additionalProperties": { "$ref": "#/definitions/text" }
+            }
+          }
+        },
+        "status": {
+          "type": "object",
+          "required": ["idle", "running", "done", "deadlock", "timeout", "noDeadlock"],
+          "additionalProperties": { "$ref": "#/definitions/text" }
+        },
+        "invariants": {
+          "type": "object",
+          "required": ["heading", "pass", "fail", "notEvaluated", "notChecked"],
+          "additionalProperties": { "$ref": "#/definitions/text" }
+        },
+        "stats": { "$ref": "#/definitions/texts" },
+        "breakerStates": {
+          "type": "object",
+          "required": ["closed", "open", "half-open"],
+          "additionalProperties": { "$ref": "#/definitions/text" }
+        },
+        "workers": {
+          "type": "object",
+          "required": ["heading", "label", "states"],
+          "properties": {
+            "heading": { "$ref": "#/definitions/text" },
+            "label": { "$ref": "#/definitions/text" },
+            "states": {
+              "type": "object",
+              "required": ["idle", "lock-1", "lock-2", "read", "work"],
+              "additionalProperties": { "$ref": "#/definitions/text" }
+            }
+          }
+        },
+        "accounts": {
+          "type": "object",
+          "required": ["summary"],
+          "properties": { "summary": { "$ref": "#/definitions/text" } }
+        },
+        "log": {
+          "type": "object",
+          "required": [
+            "heading",
+            "start",
+            "end",
+            "POSTED",
+            "REJECTED_FUNDS",
+            "DUPLICATE_ANSWERED",
+            "OUTBOX_ENQUEUED",
+            "OUTBOX_DELIVERED",
+            "PUBLISH_FAILED",
+            "GL_NOT_PERMITTED",
+            "BREAKER_OPEN",
+            "BREAKER_HALF_OPEN",
+            "BREAKER_CLOSED",
+            "DEADLOCK_DETECTED",
+            "sources"
+          ],
+          "properties": {
+            "sources": {
+              "type": "object",
+              "required": ["direct", "relay"],
+              "additionalProperties": { "$ref": "#/definitions/text" }
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "results": {
+      "type": "object",
+      "required": [
+        "heading",
+        "intro",
+        "caption",
+        "scrollLabel",
+        "facts",
+        "cores",
+        "runOne",
+        "runMany",
+        "columns",
+        "values",
+        "invariantsPassed",
+        "invariantsFailed"
+      ],
+      "properties": {
+        "facts": { "$ref": "#/definitions/texts" },
+        "columns": { "$ref": "#/definitions/texts" },
+        "values": { "$ref": "#/definitions/texts" }
+      }
+    }
+  }
+}

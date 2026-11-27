@@ -1,0 +1,215 @@
+<div class="board" [attr.aria-busy]="playing() ? 'true' : null">
+  <header class="head">
+    <p class="tag">{{ copy.label }}</p>
+    <p class="lead-text">{{ copy.lead }}</p>
+  </header>
+
+  <div class="bar">
+    <div class="control">
+      <label for="lab-mode">{{ copy.controls.mode }}</label>
+      <select id="lab-mode" (change)="choose('mode', $any($event.target).value)">
+        @for (m of modes; track m) {
+          <option [value]="m" [selected]="m === mode()">{{ copy.controls.modes[m] }}</option>
+        }
+      </select>
+    </div>
+    <div class="control">
+      <label for="lab-fault">{{ copy.controls.fault }}</label>
+      <select id="lab-fault" (change)="choose('fault', $any($event.target).value)">
+        @for (f of faults; track f) {
+          <option [value]="f" [selected]="f === fault()">{{ copy.controls.faults[f] }}</option>
+        }
+      </select>
+    </div>
+    <button
+      type="button"
+      class="btn solid run"
+      [attr.aria-disabled]="playing() ? 'true' : null"
+      (click)="run()"
+    >
+      {{ copy.controls.run }}
+    </button>
+  </div>
+
+  <div class="lab">
+    <div class="flow">
+      <div class="two">
+        <section class="part" aria-labelledby="board-queue">
+          <h3 id="board-queue">
+            {{ copy.stats['queue'] }} <span class="val">{{ queueText() }}</span>
+          </h3>
+          <svg class="meter" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true">
+            <rect class="track" width="100" height="4" rx="2" />
+            <rect class="level" width="100" height="4" rx="2" [attr.transform]="queueScale()" />
+          </svg>
+        </section>
+        <section class="part pair" aria-labelledby="board-outbox board-breaker">
+          <div>
+            <h3 id="board-outbox">{{ copy.stats['outbox'] }}</h3>
+            <p class="figure">{{ outboxText() }}</p>
+          </div>
+          <div>
+            <h3 id="board-breaker">{{ copy.stats['breaker'] }}</h3>
+            <p [class]="'figure breaker b-' + breaker()">
+              <svg class="switch" viewBox="0 0 28 12" aria-hidden="true" focusable="false">
+                <circle cx="3" cy="9" r="2" />
+                <circle cx="25" cy="9" r="2" />
+                @switch (breaker()) {
+                  @case ('closed') {
+                    <path d="M5 9h18" />
+                  }
+                  @case ('open') {
+                    <path d="M5 9l14-7" />
+                  }
+                  @default {
+                    <path d="M5 9l16-4" stroke-dasharray="3 2" />
+                  }
+                }
+              </svg>
+              <span>{{ breakerWord() }}</span>
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <div class="part chart-part">
+        <p class="visually-hidden">{{ copy.chartCaption }}</p>
+        <canvas #chart class="chart" aria-hidden="true"></canvas>
+        <ul class="legend" aria-hidden="true">
+          <li>
+            <svg viewBox="0 0 16 8"><path class="k-line" d="M0 6h5V2h6v4h5" /></svg>
+            {{ copy.stats['outbox'] }}
+          </li>
+          <li>
+            <svg viewBox="0 0 16 8"><rect class="k-open" width="16" height="8" /></svg>
+            {{ copy.breakerStates['open'] }}
+          </li>
+          <li>
+            <svg viewBox="0 0 16 8">
+              <rect class="k-frame" x="0.5" y="0.5" width="15" height="7" />
+              <path class="k-hatch" d="M-2 8l8-8M2 8l8-8M6 8l8-8M10 8l8-8" />
+            </svg>
+            {{ copy.breakerStates['half-open'] }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="two">
+        <section class="part" aria-labelledby="board-workers">
+          <h3 id="board-workers">{{ copy.workers.heading }}</h3>
+          <ul class="workers">
+            @for (w of workers(); track w.n) {
+              <li [class]="'w-' + w.state" [class.stuck]="w.stuck">
+                <span class="who">
+                  {{ copy.workers.label }} {{ w.n }}
+                  @if (w.stuck) {
+                    <svg class="mark" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                      <path d="M2 2l6 6M8 2l-6 6" />
+                    </svg>
+                  }
+                </span>
+                <span class="what">{{ w.word }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+        <section class="part" aria-labelledby="board-accounts">
+          <h3 id="board-accounts">{{ lockedSummary() }}</h3>
+          <svg class="accounts" viewBox="0 0 100 40" aria-hidden="true" focusable="false">
+            @for (a of accounts(); track $index) {
+              <rect
+                [attr.x]="a.x"
+                [attr.y]="a.y"
+                width="8"
+                height="8"
+                rx="1.5"
+                [class.locked]="a.locked"
+                [class.stuck]="a.stuck"
+              />
+              @if (a.stuck) {
+                <path
+                  class="cross"
+                  [attr.d]="
+                    'M' +
+                    (a.x + 2) +
+                    ' ' +
+                    (a.y + 2) +
+                    'l4 4M' +
+                    (a.x + 6) +
+                    ' ' +
+                    (a.y + 2) +
+                    'l-4 4'
+                  "
+                />
+              }
+            }
+          </svg>
+        </section>
+      </div>
+    </div>
+
+    <div class="verify">
+      <div role="status" [class]="'status-box o-' + outcome()">
+        <p>{{ status() }}</p>
+        @if (noDeadlock()) {
+          <p class="strong">{{ copy.status['noDeadlock'] }}</p>
+        }
+      </div>
+
+      <section class="part" aria-labelledby="board-invariants">
+        <h3 id="board-invariants">{{ copy.invariants['heading'] }}</h3>
+        <ul class="invariants" aria-labelledby="board-invariants">
+          @for (r of rows(); track r.name) {
+            <li [class]="'v-' + r.state">
+              <svg class="glyph" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                @switch (r.state) {
+                  @case ('pass') {
+                    <path d="M2 6.5l2.5 2.5L10 3.5" />
+                  }
+                  @case ('fail') {
+                    <path d="M3 3l6 6M9 3l-6 6" />
+                  }
+                  @case ('none') {
+                    <path d="M2.5 6h7" />
+                  }
+                  @default {
+                    <circle cx="6" cy="6" r="1.25" />
+                  }
+                }
+              </svg>
+              <code>{{ r.name }}</code>
+              <span class="verdict">{{ r.word }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="part" aria-labelledby="board-stats">
+        <h3 id="board-stats">{{ copy.stats['heading'] }}</h3>
+        <dl class="stats">
+          @for (s of stats(); track s.label) {
+            <div>
+              <dt>{{ s.label }}</dt>
+              <dd>{{ s.value }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    </div>
+  </div>
+
+  <section class="part log-part" aria-labelledby="board-log">
+    <h3 id="board-log">{{ copy.log.heading }}</h3>
+    <ol #log class="log" role="log" tabindex="0" aria-labelledby="board-log">
+      @for (line of lines(); track line.i) {
+        <li [class]="'l-' + line.kind">{{ line.text }}</li>
+      }
+    </ol>
+  </section>
+
+  <div class="notes">
+    @for (note of copy.notes; track $index) {
+      <p class="note-text">{{ note }}</p>
+    }
+  </div>
+</div>

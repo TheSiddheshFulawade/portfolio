@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideClientHydration } from '@angular/platform-browser';
+import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import {
   provideRouter,
   withComponentInputBinding,
@@ -21,6 +21,6 @@ export const appConfig: ApplicationConfig = {
         onViewTransitionCreated: tuneRouteTransition,
       }),
     ),
-    provideClientHydration(),
+    provideClientHydration(withIncrementalHydration()),
   ],
 };

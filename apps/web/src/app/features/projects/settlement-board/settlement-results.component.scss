@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+.results {
+  display: grid;
+  gap: var(--space-4);
+
+  h3 {
+    font-size: var(--size-row);
+  }
+}
+
+.intro {
+  max-width: var(--measure);
+  color: var(--dim);
+}
+
+.facts-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  font-size: var(--size-note);
+
+  div {
+    display: grid;
+    gap: var(--space-1);
+
+    @media (min-width: 48rem) {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+  }
+
+  dt {
+    color: var(--dim);
+  }
+
+  dd {
+    margin: 0;
+    max-width: var(--prose);
+    overflow-wrap: anywhere;
+  }
+}
+
+.scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+}
+
+caption {
+  padding: var(--space-2) var(--space-3);
+  color: var(--dim);
+  text-align: left;
+}
+
+th,
+td {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  border-bottom: 1px solid var(--line-2);
+  background: var(--raise);
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
