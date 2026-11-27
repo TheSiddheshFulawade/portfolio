@@ -1,0 +1,41 @@
+<div class="wrap">
+  <section class="band solo first" aria-labelledby="field-title">
+    <div class="rail">
+      <h2 id="field-title">{{ copy.heading }}</h2>
+      @for (paragraph of copy.intro; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+    </div>
+    <div class="detail">
+      <div class="inv">
+        <div class="stage">
+          <canvas #field aria-hidden="true"></canvas>
+        </div>
+        <div class="side">
+          <div class="ctl">
+            @for (mode of modes; track mode) {
+              <button
+                type="button"
+                class="btn"
+                [attr.aria-disabled]="busy() ? 'true' : null"
+                (click)="run(mode)"
+              >
+                {{ copy.actions[mode] }}
+              </button>
+            }
+          </div>
+          <p class="say" role="status" aria-live="polite">{{ status() }}</p>
+          <ul class="tally">
+            @for (key of counterKeys; track key) {
+              <li [class.ok]="key === 'net'">
+                <span>{{ copy.counters[key] }}</span>
+                <span class="mono">{{ value(key) }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+      <p class="note-text">{{ copy.caption }}</p>
+    </div>
+  </section>
+</div>

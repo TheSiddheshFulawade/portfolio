@@ -1,0 +1,130 @@
+# Copy of the Settlement Lab board and results table on /projects (spec 005 RD-07). The six sentences under `notes` are
+# the technical audit's wording (.cache/accuracy/rd07-model-technical.md, S1 to S6); change them only with a re-audit.
+id: lab
+published: true
+updated: 2026-11-27
+board:
+  heading: Settlement Lab in the browser
+  label: Simplified model
+  lead: Run the model, choose how the ledger synchronises and what fails, and watch six invariants decide the result. Nothing runs on a server.
+  notes:
+    - A simplified model of settlement-lab at release v1.0.0 (addb86d; SPEC.md sections 4.3 to 4.5). Accounts, transfers, queue size and waits are scaled down; retry and circuit-breaker limits and the six invariants are the repository's.
+    - Unsynchronised mode removes only the ledger's locking. The idempotency store still claims each id before the queue, so no transfer posts twice; updates are lost instead, and funds are checked against balances that may be stale. This mode and unordered locking exist only in this browser model, not in the repository.
+    - When the queue is full, a client here waits for room. The engine would wait 100 ms, answer QUEUE_FULL and free the id; in the measured runs, 64 closed-loop clients cannot fill its queue of 1,024.
+    - "Here the three attempts run within one tick. The repository waits between them: about 50 ms, then about 100 ms, each spread by up to 50 % jitter."
+    - "The workload is smaller and tighter: 40 accounts, 45 % of transfers among 12 hot accounts, opening balances of 250, amounts of 1 to 100 and about 5 % resends. About 10 % of transfers are rejected for insufficient funds here; in the repository's measured runs about 0.8 % of submissions are rejected, all for insufficient funds, since that workload sends only valid transfers and never fills the queue."
+    - 'Worker timing is invented: a lock takes one tick and the work 1 to 3 ticks. Ticks are model time, not a measurement, and say nothing about measured throughput.'
+  chartCaption: 'Outbox depth over model ticks, with the breaker state as a band below. The figures above give the current outbox depth and breaker state, and the step log keeps every breaker change; it keeps only the latest outbox events.'
+  controls:
+    mode: Ledger mode
+    fault: Fault
+    run: Run
+    modes:
+      ordered: Ordered locking
+      cas: Compare-and-set (CAS)
+      unordered: Unordered locking (unsafe, browser only)
+      unsynchronised: No synchronisation (unsafe, browser only)
+    faults:
+      none: No fault
+      flaky: Flaky general ledger
+      outage: General ledger outage
+  status:
+    idle: Choose a mode and a fault, then run the model.
+    running: Running the model.
+    done: 'Run ended at tick {tick}: every transfer answered and every posting delivered to the general ledger.'
+    deadlock: 'Run ended at tick {tick}: deadlock. Each worker in a cycle holds a lock another one needs, so the run never finishes and the invariants are not evaluated.'
+    timeout: "Run stopped at tick {tick}: it did not finish within the model's limit, so the invariants are not evaluated."
+    noDeadlock: No deadlock this time; the risk remains.
+  invariants:
+    heading: Invariants
+    pass: pass
+    fail: fail
+    notEvaluated: not evaluated
+    notChecked: checked when the run ends
+  stats:
+    heading: Counters
+    tick: Tick
+    queue: Queue
+    outbox: Outbox
+    breaker: Circuit breaker
+    opens: Breaker opens
+    retries: Retries
+    rejected: Rejected, insufficient funds
+    duplicates: Duplicates answered
+    lockWaits: Lock waits
+    casConflicts: CAS conflicts
+    postings: Postings
+    total: Sum of balances
+    openingTotal: Opening sum
+    of: of
+  breakerStates:
+    closed: closed
+    open: open
+    half-open: half-open
+  workers:
+    heading: Workers
+    label: Worker
+    states:
+      idle: idle
+      lock-1: taking first lock
+      lock-2: taking second lock
+      read: reading balances
+      work: working
+  accounts:
+    summary: '{locked} of {total} accounts locked'
+  log:
+    heading: Step log
+    start: 'Run started: {mode}, {fault}, seed {seed}.'
+    end: 'Run ended at tick {tick}.'
+    POSTED: 'Tick {tick}: {id} posted.'
+    REJECTED_FUNDS: 'Tick {tick}: {id} rejected for insufficient funds.'
+    DUPLICATE_ANSWERED: 'Tick {tick}: a resend of {id} answered with the first outcome; no queue slot used.'
+    OUTBOX_ENQUEUED: 'Tick {tick}: {id} saved to the outbox after a failed publish.'
+    OUTBOX_DELIVERED: 'Tick {tick}: the relay delivered {id} from the outbox.'
+    PUBLISH_FAILED: 'Tick {tick}: {source} publish of {id} failed after its retries.'
+    GL_NOT_PERMITTED: 'Tick {tick}: breaker open, so the {source} publish of {id} is refused without a call.'
+    BREAKER_OPEN: 'Tick {tick}: breaker open. Publishes are refused without calling the general ledger.'
+    BREAKER_HALF_OPEN: 'Tick {tick}: open wait over. The next call to the general ledger, in the next tick, moves the breaker to half-open and goes through as the first probe; the third probe decides.'
+    BREAKER_CLOSED: 'Tick {tick}: breaker closed.'
+    DEADLOCK_DETECTED: 'Tick {tick}: deadlock. Each worker in a cycle holds a lock another one needs.'
+    sources:
+      direct: direct
+      relay: relay
+results:
+  heading: Measured results
+  intro: Measured on the repository's own harness. These numbers come from the Java engine, not from the browser model above.
+  caption: Settlement Lab measured rows, one run
+  scrollLabel: Scrollable table of measured rows
+  facts:
+    measured: What was measured
+    machine: Machine
+    jdk: JDK
+    runs: Runs
+    runDate: Run date
+    workload: Workload
+    source: Source
+  cores: cores
+  runOne: run
+  runMany: runs
+  columns:
+    ledger: Ledger
+    threads: Threads
+    fault: Fault
+    rate: Submissions/s
+    p50: p50 (µs)
+    p99: p99 (µs)
+    rejected: Rejected
+    retries: Retries
+    breakerOpens: Breaker opens
+    outboxPeak: Outbox peak
+    invariants: Invariants
+  values:
+    LOCKING: Locking (ordered)
+    CAS: CAS
+    PLATFORM: Platform threads
+    VIRTUAL: Virtual threads
+    NONE: None
+    FLAKY: Flaky
+    OUTAGE: Outage
+  invariantsPassed: pass
+  invariantsFailed: fail

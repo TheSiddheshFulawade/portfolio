@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import content from '../src/generated/content.json' with { type: 'json' };
+import home from '../src/generated/home.json' with { type: 'json' };
 
 // REQ-PAGE-001, REQ-UI-003, REQ-UI-005: every published route renders from the static output.
 const routes = [
@@ -174,6 +175,40 @@ test('REQ-SEC-001 no CSP violations on any route or during client-side navigatio
   expect(await violations()).toEqual([]);
 });
 
+test('REQ-SEC-001 REQ-PROJ-101 scrolling the Settlement Lab board into view hydrates it styled, with no CSP violation', async ({
+  page,
+}) => {
+  const problems: string[] = [];
+  page.on('console', (m) => {
+    if (/content security policy|violates|style-src/i.test(m.text())) problems.push(m.text());
+  });
+  await page.addInitScript(() => {
+    const w = window as unknown as { cspViolations: string[] };
+    w.cspViolations = [];
+    document.addEventListener('securitypolicyviolation', (e) =>
+      w.cspViolations.push(`${e.violatedDirective} ${e.blockedURI || 'inline'} ${e.sample}`),
+    );
+  });
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/projects', { waitUntil: 'networkidle' });
+
+  const board = page.locator('sf-settlement-board .board');
+  await board.scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: 'Run', exact: true }).waitFor();
+  await page.waitForLoadState('networkidle');
+
+  // Styled: the board's own stylesheet applies (a blocked stylesheet leaves it at 0 px border and padding).
+  const css = await board.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { border: s.borderTopWidth, padding: s.paddingTop };
+  });
+  expect(css.border === '0px' && css.padding === '0px', 'board is unstyled').toBe(false);
+  expect(
+    await page.evaluate(() => (window as unknown as { cspViolations: string[] }).cspViolations),
+  ).toEqual([]);
+  expect(problems).toEqual([]);
+});
+
 test('REQ-COUNT-001 REQ-COUNT-005 the footer shows the visitor counter without shifting the layout', async ({
   page,
 }) => {
@@ -338,10 +373,13 @@ for (const route of allPaths) {
 
     await page.waitForTimeout(5000);
 
+    // Time-based animations only: a scroll-driven one (the Home technology strip, REQ-HOME-102) is listed too,
+    // but it moves only while the page scrolls.
     expect(
       await page.evaluate(() =>
         document
           .getAnimations()
+          .filter((a) => a.timeline === document.timeline)
           .map((a) => `${a.constructor.name} ${(a as CSSAnimation).animationName ?? ''}`),
       ),
     ).toEqual([]);
@@ -449,3 +487,169 @@ for (const reduce of [true, false]) {
     ).toBeLessThan(5);
   });
 }
+
+// --- Home (spec 005 RD-05: REQ-HOME-101, 103, 104, REQ-MOT-101, 103) ---------------------------
+const field = home.field as Record<string, any>;
+const fieldHeading: string = field['heading'];
+
+async function readCounters(page: Page): Promise<Record<string, number>> {
+  const section = page.getByRole('region', { name: fieldHeading });
+  const texts = await section.getByRole('listitem').allInnerTexts();
+  const out: Record<string, number> = {};
+  for (const [key, label] of Object.entries<string>(field['counters'])) {
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(
+      `^(?:${escaped}\\s*:?\\s*([-−]?[\\d,]+)|([-−]?[\\d,]+)\\s*:?\\s*${escaped})$`,
+    );
+    const hit = texts.map((t) => pattern.exec(t.replace(/\s+/g, ' ').trim())).find(Boolean);
+    expect(hit, `counter ${label}`).toBeTruthy();
+    out[key] = Number((hit![1] ?? hit![2]).replace(/,/g, '').replace('−', '-'));
+  }
+  return out;
+}
+
+test('REQ-HOME-101 the Home headline is complete in the raw HTML with JavaScript disabled', async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(baseURL!, { waitUntil: 'load' });
+  const { lead, phrases } = home.hero;
+
+  const visible = await page.locator('h1').evaluate((h1) => {
+    const clone = h1.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll('.visually-hidden').forEach((n) => n.remove());
+    return (clone.textContent ?? '').replace(/\s+/g, ' ').trim();
+  });
+  await context.close();
+
+  expect(visible).toBe(`${lead} ${phrases[phrases.length - 1]}`);
+});
+
+test('REQ-HOME-103 each failure button returns to rest, and committed = reachable + unreachable at rest', async ({
+  page,
+}) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const section = page.getByRole('region', { name: fieldHeading });
+
+  for (const mode of ['node', 'partition', 'duplicate'] as const) {
+    await section.getByRole('button', { name: field['actions'][mode] }).click();
+    await expect(section.getByRole('status')).toHaveText(field['status'][`${mode}Done`], {
+      timeout: 15_000,
+    });
+
+    const c = await readCounters(page);
+    expect(c['committed'], mode).toBe(c['reachable'] + c['unreachable']);
+    expect(c['unreachable']).toBe(0);
+    expect(c['recovering']).toBe(0);
+    expect(c['net']).toBe(0);
+  }
+  const final = await readCounters(page);
+  expect(final['duplicates']).toBe(final['committed'] / 2);
+});
+
+test('REQ-HOME-103 dragging over the canvas changes no counter', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const section = page.getByRole('region', { name: fieldHeading });
+  const canvas = section.locator('canvas');
+  await canvas.scrollIntoViewIfNeeded();
+  const box = (await canvas.boundingBox())!;
+  const drag = async () => {
+    await page.mouse.move(box.x + 10, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 3, { steps: 12 });
+    await page.mouse.move(box.x + box.width - 10, box.y + box.height - 10, { steps: 12 });
+    await page.mouse.up();
+  };
+
+  const before = await readCounters(page);
+  await drag();
+  expect(await readCounters(page)).toEqual(before);
+
+  await section.getByRole('button', { name: field['actions']['partition'] }).click();
+  await page.waitForTimeout(300);
+  await drag();
+  const c = await readCounters(page);
+  expect(c['committed']).toBe(c['reachable'] + c['unreachable'] + c['recovering']);
+  expect(c['net']).toBe(0);
+});
+
+test('REQ-HOME-104 Home names no employer or institution', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const text = (await page.locator('main').innerText()).toLowerCase();
+  const names = [
+    ...content.experience.map((e) => e.company),
+    ...content.education.degrees.map((d) => d.institution),
+  ].flatMap((n) => [n, ...n.split(/[(),]/).map((s) => s.trim())]);
+
+  for (const name of new Set(names.filter((n) => n.length >= 4))) {
+    expect(text, name).not.toContain(name.toLowerCase());
+  }
+});
+
+test('REQ-MOT-101 REQ-MOT-103 nothing runs an animation frame 6 s after Home loads', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as { frames: number };
+    w.frames = 0;
+    const raf = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (cb) => {
+      w.frames++;
+      return raf(cb);
+    };
+  });
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  await page.waitForTimeout(6_000);
+  await page.evaluate(() => ((window as unknown as { frames: number }).frames = 0));
+  await page.waitForTimeout(1_500);
+
+  expect(await page.evaluate(() => (window as unknown as { frames: number }).frames)).toBe(0);
+});
+
+// REQ-UI-103: the label rail is sticky from 60rem (960 px) and not below.
+for (const [width, expected] of [
+  [959, 'static'],
+  [960, 'sticky'],
+  [1280, 'sticky'],
+] as const) {
+  test(`REQ-UI-103 the Experience rail is ${expected} at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/experience', { waitUntil: 'networkidle' });
+
+    const position = await page
+      .locator('article aside')
+      .first()
+      .evaluate((el) => getComputedStyle(el).position);
+
+    expect(position).toBe(expected);
+  });
+}
+
+// REQ-EXP-101: skill evidence on About links to a role by fragment; the heading must clear the sticky header.
+test('REQ-EXP-101 an About evidence link lands on the role with its heading below the sticky header', async ({
+  page,
+}) => {
+  const roleIds = new Set(content.experience.map((r) => r.id));
+  const id = content.skills
+    .flatMap((g) => g.skills.flatMap((s) => s.evidence))
+    .find((e) => roleIds.has(e))!;
+  const role = content.experience.find((r) => r.id === id)!;
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/about', { waitUntil: 'networkidle' });
+
+  await page.locator(`main a[href="/experience#${id}"]`).first().click();
+
+  await expect(page).toHaveURL(new RegExp(`/experience/?#${id}$`));
+  const heading = page.getByRole('heading', { level: 2, name: role.title, exact: true });
+  const header = page.getByRole('banner').first();
+  await expect
+    .poll(async () => {
+      const h = await heading.boundingBox();
+      const b = await header.boundingBox();
+      return h && b ? h.y >= b.y + b.height - 1 && h.y < 800 : false;
+    })
+    .toBe(true);
+});

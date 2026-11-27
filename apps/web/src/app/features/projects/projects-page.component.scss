@@ -78,3 +78,19 @@
     font-size: var(--step--2);
   }
 }
+
+.lab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.lab-placeholder {
+  display: flex;
+  min-height: 24rem;
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  color: var(--dim);
+}

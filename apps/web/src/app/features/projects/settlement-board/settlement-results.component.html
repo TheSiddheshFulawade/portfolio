@@ -1,0 +1,99 @@
+@if (result; as r) {
+  <section class="results" aria-labelledby="results-title">
+    <h3 id="results-title">{{ copy.heading }}</h3>
+    <p class="intro">{{ copy.intro }}</p>
+
+    <dl class="facts-list">
+      <div>
+        <dt>{{ copy.facts['measured'] }}</dt>
+        &ngsp;
+        <dd>{{ r.measured }}</dd>
+        &ngsp;
+      </div>
+      <div>
+        <dt>{{ copy.facts['machine'] }}</dt>
+        &ngsp;
+        <dd>{{ r.machine }}, {{ r.os }}, {{ r.cores }} {{ copy.cores }}</dd>
+        &ngsp;
+      </div>
+      <div>
+        <dt>{{ copy.facts['jdk'] }}</dt>
+        &ngsp;
+        <dd>{{ r.jdk }}</dd>
+        &ngsp;
+      </div>
+      <div>
+        <dt>{{ copy.facts['runs'] }}</dt>
+        &ngsp;
+        <dd>{{ r.runs }} {{ r.runs === 1 ? copy.runOne : copy.runMany }}</dd>
+        &ngsp;
+      </div>
+      <div>
+        <dt>{{ copy.facts['runDate'] }}</dt>
+        &ngsp;
+        <dd>
+          <time [attr.datetime]="r.runDate">{{ runDate }}</time>
+        </dd>
+        &ngsp;
+      </div>
+      <div>
+        <dt>{{ copy.facts['workload'] }}</dt>
+        &ngsp;
+        <dd>{{ r.workload }}</dd>
+        &ngsp;
+      </div>
+      <div>
+        <dt>{{ copy.facts['source'] }}</dt>
+        &ngsp;
+        <dd>
+          <a [href]="sourceUrl" rel="noopener"
+            ><code>{{ r.source.commit }}</code></a
+          >
+        </dd>
+        &ngsp;
+      </div>
+    </dl>
+
+    <div class="scroll" role="group" [attr.aria-label]="copy.scrollLabel" tabindex="0">
+      <table>
+        <caption>
+          {{
+            copy.caption
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ copy.columns['ledger'] }}</th>
+            <th scope="col">{{ copy.columns['threads'] }}</th>
+            <th scope="col">{{ copy.columns['fault'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['rate'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['p50'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['p99'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['rejected'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['retries'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['breakerOpens'] }}</th>
+            <th scope="col" class="num">{{ copy.columns['outboxPeak'] }}</th>
+            <th scope="col">{{ copy.columns['invariants'] }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of r.rows; track $index) {
+            <tr>
+              <td>{{ label(row.ledger) }}</td>
+              <td>{{ label(row.threads) }}</td>
+              <td>{{ label(row.fault) }}</td>
+              <td class="num">{{ intl(row.submissionsPerSecond) }}</td>
+              <td class="num">{{ intl(row.p50Us) }}</td>
+              <td class="num">{{ intl(row.p99Us) }}</td>
+              <td class="num">{{ intl(row.rejected) }}</td>
+              <td class="num">{{ intl(row.retries) }}</td>
+              <td class="num">{{ intl(row.breakerOpens) }}</td>
+              <td class="num">{{ intl(row.outboxPeak) }}</td>
+              <td>{{ row.invariantsPassed ? copy.invariantsPassed : copy.invariantsFailed }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}

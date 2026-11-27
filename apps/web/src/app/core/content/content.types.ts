@@ -46,10 +46,31 @@ export interface Site {
   };
   contact: { heading: string; body: string };
   ui: Record<string, string>;
-  /** Home hero: a fixed lead and rotating phrases (REQ-HOME-101). */
-  hero: Hero;
-  /** Section labels of the Home page (REQ-HOME-104). */
-  sections: Sections;
+  /** The two section labels About shows; the full set is Home-only (HomeContent.sections). */
+  sections: Pick<Sections, 'capabilities' | 'capabilitiesIntro'>;
+}
+
+/** Copy of the invariant field: a simplified double-entry model run in the browser. */
+export interface FieldContent {
+  heading: string;
+  intro: string[];
+  actions: Record<'node' | 'partition' | 'duplicate', string>;
+  counters: Record<
+    'committed' | 'reachable' | 'unreachable' | 'recovering' | 'duplicates' | 'net',
+    string
+  >;
+  status: Record<
+    | 'rest'
+    | 'node'
+    | 'nodeReplay'
+    | 'nodeDone'
+    | 'partition'
+    | 'partitionDone'
+    | 'duplicate'
+    | 'duplicateDone',
+    string
+  >;
+  caption: string;
 }
 
 export interface Hero {
@@ -58,6 +79,8 @@ export interface Hero {
   phrases: string[];
   /** The whole sentence for screen readers and reduced motion. */
   srSentence: string;
+  /** One line under the headline: the failure path first, then the guarantee. */
+  support?: string;
 }
 
 export interface Sections {
@@ -117,6 +140,8 @@ export interface Experience extends Shared {
   start: string;
   end: string | null;
   summary: string;
+  /** Shown on Home instead of `summary` when set, so Home names no employer or system. */
+  homeSummary?: string;
   highlights: ThemedHighlights[];
   recognition?: string[];
   stack: string[];
@@ -208,9 +233,17 @@ export interface Decision {
   evidence: DecisionEvidence[];
 }
 
-/** src/generated/home.json: data only the Home page needs. */
+/** src/generated/home.json: data only the Home page needs (REQ-PERF-101), kept out of the shell. */
 export interface HomeContent {
   decisions: Decision[];
+  /** Home hero: a fixed lead and rotating phrases (REQ-HOME-101). */
+  hero: Hero;
+  /** Section labels of the Home page (REQ-HOME-104). */
+  sections: Sections;
+  /** The invariant field (REQ-HOME-103). */
+  field: FieldContent;
+  /** The Home-only ui labels. */
+  ui: Record<string, string>;
 }
 
 export interface ResultRow {
@@ -247,3 +280,45 @@ export interface BenchmarkResult {
 
 /** src/generated/results.json, keyed by result id. */
 export type ResultsContent = Record<string, BenchmarkResult>;
+
+type Texts = Record<string, string>;
+
+/** Copy of the Settlement Lab board and results table (content/lab.yaml, spec 005 RD-07). */
+export interface LabContent {
+  board: {
+    heading: string;
+    label: string;
+    lead: string;
+    notes: string[];
+    chartCaption: string;
+    controls: {
+      mode: string;
+      fault: string;
+      run: string;
+      modes: Texts;
+      faults: Texts;
+    };
+    status: Texts;
+    invariants: Texts;
+    stats: Texts;
+    breakerStates: Texts;
+    workers: { heading: string; label: string; states: Texts };
+    accounts: { summary: string };
+    /** Heading, the start and end lines, one template per event code, and the words for the publish sources. */
+    log: { heading: string; sources: Texts; [line: string]: string | Texts };
+  };
+  results: {
+    heading: string;
+    intro: string;
+    caption: string;
+    scrollLabel: string;
+    facts: Texts;
+    cores: string;
+    runOne: string;
+    runMany: string;
+    columns: Texts;
+    values: Texts;
+    invariantsPassed: string;
+    invariantsFailed: string;
+  };
+}

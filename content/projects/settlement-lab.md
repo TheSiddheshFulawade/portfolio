@@ -3,10 +3,10 @@ id: settlement-lab
 published: true
 featured: true
 order: 20
-updated: 2026-11-24
+updated: 2026-11-27
 title: Settlement Lab
 tagline: A transfer engine tested to conserve money under concurrency, duplicates and downstream faults.
-status: Engine measured, API built but not deployed
+status: "Engine measured, API built and tested but not deployed: run it locally from release v1.0.0"
 stack:
   [
     Java 21,
@@ -81,7 +81,12 @@ JDK 25 run are still to do.
 
 ## Status
 
-On `main`: the engine and its runner, an HTTP API (submit, balances, metrics, an event stream, and runs with a
-report), and a PostgreSQL ledger module with pessimistic and optimistic modes and a transactional outbox. The
-measured results above are from the in-memory engine. There are no database results yet, and the API is not
-deployed. A live page on this site that runs scenarios against it is a later release.
+On `main` at commit addb86d (release v1.0.0): the engine and its runner, an HTTP API (submit, balances, metrics, an
+event stream, and runs with a report), and a PostgreSQL ledger module with pessimistic and optimistic modes and a
+transactional outbox. The API runs on the in-memory ledgers; the PostgreSQL module is tested in CI but not wired into
+the API. The measured results above are from the in-memory engine, and there are no database results yet.
+
+The API is not deployed. I dropped hosting on 2026-11-26, so nothing on this site calls a server or runs the real
+engine, and any browser simulation on this site is a simplified model, not the repository. To run the API on your
+own machine, follow "Run it locally" in the README of
+[release v1.0.0](https://github.com/TheSiddheshFulawade/settlement-lab/releases/tag/v1.0.0).

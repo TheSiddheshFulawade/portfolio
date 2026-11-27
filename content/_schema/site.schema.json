@@ -19,6 +19,7 @@
     "ui",
     "hero",
     "sections",
+    "field",
     "contact"
   ],
   "definitions": {
@@ -172,7 +173,85 @@
         },
         "srSentence": {
           "$ref": "common.schema.json#/definitions/text"
+        },
+        "support": {
+          "$ref": "common.schema.json#/definitions/text"
         }
+      }
+    },
+    "field": {
+      "type": "object",
+      "required": [
+        "heading",
+        "intro",
+        "actions",
+        "counters",
+        "status",
+        "caption"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "heading": { "$ref": "common.schema.json#/definitions/text" },
+        "intro": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/definitions/text" }
+        },
+        "actions": {
+          "type": "object",
+          "required": ["node", "partition", "duplicate"],
+          "additionalProperties": false,
+          "properties": {
+            "node": { "$ref": "common.schema.json#/definitions/text" },
+            "partition": { "$ref": "common.schema.json#/definitions/text" },
+            "duplicate": { "$ref": "common.schema.json#/definitions/text" }
+          }
+        },
+        "counters": {
+          "type": "object",
+          "required": [
+            "committed",
+            "reachable",
+            "unreachable",
+            "recovering",
+            "duplicates",
+            "net"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "committed": { "$ref": "common.schema.json#/definitions/text" },
+            "reachable": { "$ref": "common.schema.json#/definitions/text" },
+            "unreachable": { "$ref": "common.schema.json#/definitions/text" },
+            "recovering": { "$ref": "common.schema.json#/definitions/text" },
+            "duplicates": { "$ref": "common.schema.json#/definitions/text" },
+            "net": { "$ref": "common.schema.json#/definitions/text" }
+          }
+        },
+        "status": {
+          "type": "object",
+          "required": [
+            "rest",
+            "node",
+            "nodeReplay",
+            "nodeDone",
+            "partition",
+            "partitionDone",
+            "duplicate",
+            "duplicateDone"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "rest": { "$ref": "common.schema.json#/definitions/text" },
+            "node": { "$ref": "common.schema.json#/definitions/text" },
+            "nodeReplay": { "$ref": "common.schema.json#/definitions/text" },
+            "nodeDone": { "$ref": "common.schema.json#/definitions/text" },
+            "partition": { "$ref": "common.schema.json#/definitions/text" },
+            "partitionDone": { "$ref": "common.schema.json#/definitions/text" },
+            "duplicate": { "$ref": "common.schema.json#/definitions/text" },
+            "duplicateDone": { "$ref": "common.schema.json#/definitions/text" }
+          }
+        },
+        "caption": { "$ref": "common.schema.json#/definitions/text" }
       }
     },
     "sections": {
