@@ -33,7 +33,8 @@ const MIN_DEPTH = 4;
  * Outbox depth over model ticks, with the breaker state as a band under it (open solid, half-open hatched). It draws
  * only points the model emitted; nothing is interpolated. The x axis spans the ticks run so far, so it grows with the
  * run and stops when the run ends. Colours are tokens, read again on theme change (`refresh`). The canvas is
- * decorative for assistive technology: the same numbers are in the counters and the step log.
+ * decorative for assistive technology: a text caption names it; the counters give the current outbox depth and breaker
+ * state, and the step log keeps every breaker change but only the latest outbox events.
  */
 export class OutboxChart {
   private readonly ctx: CanvasRenderingContext2D | null;

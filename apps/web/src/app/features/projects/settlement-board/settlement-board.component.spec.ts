@@ -349,7 +349,7 @@ describe('REQ-ACC-004 REQ-MOT-102 labels, copy and reduced motion', () => {
     const region = container.querySelector('.board')!;
 
     expect(text()).toContain(
-      'Outbox depth over model ticks, with the breaker state as a band below; the same numbers are in the counters and the step log.',
+      'Outbox depth over model ticks, with the breaker state as a band below. The figures above give the current outbox depth and breaker state, and the step log keeps every breaker change; it keeps only the latest outbox events.',
     );
     expect(region.getAttribute('aria-busy')).toBeNull();
     run();

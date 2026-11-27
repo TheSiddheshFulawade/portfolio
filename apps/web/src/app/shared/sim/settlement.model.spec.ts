@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { SettlementSim, checkInvariants } from './settlement.model';
 
 // REQ-PROJ-103, REQ-ACC-003: the Settlement Lab model is pure and seeded; the view only draws it.
-// It follows settlement-lab at e3c1b91 (InvariantChecker, SettlementEngine, IdempotencyStore, OutboxPublisher,
+// It follows settlement-lab at release v1.0.0, addb86d (modelled code unchanged since e3c1b91; InvariantChecker, SettlementEngine, IdempotencyStore, OutboxPublisher,
 // ResilientPublisher, ResilienceConfig, FaultProfile, FakeGeneralLedger) with scaled-down sizes, and corrects the
 // blueprint errors W9 to W14, M4 to M6, M12, I9 and I11 (docs/design/blueprint/KNOWN-ERRORS.md).
 //
