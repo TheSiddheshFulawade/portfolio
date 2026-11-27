@@ -155,31 +155,52 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
   );
 
   it(
-    'REQ-PROJ-103 F6a when the workload ends with the breaker not closed or with a backlog, the relay still closes the breaker afterwards and the outbox drains to zero',
+    'REQ-PROJ-103 F6a the workload can end while the breaker is not closed or the outbox is not empty; the relay then closes the breaker and the outbox drains to zero',
     () => {
-      const lastWork = (events: Ev[]) =>
-        Math.max(...events.filter((e) => e.code === 'POSTED' || e.code === 'REJECTED_FUNDS').map((e) => e.tick));
+      // With the 90 tick open wait no seed of the default outage (ticks 40 to 110) reaches the end of the workload (about
+      // tick 500 ordered, 1,000 cas) in that state, so the tail is built: `outage` places the fault window. It starts 20
+      // ticks before the last settlement and runs 200 ticks past it, so the breaker is open or half-open and the outbox is
+      // full when the last transfer settles. Only the relay can finish such a run.
       const bad: string[] = [];
-      let tail = 0;
-      for (const [mode, fault] of [
-        ['ordered', 'outage'],
-        ['cas', 'outage'],
-        ['ordered', 'flaky'],
-        ['cas', 'flaky'],
-      ] as [Mode, Fault][]) {
-        for (const seed of SEEDS) {
-          const r = run(mode, fault, seed);
-          const done = lastWork(r.events);
-          // nothing is left to publish directly after the last settlement: only the relay can finish the run
-          if (r.startBreaker[done] !== 'closed' || r.outboxAtStart[done] !== 0) tail++;
-          const closed = r.startBreaker[done] === 'closed' || r.events.some((e) => e.code === 'BREAKER_CLOSED' && e.tick > done);
-          if (r.end !== 'done' || !closed || r.breaker !== 'closed' || r.outboxDepth !== 0)
-            bad.push(`${mode}/${fault}/${seed}:${r.end}/closed=${closed}/outbox=${r.outboxDepth}`);
+      let tails = 0;
+      for (const mode of ['ordered', 'cas'] as Mode[]) {
+        for (const seed of SEEDS.slice(0, 10)) {
+          const lastWork = Math.max(
+            ...run(mode, 'none', seed)
+              .events.filter((e) => e.code === 'POSTED' || e.code === 'REJECTED_FUNDS')
+              .map((e) => e.tick),
+          );
+          // `outage` is a new optional constructor option { from, to } in ticks; the default stays { from: 40, to: 110 }
+          const sim = new SettlementSim({
+            mode,
+            fault: 'outage',
+            seed,
+            outage: { from: lastWork - 20, to: lastWork + 200 },
+          } as ConstructorParameters<typeof SettlementSim>[0]);
+          const states: string[] = ['closed'];
+          const outbox: number[] = [0];
+          let n = 0;
+          while (sim.snapshot.end === '' && n++ < MAX_STEPS) {
+            sim.step();
+            states.push(sim.snapshot.breaker);
+            outbox.push(sim.snapshot.outboxDepth);
+          }
+          const s = sim.snapshot;
+          const settledAt = Math.max(
+            ...[...sim.events]
+              .filter((e) => e.code === 'POSTED' || e.code === 'REJECTED_FUNDS')
+              .map((e) => e.tick),
+          );
+          if (states[settledAt] !== 'closed' || outbox[settledAt] > 0) tails++;
+          const closedAfter = (sim.events as unknown as Ev[]).some(
+            (e) => e.code === 'BREAKER_CLOSED' && e.tick > settledAt,
+          );
+          if (s.end !== 'done' || !closedAfter || s.breaker !== 'closed' || s.outboxDepth !== 0 || s.tick <= settledAt)
+            bad.push(`${mode}/${seed}:${s.end}/closedAfter=${closedAfter}/${s.breaker}/outbox=${s.outboxDepth}`);
         }
       }
 
-      // `tail` counts runs that really had a tail; the constants may leave none, the end state is checked for every run
-      expect(tail).toBeGreaterThanOrEqual(0);
+      expect(tails).toBe(20); // every constructed run really has the tail
       expect(bad).toEqual([]);
     },
     T,
@@ -208,7 +229,7 @@ describe('REQ-PROJ-103 relay and breaker (OutboxPublisher.relayLoop)', () => {
   );
 
   it(
-    'REQ-PROJ-103 F6c Resilience4j rule traced call by call: at least 10 calls and a failure rate of 50 % or more open the breaker; in half-open 3 probes with at most 1 failure close it, 2 or more open it again',
+    'REQ-PROJ-103 F6c the model events obey the Resilience4j rule call by call: at least 10 calls and a failure rate of 50 % or more open the breaker; in half-open 3 probes with at most 1 failure close it, 2 or more open it again',
     () => {
       // Resilience4j CircuitBreakerConfig: count-based sliding window 20, minimumNumberOfCalls 10, failureRateThreshold 50
       // (opens when the failure rate is >= 50 % once the minimum is reached); permittedNumberOfCallsInHalfOpenState 3,
