@@ -379,7 +379,9 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless every req
   };
   const page = (inner) => "<html><body><sf-root>" + inner + "</sf-root></body></html>";
   const board = (inner) =>
-    inner + "<sf-settlement-board><select></select><select></select><button>Run</button></sf-settlement-board>";
+    inner +
+    "<sf-saga-board><select></select><button>Run</button></sf-saga-board>" +
+    "<sf-settlement-board><select></select><select></select><button>Run</button></sf-settlement-board>";
   const good = {
     "browser/index.html": page("<main><h1>Hello</h1></main>"),
     "browser/experience/index.html": page("<main><h1>Experience</h1></main>"),
@@ -406,6 +408,26 @@ test("REQ-WEB-002 REQ-PAGE-001 verify-prerender fails the build unless every req
     run({ ...good, "browser/projects/index.html": page("<main><h1>Projects</h1></main>") }).status,
     1,
     "Settlement Lab board not prerendered (REQ-SEC-001)",
+  );
+  assert.equal(
+    run({
+      ...good,
+      "browser/projects/index.html": page(
+        "<main><h1>Projects</h1></main><sf-settlement-board><select></select><select></select><button>Run</button></sf-settlement-board>",
+      ),
+    }).status,
+    1,
+    "PayFlow board not prerendered (REQ-SEC-101): its component styles would be blocked by the CSP",
+  );
+  assert.equal(
+    run({
+      ...good,
+      "browser/projects/index.html": page(
+        "<main><h1>Projects</h1></main><sf-saga-board><p>no controls</p></sf-saga-board><sf-settlement-board><select></select><select></select><button>Run</button></sf-settlement-board>",
+      ),
+    }).status,
+    1,
+    "PayFlow board without its scenario selector and Run button",
   );
   assert.equal(run({ ...good, "server/server.mjs": "" }).status, 1, "server.mjs emitted");
 });
