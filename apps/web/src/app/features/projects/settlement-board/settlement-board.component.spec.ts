@@ -25,7 +25,7 @@ import { OutboxChart, type ChartSeries } from './outbox-chart';
 //   - the loop stops when the document is hidden, when the board is off screen (IntersectionObserver) and when settled.
 
 const S1 =
-  "A simplified model of settlement-lab at e3c1b91 (SPEC.md sections 4.3 to 4.5). Accounts, transfers, queue size and waits are scaled down; retry and circuit-breaker limits and the six invariants are the repository's.";
+  "A simplified model of settlement-lab at release v1.0.0 (addb86d; SPEC.md sections 4.3 to 4.5). Accounts, transfers, queue size and waits are scaled down; retry and circuit-breaker limits and the six invariants are the repository's.";
 const S2 =
   "Unsynchronised mode removes only the ledger's locking. The idempotency store still claims each id before the queue, so no transfer posts twice; updates are lost instead, and funds are checked against balances that may be stale. This mode and unordered locking exist only in this browser model, not in the repository.";
 const S3 =
@@ -33,7 +33,7 @@ const S3 =
 const S4 =
   'Here the three attempts run within one tick. The repository waits between them: about 50 ms, then about 100 ms, each spread by up to 50 % jitter.';
 const S5 =
-  "The workload is smaller and tighter: 40 accounts, 45 % of transfers among 12 hot accounts, opening balances of 250, amounts of 1 to 100 and about 5 % resends. About 10 % of transfers are rejected for funds here; the repository's measured runs reject about 0.8 %.";
+  "The workload is smaller and tighter: 40 accounts, 45 % of transfers among 12 hot accounts, opening balances of 250, amounts of 1 to 100 and about 5 % resends. About 10 % of transfers are rejected for insufficient funds here; in the repository's measured runs about 0.8 % of submissions are rejected, all for insufficient funds, since that workload sends only valid transfers and never fills the queue.";
 const S6 =
   'Worker timing is invented: a lock takes one tick and the work 1 to 3 ticks. Ticks are model time, not a measurement, and say nothing about measured throughput.';
 const NO_DEADLOCK = 'No deadlock this time; the risk remains.';

@@ -8,11 +8,11 @@ board:
   label: Simplified model
   lead: Run the model, choose how the ledger synchronises and what fails, and watch six invariants decide the result. Nothing runs on a server.
   notes:
-    - A simplified model of settlement-lab at e3c1b91 (SPEC.md sections 4.3 to 4.5). Accounts, transfers, queue size and waits are scaled down; retry and circuit-breaker limits and the six invariants are the repository's.
+    - A simplified model of settlement-lab at release v1.0.0 (addb86d; SPEC.md sections 4.3 to 4.5). Accounts, transfers, queue size and waits are scaled down; retry and circuit-breaker limits and the six invariants are the repository's.
     - Unsynchronised mode removes only the ledger's locking. The idempotency store still claims each id before the queue, so no transfer posts twice; updates are lost instead, and funds are checked against balances that may be stale. This mode and unordered locking exist only in this browser model, not in the repository.
     - When the queue is full, a client here waits for room. The engine would wait 100 ms, answer QUEUE_FULL and free the id; in the measured runs, 64 closed-loop clients cannot fill its queue of 1,024.
     - "Here the three attempts run within one tick. The repository waits between them: about 50 ms, then about 100 ms, each spread by up to 50 % jitter."
-    - "The workload is smaller and tighter: 40 accounts, 45 % of transfers among 12 hot accounts, opening balances of 250, amounts of 1 to 100 and about 5 % resends. About 10 % of transfers are rejected for funds here; the repository's measured runs reject about 0.8 %."
+    - "The workload is smaller and tighter: 40 accounts, 45 % of transfers among 12 hot accounts, opening balances of 250, amounts of 1 to 100 and about 5 % resends. About 10 % of transfers are rejected for insufficient funds here; in the repository's measured runs about 0.8 % of submissions are rejected, all for insufficient funds, since that workload sends only valid transfers and never fills the queue."
     - 'Worker timing is invented: a lock takes one tick and the work 1 to 3 ticks. Ticks are model time, not a measurement, and say nothing about measured throughput.'
   controls:
     mode: Ledger mode
@@ -48,7 +48,7 @@ board:
     breaker: Circuit breaker
     opens: Breaker opens
     retries: Retries
-    rejected: Rejected for funds
+    rejected: Rejected, insufficient funds
     duplicates: Duplicates answered
     lockWaits: Lock waits
     casConflicts: CAS conflicts
@@ -76,14 +76,14 @@ board:
     start: 'Run started: {mode}, {fault}, seed {seed}.'
     end: 'Run ended at tick {tick}.'
     POSTED: 'Tick {tick}: {id} posted.'
-    REJECTED_FUNDS: 'Tick {tick}: {id} rejected for funds.'
+    REJECTED_FUNDS: 'Tick {tick}: {id} rejected for insufficient funds.'
     DUPLICATE_ANSWERED: 'Tick {tick}: a resend of {id} answered with the first outcome; no queue slot used.'
     OUTBOX_ENQUEUED: 'Tick {tick}: {id} saved to the outbox after a failed publish.'
     OUTBOX_DELIVERED: 'Tick {tick}: the relay delivered {id} from the outbox.'
     PUBLISH_FAILED: 'Tick {tick}: {source} publish of {id} failed after its retries.'
     GL_NOT_PERMITTED: 'Tick {tick}: breaker open, so the {source} publish of {id} is refused without a call.'
     BREAKER_OPEN: 'Tick {tick}: breaker open. Publishes are refused without calling the general ledger.'
-    BREAKER_HALF_OPEN: 'Tick {tick}: breaker half-open after its wait. The next call goes through as a probe; the third probe decides.'
+    BREAKER_HALF_OPEN: 'Tick {tick}: open wait over. The next call to the general ledger, in the next tick, moves the breaker to half-open and goes through as the first probe; the third probe decides.'
     BREAKER_CLOSED: 'Tick {tick}: breaker closed.'
     DEADLOCK_DETECTED: 'Tick {tick}: deadlock. Each worker in a cycle holds a lock another one needs.'
     sources:

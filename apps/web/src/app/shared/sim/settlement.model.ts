@@ -1,7 +1,7 @@
 import { createRng } from './rng';
 
 /**
- * A simplified model of settlement-lab at e3c1b91 (REQ-PROJ-103): 600 transfers, a bounded queue, 8 workers, a ledger,
+ * A simplified model of settlement-lab at release v1.0.0, addb86d (unchanged from e3c1b91 for the modelled code; REQ-PROJ-103): 600 transfers, a bounded queue, 8 workers, a ledger,
  * then a direct publish to a simulated general ledger with retry inside a circuit breaker, and an outbox for failures.
  * Pure and seeded: no DOM, no timers, no clock. One step() is one tick. Sizes and waits are scaled down (40 accounts
  * instead of the runner's, a queue of 64 instead of 1,024, waits in ticks); retry and breaker limits are the repository's
@@ -385,7 +385,7 @@ export class SettlementSim {
         if (known) this.answerDuplicate(index, known);
         else this.waiting.set(index, (this.waiting.get(index) ?? 0) + 1);
       } else {
-        if (this.queue.length >= QUEUE) return; // the client waits for room (here the client waits for room; the engine would wait 100 ms, answer QUEUE_FULL and free the id)
+        if (this.queue.length >= QUEUE) return; // here the client waits for room; the engine would wait 100 ms, answer QUEUE_FULL and free the id
         this.claimed.add(index);
         this.queue.push(this.transfers[index]);
         this.emit('QUEUED', { transferId: this.transfers[index].id });

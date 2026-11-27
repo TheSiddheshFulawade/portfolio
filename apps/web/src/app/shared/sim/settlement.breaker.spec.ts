@@ -7,16 +7,16 @@ import * as model from './settlement.model';
 //
 // Contract the implementation must export from settlement.model.ts (SettlementSim uses it for every publish):
 //   export class Breaker {
-//     constructor(config?: Partial<{ window: number; minCalls: number; failurePercent: number; probes: number }>)
-//       // defaults: window 20, minCalls 10, failurePercent 50, probes 3
+//     constructor(config?: Partial<{ windowSize: number; minCalls: number; failurePercent: number; probes: number }>)
+//       // defaults: windowSize 20, minCalls 10, failurePercent 50, probes 3
 //     get state(): BreakerState                     // starts 'closed'
 //     permits(): boolean                            // false only while 'open'
 //     record(ok: boolean): BreakerState | null      // one outcome per publish; the NEW state on a transition, else null.
 //                                                   // While 'open' it is ignored (returns null, changes nothing).
 //     halfOpen(): boolean                           // open -> half-open (fresh probe count); true if it changed, else false
 //   }
-// A transition clears the window and the probes. The model decides when to call halfOpen() (OPEN_WAIT 90 ticks, when the
-// relay next calls); the class has no clock.
+// A transition clears the window and the probes. The model decides when to call halfOpen() (OPEN_WAIT 90 ticks: at the end of
+// the tick the wait ends; the next call, in the next tick, is the first probe); the class has no clock.
 
 interface BreakerLike {
   readonly state: 'closed' | 'open' | 'half-open';

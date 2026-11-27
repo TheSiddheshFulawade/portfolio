@@ -280,7 +280,8 @@ function audit(t: Trace): Audit {
       if (
         pendingDeliver !== null &&
         e.code !== 'OUTBOX_DELIVERED' &&
-        !e.code.startsWith('BREAKER_')
+        e.code !== 'BREAKER_OPEN' &&
+        e.code !== 'BREAKER_CLOSED'
       ) {
         v['outbox'].push(
           `event ${i}: a successful relay publish of ${pendingDeliver} must be followed by OUTBOX_DELIVERED`,
