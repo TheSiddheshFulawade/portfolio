@@ -46,6 +46,7 @@ export type EventCode =
   | 'MESSAGE_APPLIED'
   | 'REPLY_IGNORED'
   | 'DUPLICATE_DROPPED'
+  | 'REDELIVERED'
   | 'COMMAND_RESENT'
   | 'BROKER_DOWN'
   | 'BROKER_UP'
@@ -277,7 +278,7 @@ export class SagaSim {
     return false;
   }
 
-  /** OutboxRelay: the broker acks one row, which then leaves the outbox. */
+  /** OutboxRelay: the broker acks one row; PayFlow marks it sent, so it no longer waits (the model counts unsent rows). */
   private relay(): boolean {
     const row = this.brokerUp ? this.rows.shift() : undefined;
     if (!row) return false;
@@ -309,7 +310,10 @@ export class SagaSim {
       seen.set(m.messageId, this.queue(m.to, reply, m.attempt));
       this.emit('MESSAGE_APPLIED', m.to, m);
       // the offset was not committed after the database commit (crash or rebalance): Kafka redelivers the command
-      if (this.scenario === 'duplicate-delivery' && m.type === 'CaptureFunds') this.topic.push(m);
+      if (this.scenario === 'duplicate-delivery' && m.type === 'CaptureFunds') {
+        this.emit('REDELIVERED', m.to, m);
+        this.topic.push(m);
+      }
     }
     return true;
   }

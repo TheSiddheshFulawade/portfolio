@@ -13,7 +13,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { sagaContent } from '../../../core/content/saga-content';
-import { SagaSim, SCENARIO_LABELS, type Scenario } from '../../../shared/sim/saga.model';
+import {
+  SagaSim,
+  SCENARIO_LABELS,
+  type SagaEvent,
+  type Scenario,
+} from '../../../shared/sim/saga.model';
 
 /**
  * Model steps per second of playback. The longest scenario has 20 steps, so every run ends in 4 s (REQ-MOT-101).
@@ -39,6 +44,7 @@ const LINE_KIND: Readonly<Record<string, LineKind>> = {
   BROKER_DOWN: 'held',
   WALLET_DOWN: 'held',
   DUPLICATE_DROPPED: 'held',
+  REDELIVERED: 'held',
   REPLY_IGNORED: 'held',
   BROKER_UP: 'ok',
   WALLET_UP: 'ok',
@@ -92,8 +98,14 @@ export class SagaBoardComponent {
   protected readonly status = computed(() => {
     if (!this.started()) return this.copy.status['idle'];
     if (this.finished()) return fill(this.copy.status['done'], { state: this.snap().state });
+    const s = this.snap();
+    if (!s.brokerUp) return this.eventText('BROKER_DOWN', { service: 'broker' });
+    if (!s.walletUp) return this.eventText('WALLET_DOWN', { service: 'wallet' });
     return this.playing() ? this.copy.status['running'] : this.copy.status['paused'];
   });
+  protected readonly stateText = computed(() =>
+    this.snap().state === 'NONE' ? this.copy.fields['stateNone'] : this.snap().state,
+  );
   protected readonly money = computed(() => {
     const w = this.snap().wallets;
     return {
@@ -255,7 +267,7 @@ export class SagaBoardComponent {
       const e = events[this.processed];
       this.logLines.push({
         i: this.processed,
-        text: fill(this.copy.events[e.code], {
+        text: fill(this.copy.events[this.templateOf(e)], {
           service: this.copy.services[e.service],
           type: e.type ?? '',
           id: e.messageId ?? '',
@@ -265,6 +277,17 @@ export class SagaBoardComponent {
       });
     }
     this.lines.set([...this.logLines]);
+  }
+
+  /** A wallet or risk duplicate re-queues its stored reply, so its text says so; the orchestrator stores none. */
+  private templateOf(e: SagaEvent): string {
+    return e.code === 'DUPLICATE_DROPPED' && e.service !== 'payment'
+      ? 'DUPLICATE_DROPPED_REPLY'
+      : e.code;
+  }
+
+  private eventText(code: string, e: { service: string }): string {
+    return fill(this.copy.events[code], { service: this.copy.services[e.service] });
   }
 
   /** True when the log shows its last line, so new lines may keep it there; false once the reader scrolls up. */

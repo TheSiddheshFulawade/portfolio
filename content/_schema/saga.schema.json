@@ -81,6 +81,8 @@
             "MESSAGE_APPLIED",
             "REPLY_IGNORED",
             "DUPLICATE_DROPPED",
+            "DUPLICATE_DROPPED_REPLY",
+            "REDELIVERED",
             "COMMAND_RESENT",
             "BROKER_DOWN",
             "BROKER_UP",

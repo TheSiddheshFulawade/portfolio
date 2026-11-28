@@ -93,6 +93,14 @@ function frames(max: number): number {
   }
   return n;
 }
+let clock = 0;
+/** One frame on a clock that keeps moving across calls (frames() restarts its own clock each time). */
+function oneFrame() {
+  const queued = rafQueue;
+  rafQueue = [];
+  clock += 16;
+  for (const f of queued) f.cb(clock);
+}
 function setHidden(hidden: boolean) {
   Object.defineProperty(document, 'hidden', { value: hidden, configurable: true });
   Object.defineProperty(document, 'visibilityState', {
@@ -152,13 +160,14 @@ afterEach(() => {
 });
 
 describe('REQ-PROJ-105 start, pause and end', () => {
-  it('REQ-PROJ-105 REQ-MOT-101 nothing runs on load: no frame, empty log, state NONE, zero counts', async () => {
+  it('REQ-PROJ-105 REQ-MOT-101 nothing runs on load: no frame, empty log, state "not created yet", zero counts', async () => {
     stubBrowser();
     await render(SagaBoardComponent, { inputs: { seed: SEED } });
 
     expect(rafQueue).toHaveLength(0);
     expect(log().children).toHaveLength(0);
-    expect(id('payment-state')).toBe('NONE');
+    expect(id('payment-state')).toBe(sagaContent.board.fields['stateNone']);
+    expect(text()).not.toContain('NONE');
     for (const s of ['payment', 'wallet', 'risk']) {
       expect(num(`inbox-${s}`)).toBe(0);
       expect(num(`outbox-${s}`)).toBe(0);
@@ -322,6 +331,61 @@ describe('REQ-PROJ-102 REQ-ACC-003 the view draws the model', () => {
     expect(resent.messageId).not.toBe(first.messageId);
     expect(lines.some((l) => l.includes(resent.messageId!))).toBe(true);
     expect(lines.some((l) => l.includes(first.messageId!))).toBe(true);
+  });
+
+  it('REQ-PROJ-102 trap 3 M1: the log gives the cause before the redelivered capture is dropped', async () => {
+    stubBrowser();
+    await board('duplicate-delivery');
+    run();
+    frames(20_000);
+    const lines = [...log().children].map((l) => norm(l.textContent));
+    const cause = lines.findIndex((l) => l.includes('offset was not committed'));
+    const drop = lines.findIndex((l) => l.startsWith('wallet-service: dropped CaptureFunds'));
+
+    expect(cause).toBeGreaterThan(-1);
+    expect(drop).toBeGreaterThan(cause);
+  });
+
+  it('REQ-PROJ-102 trap 2 M2: the wallet duplicate says its stored reply goes out again, and the outbox goes 0 to 1', async () => {
+    stubBrowser();
+    await board('duplicate-delivery');
+    run();
+    const lines = () => [...log().children].map((l) => norm(l.textContent));
+    const dropped = () => lines().find((l) => l.startsWith('wallet-service: dropped CaptureFunds'));
+    expect(num('outbox-wallet')).toBe(0);
+    for (let i = 0; i < 2_000 && !dropped(); i++) oneFrame();
+
+    expect(dropped()).toContain('stored reply goes out again with its original message id');
+    expect(num('outbox-wallet')).toBe(1);
+    frames(20_000);
+    const ids = lines()
+      .filter((l) => l.includes('relay sent FundsCaptured'))
+      .map((l) => /FundsCaptured (\w+),/.exec(l)![1]);
+    expect(ids).toHaveLength(2);
+    expect(ids[0]).toBe(ids[1]);
+  });
+
+  it('REQ-PROJ-102 M2: a payment-service duplicate keeps the plain text, with no stored reply', async () => {
+    stubBrowser();
+    await board('duplicate-delivery');
+    run();
+    frames(20_000);
+    const lines = [...log().children].map((l) => norm(l.textContent));
+    const drop = lines.find((l) => l.startsWith('payment-service: dropped'))!;
+
+    expect(drop).not.toContain('stored reply');
+  });
+
+  it('REQ-PROJ-102 I4: while the broker is down the status line says so, in text', async () => {
+    stubBrowser();
+    await board('broker-outage');
+    run();
+    const status = () => screen.getByRole('status').textContent ?? '';
+    for (let i = 0; i < 2_000 && !status().includes('unavailable'); i++) oneFrame();
+
+    expect(status()).toContain('unavailable');
+    frames(20_000);
+    expect(status()).not.toContain('unavailable');
   });
 
   it('REQ-ACC-003 a different seed changes the message ids shown, not the outcome', async () => {

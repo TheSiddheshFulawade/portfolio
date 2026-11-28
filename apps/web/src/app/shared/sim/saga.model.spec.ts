@@ -39,6 +39,7 @@ import {
  *     REPLY_IGNORED      payment   first delivery of a reply for another attempt: inbox row stays, nothing else
  *     DUPLICATE_DROPPED  consumer; same message id again: inbox unchanged; a wallet or risk consumer queues its
  *                        stored reply again under the stored reply's message id; the orchestrator queues nothing
+ *     REDELIVERED        wallet    the broker delivers a command again (offset not committed after the database commit)
  *     COMMAND_RESENT     payment   the sweeper: same command, NEW message id, attempt + 1, in one commit
  *     BROKER_DOWN, BROKER_UP, WALLET_DOWN, WALLET_UP   (service 'broker' / 'wallet')
  *   message types: ReserveFunds CheckRisk CaptureFunds ReleaseFunds FundsReserved FundsRejected RiskApproved
@@ -633,6 +634,32 @@ describe('PayFlow saga model: outbox, relay and ids', () => {
     });
     expect(t.events.indexOf(dup[0]!)).toBeGreaterThan(t.events.indexOf(applied));
   });
+
+  it('REQ-PF-021 trap 3 M1: Kafka redelivers the capture with a cause event, after the first apply and before the drop', () => {
+    const t = run('duplicate-delivery');
+    const applied = t.events.find(
+      (e) => e.code === 'MESSAGE_APPLIED' && e.type === 'CaptureFunds',
+    )!;
+    const cause = all(t, 'REDELIVERED');
+    const dup = all(t, 'DUPLICATE_DROPPED', 'wallet')[0]!;
+
+    expect(cause).toHaveLength(1);
+    expect(cause[0]).toMatchObject({
+      service: 'wallet',
+      type: 'CaptureFunds',
+      messageId: applied.messageId,
+      attempt: applied.attempt,
+    });
+    expect(t.events.indexOf(cause[0]!)).toBeGreaterThan(t.events.indexOf(applied));
+    expect(t.events.indexOf(cause[0]!)).toBeLessThan(t.events.indexOf(dup));
+  });
+
+  it.each(SCENARIOS.filter((s) => s !== 'duplicate-delivery'))(
+    'REQ-PF-021 trap 3 M1: %s has no redelivery',
+    (s) => {
+      expect(all(run(s), 'REDELIVERED')).toHaveLength(0);
+    },
+  );
 
   it("REQ-PF-021 trap 2 W8: a redelivered command adds no inbox row and no effect, and one outbox row with the stored reply's message id", () => {
     const t = run('duplicate-delivery');
