@@ -194,7 +194,10 @@ test('REQ-SEC-001 REQ-PROJ-101 scrolling the Settlement Lab board into view hydr
 
   const board = page.locator('sf-settlement-board .board');
   await board.scrollIntoViewIfNeeded();
-  await page.locator('sf-settlement-board').getByRole('button', { name: 'Run', exact: true }).waitFor();
+  await page
+    .locator('sf-settlement-board')
+    .getByRole('button', { name: 'Run', exact: true })
+    .waitFor();
   await page.waitForLoadState('networkidle');
 
   // Styled: the board's own stylesheet applies (a blocked stylesheet leaves it at 0 px border and padding).

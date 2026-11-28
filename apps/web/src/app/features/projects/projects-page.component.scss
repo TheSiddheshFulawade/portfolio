@@ -16,13 +16,18 @@
   font-size: var(--step-1);
 }
 
-.cards,
 .earlier-list {
   display: grid;
   gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.project {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .card {

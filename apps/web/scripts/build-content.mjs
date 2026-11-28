@@ -32,6 +32,7 @@ const omit = (object, keys) =>
 
 export const DEFAULT_HOME_FILE = resolve(HERE, '../src/generated/home.json');
 export const DEFAULT_LAB_FILE = resolve(HERE, '../src/generated/lab.json');
+export const DEFAULT_SAGA_FILE = resolve(HERE, '../src/generated/saga.json');
 export const DEFAULT_RESULTS_FILE = resolve(HERE, '../src/generated/results.json');
 export const DEFAULT_BODIES_FILE = resolve(HERE, '../src/generated/bodies.json');
 export const DEFAULT_PUBLIC_DIR = resolve(HERE, '../public');
@@ -212,6 +213,14 @@ export async function buildContent({
     single.lab = data;
   }
 
+  // content/saga.yaml: copy of the PayFlow board (spec 005 RD-08). Optional: only /projects reads it.
+  const sagaPath = join(contentDir, 'saga.yaml');
+  if (existsSync(sagaPath)) {
+    const data = readYaml(sagaPath);
+    if (data !== undefined) check('saga.yaml', 'saga', data);
+    single.saga = data;
+  }
+
   /** REQ-UI-105: the portrait exists, is under 60 KB, is declared 4:5 and has alt text (schema). */
   function checkPhoto(photo) {
     if (!photo || typeof photo !== 'object') return;
@@ -343,6 +352,7 @@ export async function buildContent({
     home,
     results,
     lab: single.lab?.published === false ? null : (single.lab ?? null),
+    saga: single.saga?.published === false ? null : (single.saga ?? null),
     errors,
   };
 }
@@ -389,6 +399,7 @@ export async function main(
     homeOut = DEFAULT_HOME_FILE,
     resultsOut = DEFAULT_RESULTS_FILE,
     labOut = DEFAULT_LAB_FILE,
+    sagaOut = DEFAULT_SAGA_FILE,
     bodiesOut = DEFAULT_BODIES_FILE,
     contentDir = DEFAULT_CONTENT_DIR,
     publicDir = DEFAULT_PUBLIC_DIR,
@@ -396,7 +407,10 @@ export async function main(
     error = console.error,
   } = {},
 ) {
-  const { content, home, results, lab, errors } = await buildContent({ contentDir, publicDir });
+  const { content, home, results, lab, saga, errors } = await buildContent({
+    contentDir,
+    publicDir,
+  });
   if (errors.length) {
     error(
       `build-content: ${errors.length} problem(s) in content/:\n${errors.map((e) => `  - ${e}`).join('\n')}`,
@@ -429,6 +443,7 @@ export async function main(
     [homeOut, home],
     [resultsOut, results],
     [labOut, lab],
+    [sagaOut, saga],
     [bodiesOut, bodies],
   ]) {
     mkdirSync(dirname(file), { recursive: true });

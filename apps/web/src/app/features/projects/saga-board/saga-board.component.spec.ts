@@ -370,15 +370,18 @@ describe('REQ-ACC-004 REQ-ACC-005 labels and copy', () => {
       expect(norm(o.textContent)).toContain(SCENARIO_LABELS[o.value as Scenario]);
   });
 
-  it.each(SCENARIOS)('REQ-ACC-005 %s: the chosen scenario shows its label as text outside the select', async (scenario) => {
-    stubBrowser();
-    const { container } = await board(scenario);
-    const outside = [...container.querySelectorAll('*')]
-      .filter((el) => !el.closest('select') && el.querySelector('select') === null)
-      .map((el) => norm(el.textContent));
+  it.each(SCENARIOS)(
+    'REQ-ACC-005 %s: the chosen scenario shows its label as text outside the select',
+    async (scenario) => {
+      stubBrowser();
+      const { container } = await board(scenario);
+      const outside = [...container.querySelectorAll('*')]
+        .filter((el) => !el.closest('select') && el.querySelector('select') === null)
+        .map((el) => norm(el.textContent));
 
-    expect(outside.some((t) => t.includes(SCENARIO_LABELS[scenario]))).toBe(true);
-  });
+      expect(outside.some((t) => t.includes(SCENARIO_LABELS[scenario]))).toBe(true);
+    },
+  );
 
   it('REQ-ACC-004 REQ-PROJ-102 trap 4: REVERSED is explained as an authorisation reversal, whenever it is on screen', async () => {
     const reversed = norm(sagaContent.board.reversed);
@@ -418,7 +421,9 @@ describe('REQ-ACC-004 REQ-ACC-005 labels and copy', () => {
     const html = readFileSync(`${dir}saga-board.component.html`, 'utf8');
     const ts = readFileSync(`${dir}saga-board.component.ts`, 'utf8');
 
-    expect(html + ts).not.toMatch(/authori[sz]ation reversal|simplified model|167d172|not built yet/i);
+    expect(html + ts).not.toMatch(
+      /authori[sz]ation reversal|simplified model|167d172|not built yet/i,
+    );
   });
 
   it('REQ-ACC-005 a terminal state is text, never colour alone', async () => {
@@ -433,23 +438,26 @@ describe('REQ-ACC-004 REQ-ACC-005 labels and copy', () => {
 });
 
 describe('REQ-MOT-102 reduced motion', () => {
-  it.each(SCENARIOS)('REQ-MOT-102 %s: Run shows the final state at once, with the same text as the animated run', async (scenario) => {
-    stubBrowser();
-    const first = await board(scenario);
-    run();
-    frames(20_000);
-    const animated = text();
-    first.fixture.destroy();
-    first.container.remove();
+  it.each(SCENARIOS)(
+    'REQ-MOT-102 %s: Run shows the final state at once, with the same text as the animated run',
+    async (scenario) => {
+      stubBrowser();
+      const first = await board(scenario);
+      run();
+      frames(20_000);
+      const animated = text();
+      first.fixture.destroy();
+      first.container.remove();
 
-    stubBrowser({ reduced: true });
-    await board(scenario);
-    run();
+      stubBrowser({ reduced: true });
+      await board(scenario);
+      run();
 
-    expect(rafQueue).toHaveLength(0);
-    expect(text()).toBe(animated);
-    expect(readView()).toEqual(expectedView(scenario));
-  });
+      expect(rafQueue).toHaveLength(0);
+      expect(text()).toBe(animated);
+      expect(readView()).toEqual(expectedView(scenario));
+    },
+  );
 });
 
 describe('REQ-SEC-101 CSP: no inline styles, no global class clash', () => {

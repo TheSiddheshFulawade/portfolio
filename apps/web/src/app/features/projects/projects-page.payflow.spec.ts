@@ -12,7 +12,8 @@ import { ProjectsPageComponent } from './projects-page.component';
 // after the link to /projects/payflow and before the link to /projects/settlement-lab.
 
 const root = `${process.cwd()}/src/app/`;
-const template = () => readFileSync(`${root}features/projects/projects-page.component.html`, 'utf8');
+const template = () =>
+  readFileSync(`${root}features/projects/projects-page.component.html`, 'utf8');
 const before = (a: Element, b: Element) =>
   !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
@@ -63,8 +64,7 @@ describe('REQ-PROJ-101 REQ-PROJ-102 /projects composition with PayFlow', () => {
     const files = (readdirSync(root, { recursive: true }) as string[])
       .map((f) => f.replace(/\\/g, '/'))
       .filter((f) => f.endsWith('.ts') && !f.endsWith('.spec.ts'));
-    const importers = (re: RegExp) =>
-      files.filter((f) => re.test(readFileSync(root + f, 'utf8')));
+    const importers = (re: RegExp) => files.filter((f) => re.test(readFileSync(root + f, 'utf8')));
 
     const model = importers(/from\s+['"][^'"]*saga\.model['"]/);
     const content = importers(/from\s+['"][^'"]*saga-content['"]/);
@@ -72,7 +72,8 @@ describe('REQ-PROJ-101 REQ-PROJ-102 /projects composition with PayFlow', () => {
     expect(model.length).toBeGreaterThan(0);
     expect(content.length).toBeGreaterThan(0);
     for (const f of model) expect(f).toMatch(/^(features\/projects\/saga-board\/|shared\/sim\/)/);
-    for (const f of content) expect(f).toMatch(/^(features\/projects\/saga-board\/|core\/content\/)/);
+    for (const f of content)
+      expect(f).toMatch(/^(features\/projects\/saga-board\/|core\/content\/)/);
   });
 
   it('REQ-PROJ-102 the page keeps its detail links and loads no PayFlow figures of its own', async () => {

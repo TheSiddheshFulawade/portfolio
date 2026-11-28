@@ -1,7 +1,7 @@
 import { createRng } from './rng';
 
 /**
- * A simplified model of the PayFlow saga in payflow `SPEC.md` section 4, read at commit 8566bf4 (PF-06).
+ * A simplified model of the PayFlow saga in payflow `SPEC.md` section 4, read at commit 167d172 (PF-01 to PF-06 merged).
  * Pure and deterministic: no clock, timers or DOM. Time is model time in ms, advanced by the model itself.
  * Each `step()` is exactly one of: a commit, one delivery, one relay ack, one fault toggle or one sweeper re-send.
  * An inbox row, the effect and the outgoing message of a delivery commit in the same step.
@@ -91,9 +91,9 @@ export const SCENARIO_LABELS: Record<Scenario, string> = {
   completes: 'merged, tested per service',
   'duplicate-delivery': 'merged, tested per service',
   'insufficient-funds': 'merged, tested per service',
+  'risk-rejection': 'merged, tested per service',
   'broker-outage': 'partly merged',
   'wallet-crash': 'partly merged',
-  'risk-rejection': 'partly merged',
 };
 
 /** First-attempt step deadlines (SPEC section 4). */

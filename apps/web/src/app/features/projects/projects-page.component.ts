@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/seo/seo.service';
 import { ContentService } from '../../core/content/content.service';
 import { labContent } from '../../core/content/lab-content';
+import { SagaBoardComponent } from './saga-board/saga-board.component';
 import { SettlementBoardComponent } from './settlement-board/settlement-board.component';
 import { SettlementResultsComponent } from './settlement-board/settlement-results.component';
 import { StatusPillComponent } from '../../shared/ui/status-pill.component';
@@ -13,7 +14,13 @@ import { StatusPillComponent } from '../../shared/ui/status-pill.component';
  */
 @Component({
   selector: 'sf-projects-page',
-  imports: [RouterLink, StatusPillComponent, SettlementBoardComponent, SettlementResultsComponent],
+  imports: [
+    RouterLink,
+    StatusPillComponent,
+    SagaBoardComponent,
+    SettlementBoardComponent,
+    SettlementResultsComponent,
+  ],
   templateUrl: './projects-page.component.html',
   styleUrl: './projects-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -18,18 +18,21 @@ describe('ProjectsPageComponent', () => {
 
   it('REQ-PAGE-004 REQ-CONTENT-004 lists current projects in content order, each linking to its page', async () => {
     const content = await setup();
-    const current = screen.getByRole('list', { name: 'Projects' });
-    const titles = within(current)
-      .getAllByRole('heading', { level: 2 })
-      .map((h) => h.textContent?.trim());
+    const sections = content.currentProjects.map((p) =>
+      screen.getByRole('region', { name: p.title }),
+    );
 
-    expect(titles).toEqual(content.currentProjects.map((p) => p.title));
-    for (const project of content.currentProjects) {
-      expect(within(current).getByRole('link', { name: project.title }).getAttribute('href')).toBe(
+    content.currentProjects.forEach((project, i) => {
+      const section = sections[i];
+      expect(within(section).getByRole('link', { name: project.title }).getAttribute('href')).toBe(
         `/projects/${project.id}`,
       );
-      expect(within(current).getByText(project.tagline)).toBeTruthy();
-    }
+      expect(within(section).getByText(project.tagline)).toBeTruthy();
+      if (i > 0)
+        expect(
+          sections[i - 1].compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+    });
   });
 
   it('REQ-PAGE-004 shows earlier work in its own section, linking to detail pages only', async () => {
