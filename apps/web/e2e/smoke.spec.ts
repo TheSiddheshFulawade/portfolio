@@ -194,7 +194,10 @@ test('REQ-SEC-001 REQ-PROJ-101 scrolling the Settlement Lab board into view hydr
 
   const board = page.locator('sf-settlement-board .board');
   await board.scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: 'Run', exact: true }).waitFor();
+  await page
+    .locator('sf-settlement-board')
+    .getByRole('button', { name: 'Run', exact: true })
+    .waitFor();
   await page.waitForLoadState('networkidle');
 
   // Styled: the board's own stylesheet applies (a blocked stylesheet leaves it at 0 px border and padding).
@@ -203,6 +206,43 @@ test('REQ-SEC-001 REQ-PROJ-101 scrolling the Settlement Lab board into view hydr
     return { border: s.borderTopWidth, padding: s.paddingTop };
   });
   expect(css.border === '0px' && css.padding === '0px', 'board is unstyled').toBe(false);
+  expect(
+    await page.evaluate(() => (window as unknown as { cspViolations: string[] }).cspViolations),
+  ).toEqual([]);
+  expect(problems).toEqual([]);
+});
+
+test('REQ-SEC-101 REQ-PROJ-102 scrolling the PayFlow board into view hydrates it styled, with no CSP violation', async ({
+  page,
+}) => {
+  const problems: string[] = [];
+  page.on('console', (m) => {
+    if (/content security policy|violates|style-src/i.test(m.text())) problems.push(m.text());
+  });
+  await page.addInitScript(() => {
+    const w = window as unknown as { cspViolations: string[] };
+    w.cspViolations = [];
+    document.addEventListener('securitypolicyviolation', (e) =>
+      w.cspViolations.push(`${e.violatedDirective} ${e.blockedURI || 'inline'} ${e.sample}`),
+    );
+  });
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/projects', { waitUntil: 'networkidle' });
+
+  const board = page.locator('sf-saga-board .saga-board');
+  await board.scrollIntoViewIfNeeded();
+  const run = page.locator('sf-saga-board').getByRole('button', { name: 'Run', exact: true });
+  await run.waitFor();
+  await page.waitForLoadState('networkidle');
+
+  const css = await board.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { border: s.borderTopWidth, padding: s.paddingTop };
+  });
+  expect(css.border === '0px' && css.padding === '0px', 'PayFlow board is unstyled').toBe(false);
+
+  await run.click();
+  await expect(page.locator('sf-saga-board').getByTestId('payment-state')).not.toHaveText('NONE');
   expect(
     await page.evaluate(() => (window as unknown as { cspViolations: string[] }).cspViolations),
   ).toEqual([]);

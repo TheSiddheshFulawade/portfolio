@@ -322,3 +322,20 @@ export interface LabContent {
     invariantsFailed: string;
   };
 }
+
+/** Copy of the PayFlow board (content/saga.yaml, spec 005 RD-08). */
+export interface SagaContent {
+  board: {
+    heading: string;
+    label: string;
+    lead: string;
+    notes: string[];
+    reversed: string;
+    controls: Texts;
+    scenarios: Texts;
+    fields: Texts;
+    services: Texts;
+    status: Texts;
+    events: Texts;
+  };
+}

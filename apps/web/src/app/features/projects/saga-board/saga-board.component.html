@@ -1,0 +1,98 @@
+<section
+  class="saga-board"
+  aria-labelledby="saga-title"
+  [attr.aria-busy]="playing() ? 'true' : null"
+>
+  <header class="head">
+    <h2 id="saga-title">{{ copy.heading }}</h2>
+    <p class="tag">{{ copy.label }}</p>
+    <p class="lead-text">{{ copy.lead }}</p>
+  </header>
+
+  <div class="bar">
+    <div class="control">
+      <label for="saga-scenario">{{ copy.controls['scenario'] }}</label>
+      <select id="saga-scenario" (change)="choose($any($event.target).value)">
+        @for (s of scenarios; track s) {
+          <option [value]="s" [selected]="s === scenario()">
+            {{ copy.scenarios[s] }} ({{ labels[s] }})
+          </option>
+        }
+      </select>
+    </div>
+    <button type="button" class="btn solid run" (click)="toggle()">{{ buttonText() }}</button>
+  </div>
+
+  <p class="coverage">{{ copy.fields['coverage'] }} {{ label() }}</p>
+  <p class="status-line" role="status">{{ status() }}</p>
+
+  <div class="state-row">
+    <h3 class="cap">{{ copy.fields['state'] }}</h3>
+    <p class="state" data-testid="payment-state">{{ stateText() }}</p>
+  </div>
+
+  <div class="tables">
+    <table>
+      <thead>
+        <tr>
+          <td></td>
+          <th scope="col">{{ copy.fields['inbox'] }}</th>
+          <th scope="col">{{ copy.fields['outbox'] }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of counts(); track c.svc) {
+          <tr>
+            <th scope="row">{{ c.name }}</th>
+            <td [attr.data-testid]="'inbox-' + c.svc">{{ c.inbox }}</td>
+            <td [attr.data-testid]="'outbox-' + c.svc">{{ c.outbox }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <table>
+      <thead>
+        <tr>
+          <td></td>
+          <th scope="col">{{ copy.fields['available'] }}</th>
+          <th scope="col">{{ copy.fields['held'] }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">{{ copy.fields['payer'] }}</th>
+          <td data-testid="payer-available">{{ money().payer.available }}</td>
+          <td data-testid="payer-held">{{ money().payer.held }}</td>
+        </tr>
+        <tr>
+          <th scope="row">{{ copy.fields['payee'] }}</th>
+          <td data-testid="payee-available">{{ money().payee.available }}</td>
+          <td data-testid="payee-held">{{ money().payee.held }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" colspan="2">{{ copy.fields['sigma'] }}</th>
+          <td data-testid="sigma">{{ money().sigma }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <section class="log-part" aria-labelledby="saga-log">
+    <h3 id="saga-log" class="cap">{{ copy.fields['log'] }}</h3>
+    <ol #log class="log" role="log" tabindex="0" aria-labelledby="saga-log">
+      @for (line of lines(); track line.i) {
+        <li [class]="'l-' + line.kind">{{ line.text }}</li>
+      }
+    </ol>
+  </section>
+
+  <div class="notes">
+    <p class="note-text reversed">{{ copy.reversed }}</p>
+    @for (note of copy.notes; track $index) {
+      <p class="note-text">{{ note }}</p>
+    }
+  </div>
+</section>

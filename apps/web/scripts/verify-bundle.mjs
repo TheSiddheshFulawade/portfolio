@@ -24,6 +24,8 @@ export function pageOnlySamples(generated) {
   if (field) out.push(['invariant field copy', sample(field)]);
   const lab = generated.lab?.board?.notes?.[0];
   if (lab) out.push(['lab copy', sample(lab)]);
+  const saga = generated.saga?.board?.notes?.[0];
+  if (saga) out.push(['PayFlow board copy', sample(saga)]);
   const result = Object.values(generated.results ?? {})[0];
   if (result) out.push(['results', sample(result.workload)]);
   const body = Object.values(generated.bodies ?? {})[0];
@@ -53,6 +55,7 @@ export function main(distArg = process.argv[2]) {
     home: read('home'),
     results: read('results'),
     lab: read('lab'),
+    saga: read('saga'),
     bodies: read('bodies'),
   };
   const found = leaks(readFileSync(join(browser, mains[0]), 'utf8'), generated);

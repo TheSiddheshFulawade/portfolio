@@ -3,11 +3,11 @@
   <p class="lede">{{ page.description }}</p>
 </header>
 
-<ul class="cards" aria-labelledby="projects-title">
-  @for (project of current; track project.id) {
-    <li class="card">
+@for (project of current; track project.id) {
+  <section class="project" [attr.aria-labelledby]="'project-' + project.id">
+    <div class="card">
       <div class="card-top">
-        <h2>
+        <h2 [id]="'project-' + project.id">
           <a [routerLink]="['/projects', project.id]">{{ project.title }}</a>
         </h2>
         <sf-status-pill [label]="project.status" />
@@ -18,21 +18,29 @@
           <li>{{ tech }}</li>
         }
       </ul>
-    </li>
-  }
-</ul>
-
-<section class="lab" aria-labelledby="lab-title">
-  <h2 id="lab-title">{{ lab.heading }}</h2>
-  @defer (on idle; hydrate on viewport) {
-    <sf-settlement-board />
-  } @placeholder {
-    <div class="lab-placeholder">
-      <p>{{ lab.lead }}</p>
     </div>
-  }
-  <sf-settlement-results />
-</section>
+    @switch (project.id) {
+      @case ('payflow') {
+        @defer (on idle; hydrate on viewport) {
+          <sf-saga-board />
+        }
+      }
+      @case ('settlement-lab') {
+        <section class="lab" aria-labelledby="lab-title">
+          <h2 id="lab-title">{{ lab.heading }}</h2>
+          @defer (on idle; hydrate on viewport) {
+            <sf-settlement-board />
+          } @placeholder {
+            <div class="lab-placeholder">
+              <p>{{ lab.lead }}</p>
+            </div>
+          }
+          <sf-settlement-results />
+        </section>
+      }
+    }
+  </section>
+}
 
 @if (earlier.length) {
   <section class="earlier" aria-labelledby="earlier-title">

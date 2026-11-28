@@ -114,7 +114,7 @@ One branch and PR per task (ADR-0005). RD-03 and RD-04 can run in parallel; so c
       set is asserted per seed (POSTINGS_EXPLAIN_BALANCES always, TOTAL_CONSERVED on these seeds); the six checks equal
       `InvariantChecker` and take accepted ids from callers' outcomes; 3 attempts; never open → closed directly; duplicates use no queue
       slot; every seed rejects some transfers; one playback rate for all modes; outbox drains.
-- [ ] RD-08 [web] PayFlow model and view (REQ-PROJ-102, 105). Tests first: each scenario's terminal state, one terminal state only, Σ constant after every
+- [x] RD-08 [web] PayFlow model and view (REQ-PROJ-102, 105). Tests first: each scenario's terminal state, one terminal state only, Σ constant after every
       step, no effect before its commit, re-send has a new id, redelivery has the same id, late attempt ignored; inbox,
       effect and outgoing message in one step; RECEIVED never alone; outbox falls only after the ack; a redelivered command
       adds an outbox row with the stored reply's message id and no inbox row; a redelivered reply adds neither; each COMPLETED has exactly

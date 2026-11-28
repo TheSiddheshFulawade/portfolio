@@ -50,6 +50,18 @@ if (existsSync(projects)) {
       `${projects} does not contain the prerendered Settlement Lab board (selects and Run button)`,
     );
 }
+// REQ-SEC-101: the same for the PayFlow board (scenario select and Run button).
+if (existsSync(projects)) {
+  const html = readFileSync(projects, 'utf8');
+  if (
+    !/<sf-saga-board[^>]*>(?:(?!<\/sf-saga-board>)[\s\S])*?<select(?:(?!<\/sf-saga-board>)[\s\S])*?<button/.test(
+      html,
+    )
+  )
+    errors.push(
+      `${projects} does not contain the prerendered PayFlow board (scenario select and Run button)`,
+    );
+}
 for (const server of find(dist, 'server.mjs'))
   errors.push(`${server} was emitted (output must be static, no server)`);
 

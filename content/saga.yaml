@@ -1,0 +1,66 @@
+# Copy of the PayFlow board on /projects (spec 005 RD-08). The notes and `reversed` are audited wording: change them only
+# with a re-audit. Source: payflow SPEC.md section 4 and the section 8 task list, read at commit 167d172.
+id: saga
+published: true
+updated: 2026-11-28
+board:
+  heading: PayFlow in the browser
+  label: Simplified model
+  lead: Choose a scenario and run one payment through three services. Watch each outbox, inbox and wallet change, and the log of every message. Nothing runs on a server.
+  notes:
+    - A simplified model of the saga in SPEC.md section 4 of payflow, read at commit 167d172. Message ids come from the model's seed, the amounts are small examples in minor units, and nothing here is a measurement.
+    - "Merged at that commit: the messaging library, wallet-service, risk-service, and payment-service with compensation, timeouts and the sweeper (PF-01 to PF-06). Each is tested on its own service. Nothing yet runs the three services together."
+    - 'The label beside each scenario says how much of it is built. "Merged, tested per service" means each step has a merged test for its own service. "Partly merged" means the pieces are tested per service, but stopping a real wallet or broker is a system test in PF-09.'
+    - PF-07 to PF-12 (security, containers and a demo script, system tests with chaos scenarios, reconciliation, the README and the release) are specified, not built yet.
+    - The model takes one step at a time, such as a commit, a delivery, an acknowledgement from the broker, a fault or a sweeper re-send. The sweeper acts only when nothing else can, so it never races a reply, and compensation after repeated timeouts is not modelled.
+    - "A redelivered message keeps its message id, and the inbox drops it. A command the sweeper re-sends gets a new message id and a higher attempt number, and the wallet's hold row and risk-service's decision row stop a second effect. Replies count only for the payment's current attempt, except while it releases a hold: the wallet's answer to any release attempt states the hold's final state, so it counts."
+    - Capture moves the balance at once, as in PayFlow. In card payments a capture submits the payment for clearing, and money moves at settlement.
+  reversed: 'REVERSED is an authorisation reversal. Any hold was released and nothing was captured, so this payment moved no money between the wallets: whatever it held is back in the payer''s available balance.'
+  controls:
+    scenario: Scenario
+    run: Run
+    pause: Pause
+    resume: Resume
+  scenarios:
+    completes: Payment completes
+    wallet-crash: Wallet-service stops, then returns
+    duplicate-delivery: Capture delivered twice (the wallet restarts before committing its offset)
+    risk-rejection: "Risk check rejects the payment (velocity: the payer's sixth payment within 60 s)"
+    broker-outage: Broker unavailable for 4 s of model time (the command waits unsent in the outbox; the sweeper never re-sends an unsent command)
+    insufficient-funds: Payer has too little available
+  fields:
+    coverage: 'What is built:'
+    state: Payment state
+    stateNone: not created yet
+    payer: Payer wallet
+    payee: Payee wallet
+    available: Available
+    held: Held
+    sigma: Available plus held, both wallets
+    inbox: Inbox rows
+    outbox: Outbox rows waiting for the broker
+    log: Event log
+  services:
+    payment: payment-service
+    wallet: wallet-service
+    risk: risk-service
+    broker: Kafka broker
+  status:
+    idle: Choose a scenario, then run the model.
+    running: Running the model.
+    paused: Paused.
+    done: 'Run ended: the payment is {state}, every outbox row was acknowledged and every message was consumed.'
+  events:
+    PAYMENT_COMMITTED: '{service}: committed the payment, its state and the first command together.'
+    HTTP_202: '{service}: answered the client with 202 Accepted, after that commit.'
+    RELAY_PUBLISHED: '{service}: relay sent {type} {id}, attempt {attempt}. The broker acknowledged it, so its outbox row is marked sent and no longer waits.'
+    MESSAGE_APPLIED: '{service}: applied {type} {id}, attempt {attempt}. The inbox row, the effect and any outgoing message were committed together.'
+    REPLY_IGNORED: "{service}: ignored {type} {id}, attempt {attempt}. It does not match the payment's current step and attempt."
+    DUPLICATE_DROPPED: '{service}: dropped {type} {id}, attempt {attempt}. The inbox already holds this message id, so there is no second effect.'
+    DUPLICATE_DROPPED_REPLY: '{service}: dropped {type} {id}, attempt {attempt}. The inbox already holds this message id, so there is no second effect. Its stored reply goes out again with its original message id.'
+    REDELIVERED: '{service}: the offset of {type} {id} was not committed after its database commit (a restart or a consumer-group rebalance), so Kafka will deliver it again.'
+    COMMAND_RESENT: '{service}: sweeper re-sent {type} as attempt {attempt}, under a new message id {id}.'
+    BROKER_DOWN: '{service}: unavailable. Outbox rows wait.'
+    BROKER_UP: '{service}: available again. The relay sends the waiting rows.'
+    WALLET_DOWN: '{service}: stopped. It consumes nothing.'
+    WALLET_UP: '{service}: running again.'
