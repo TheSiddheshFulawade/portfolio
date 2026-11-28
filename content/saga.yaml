@@ -26,7 +26,7 @@ board:
     wallet-crash: Wallet-service stops, then returns
     duplicate-delivery: Capture delivered twice (the wallet restarts before committing its offset)
     risk-rejection: "Risk check rejects the payment (velocity: the payer's sixth payment within 60 s)"
-    broker-outage: Broker unavailable for 4 s of model time (under the 10 s deadline, so nothing is re-sent)
+    broker-outage: Broker unavailable for 4 s of model time (the command waits unsent in the outbox; the sweeper never re-sends an unsent command)
     insufficient-funds: Payer has too little available
   fields:
     coverage: 'What is built:'
@@ -58,7 +58,7 @@ board:
     REPLY_IGNORED: "{service}: ignored {type} {id}, attempt {attempt}. It does not match the payment's current step and attempt."
     DUPLICATE_DROPPED: '{service}: dropped {type} {id}, attempt {attempt}. The inbox already holds this message id, so there is no second effect.'
     DUPLICATE_DROPPED_REPLY: '{service}: dropped {type} {id}, attempt {attempt}. The inbox already holds this message id, so there is no second effect. Its stored reply goes out again with its original message id.'
-    REDELIVERED: '{service}: Kafka delivers {type} {id} again. Its database commit was done, but the offset was not committed (a restart or a consumer-group rebalance).'
+    REDELIVERED: '{service}: the offset of {type} {id} was not committed after its database commit (a restart or a consumer-group rebalance), so Kafka will deliver it again.'
     COMMAND_RESENT: '{service}: sweeper re-sent {type} as attempt {attempt}, under a new message id {id}.'
     BROKER_DOWN: '{service}: unavailable. Outbox rows wait.'
     BROKER_UP: '{service}: available again. The relay sends the waiting rows.'

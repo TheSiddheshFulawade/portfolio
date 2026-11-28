@@ -339,7 +339,7 @@ describe('REQ-PROJ-102 REQ-ACC-003 the view draws the model', () => {
     run();
     frames(20_000);
     const lines = [...log().children].map((l) => norm(l.textContent));
-    const cause = lines.findIndex((l) => l.includes('offset was not committed'));
+    const cause = lines.findIndex((l) => l.includes('was not committed after its database commit'));
     const drop = lines.findIndex((l) => l.startsWith('wallet-service: dropped CaptureFunds'));
 
     expect(cause).toBeGreaterThan(-1);
